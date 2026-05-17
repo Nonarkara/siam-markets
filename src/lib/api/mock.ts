@@ -1,0 +1,143 @@
+/**
+ * Mock data — used when APIs are unavailable or keys not yet configured.
+ * Provides realistic SET50 data so the UI renders fully on first load.
+ */
+
+import type { IndexQuote, StockFundamentals, WorldEvent, MacroPill } from "../types";
+import { grahamNumber, marginOfSafety } from "../graham";
+
+// ─── Mock Market Pulse ────────────────────────────────────────────
+
+export const MOCK_SET: IndexQuote = {
+  symbol: "^SET.BK",
+  name: "SET",
+  price: 1312.45,
+  change: -8.23,
+  changePct: -0.62,
+  high52w: 1506.22,
+  low52w: 1202.34,
+  updatedAt: new Date().toISOString(),
+};
+
+export const MOCK_INDICES: IndexQuote[] = [
+  { symbol: "^GSPC",  name: "S&P 500",   price: 5247.49, change: 23.1,   changePct: 0.44,  high52w: 5783, low52w: 4103, updatedAt: new Date().toISOString() },
+  { symbol: "^N225",  name: "Nikkei",    price: 38412.0, change: -201.3, changePct: -0.52, high52w: 42426, low52w: 30487, updatedAt: new Date().toISOString() },
+  { symbol: "^HSI",   name: "Hang Seng", price: 19832.2, change: 142.5,  changePct: 0.72,  high52w: 22504, low52w: 14794, updatedAt: new Date().toISOString() },
+  { symbol: "^ESTI",  name: "STI",       price: 3812.1,  change: -6.3,   changePct: -0.17, high52w: 3955,  low52w: 3012,  updatedAt: new Date().toISOString() },
+];
+
+export const MOCK_MACRO: MacroPill = {
+  fedRate: 5.25,
+  thCpi: 2.1,
+  setPe: 15.4,
+  cape: 34.2,
+  thbUsd: 33.5,
+};
+
+// ─── Mock SET50 Fundamentals ──────────────────────────────────────
+
+function makeFundamental(
+  symbol: string, name: string, sector: string,
+  price: number, eps: number, bvps: number,
+  pe: number, pb: number, roe: number, roe10: number,
+  divYield: number, de: number, grossMargin: number,
+  moat: "wide" | "narrow" | "none" | "unknown",
+): StockFundamentals {
+  const gn = grahamNumber(eps, bvps);
+  const mos = marginOfSafety(price, gn);
+  const dScore = [
+    true,                  // adequate size
+    de < 1,                // financial strength
+    true,                  // earnings stability (assumed for SET50)
+    divYield > 0,          // dividend record
+    true,                  // earnings growth (assumed)
+    pe <= 15,              // P/E ≤ 15
+    pb <= 1.5,             // P/B ≤ 1.5
+  ].filter(Boolean).length;
+
+  const bScore = (
+    (roe10 >= 20 ? 2 : 0) +
+    (roe >= 15 ? 2 : 0) +
+    (de < 1 ? 2 : 0) +
+    (grossMargin > 40 ? 2 : 0) +
+    2  // simplified: assume FCF > NI for mocks
+  );
+
+  return {
+    symbol, name, sector, price, eps, bvps, pe, pb,
+    roe, roe10, dividendYield: divYield, debtToEquity: de,
+    grossMargin, fcf: eps * 0.85, netIncome: eps,
+    marketCap: price * 1e8,
+    grahamNumber: gn,
+    marginOfSafety: mos,
+    defensiveScore: dScore,
+    buffettScore: Math.min(10, bScore),
+    moat,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export const MOCK_STOCKS: StockFundamentals[] = [
+  makeFundamental("PTT.BK",    "PTT",             "Energy",      35.5, 3.2,  38.1,  11.1, 0.93, 14.2, 12.1, 5.2, 0.6,  22.1, "wide"),
+  makeFundamental("ADVANC.BK", "Advanced Info",   "Telecom",     232.0, 12.4, 45.2, 18.7, 5.1,  82.5, 75.3, 6.1, 1.2,  68.4, "wide"),
+  makeFundamental("KBANK.BK",  "Kasikorn Bank",   "Banking",     141.0, 18.6, 192.4, 7.6, 0.73, 9.8,  9.2,  3.0, 7.8,  55.2, "narrow"),
+  makeFundamental("SCB.BK",    "SCB",             "Banking",     108.5, 13.2, 148.7, 8.2, 0.73, 9.1,  8.8,  2.8, 8.2,  52.1, "narrow"),
+  makeFundamental("BBL.BK",    "Bangkok Bank",    "Banking",     157.0, 20.1, 218.5, 7.8, 0.72, 9.3,  8.9,  3.1, 6.1,  54.3, "narrow"),
+  makeFundamental("CPALL.BK",  "CP All",          "Consumer",    64.5,  2.9,  12.8,  22.2, 5.0,  38.4, 35.1, 1.8, 1.8,  28.3, "wide"),
+  makeFundamental("GULF.BK",   "Gulf Energy",     "Utilities",   44.75, 1.8,  22.3,  24.9, 2.0,  11.2, 10.8, 2.1, 2.4,  32.1, "narrow"),
+  makeFundamental("PTTGC.BK",  "PTTGC",           "Chemicals",   43.5,  1.2,  65.4,  36.3, 0.67, 3.1,  5.2,  4.0, 0.9,  18.2, "narrow"),
+  makeFundamental("SCC.BK",    "Siam Cement",     "Materials",   360.0, 30.2, 326.8, 11.9, 1.10, 9.8,  12.3, 4.2, 1.1,  28.9, "wide"),
+  makeFundamental("MINT.BK",   "Minor Int'l",     "Tourism",     33.25, 1.4,  16.2,  23.8, 2.05, 9.2,  8.1,  1.2, 1.8,  35.6, "narrow"),
+  makeFundamental("CPN.BK",    "Central Pattana", "Real Estate", 58.75, 3.1,  28.4,  19.0, 2.07, 11.4, 10.2, 2.8, 1.9,  45.2, "wide"),
+  makeFundamental("HMPRO.BK",  "HomePro",         "Consumer",    14.8,  0.72, 5.8,   20.6, 2.55, 30.1, 28.4, 3.5, 0.5,  38.4, "narrow"),
+  makeFundamental("AOT.BK",    "Airports of TH",  "Transport",   63.25, 2.1,  16.8,  30.1, 3.77, 12.8, 18.3, 1.2, 0.1,  55.8, "wide"),
+  makeFundamental("TRUE.BK",   "True Corp",       "Telecom",     9.15,  0.21, 6.4,   43.6, 1.43, 3.2,  2.8,  0.0, 3.2,  42.1, "narrow"),
+  makeFundamental("RATCH.BK",  "Ratchaburi",      "Utilities",   35.5,  4.2,  52.3,  8.5,  0.68, 8.3,  9.1,  5.8, 0.7,  31.2, "narrow"),
+];
+
+// ─── Mock World Events ────────────────────────────────────────────
+
+export const MOCK_EVENTS: WorldEvent[] = [
+  {
+    id: "evt-1", date: "2026-05-15T09:00:00Z",
+    headline: "Fed signals potential rate pause in June meeting",
+    country: "US", countryName: "United States",
+    sentiment: 0.12, setChangePct: 1.3, spxChangePct: 0.8,
+    source: "reuters.com",
+  },
+  {
+    id: "evt-2", date: "2026-05-14T06:30:00Z",
+    headline: "US-China trade tensions escalate over semiconductor exports",
+    country: "CN", countryName: "China",
+    sentiment: -0.45, setChangePct: -0.9, spxChangePct: -1.2,
+    source: "ft.com",
+  },
+  {
+    id: "evt-3", date: "2026-05-13T11:00:00Z",
+    headline: "Thailand GDP growth beats forecast at 3.2% in Q1 2026",
+    country: "TH", countryName: "Thailand",
+    sentiment: 0.38, setChangePct: 1.8, spxChangePct: null,
+    source: "bangkokpost.com",
+  },
+  {
+    id: "evt-4", date: "2026-05-12T08:00:00Z",
+    headline: "BOT holds policy rate at 2.5% amid global uncertainty",
+    country: "TH", countryName: "Thailand",
+    sentiment: 0.05, setChangePct: -0.3, spxChangePct: null,
+    source: "bot.or.th",
+  },
+  {
+    id: "evt-5", date: "2026-05-10T04:00:00Z",
+    headline: "Oil prices fall 4% on OPEC+ supply increase announcement",
+    country: "US", countryName: "United States",
+    sentiment: -0.28, setChangePct: -1.4, spxChangePct: -0.7,
+    source: "bloomberg.com",
+  },
+  {
+    id: "evt-6", date: "2026-05-08T07:30:00Z",
+    headline: "ASEAN economic ministers agree on digital trade framework",
+    country: "SG", countryName: "Singapore",
+    sentiment: 0.22, setChangePct: 0.5, spxChangePct: 0.2,
+    source: "channelnewsasia.com",
+  },
+];

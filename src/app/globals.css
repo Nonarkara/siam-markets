@@ -1,0 +1,290 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+/* ─── Design Tokens ─────────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --bg:          #0d0d0d;
+  --bg-raised:   #161616;
+  --bg-surface:  #1e1e1e;
+  --bg-hover:    #242424;
+
+  /* Type */
+  --ink:    #e8e8e8;
+  --muted:  #888884;
+  --dim:    #4a4a46;
+
+  /* Borders */
+  --line:     #2a2a2a;
+  --line-dim: #1e1e1e;
+
+  /* Signal palette */
+  --bull:    #00c896;   /* gain, growth, buy */
+  --bear:    #ff3b30;   /* loss, danger, sell */
+  --caution: #ff9500;   /* watch, neutral */
+  --tech:    #007aff;   /* UI chrome, links */
+
+  /* Bull/bear with opacity */
+  --bull-10:  rgba(0, 200, 150, 0.10);
+  --bull-20:  rgba(0, 200, 150, 0.20);
+  --bear-10:  rgba(255, 59, 48, 0.10);
+  --bear-20:  rgba(255, 59, 48, 0.20);
+  --caution-10: rgba(255, 149, 0, 0.10);
+
+  /* Typography scale — three sizes only (§11.7) */
+  --text-display: 2rem;       /* 32px — page titles, hero numbers */
+  --text-body:    0.875rem;   /* 14px — labels, captions, data */
+  --text-micro:   0.6875rem;  /* 11px — eyebrows, timestamps */
+
+  /* Fonts */
+  --font-display: "Josefin Sans", system-ui, sans-serif;
+  --font-body:    "Source Sans 3", system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", "Courier New", monospace;
+
+  /* Motion */
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur:  240ms;
+
+  /* Layout */
+  --nav-h: 64px;       /* mobile bottom nav height */
+  --top-h: 52px;       /* desktop top nav height */
+  --pad:   16px;       /* page horizontal padding */
+  --gap:   12px;       /* card gap */
+  --radius: 0px;       /* zero border-radius — always */
+}
+
+/* ─── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important;   /* enforce zero — no exceptions */
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+  padding-bottom: var(--nav-h);
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding-bottom: 0;
+    padding-top: var(--top-h);
+  }
+}
+
+/* ─── Typography utilities ───────────────────────────────────────── */
+.t-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+.t-micro {
+  font-family: var(--font-body);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.t-mono-display {
+  font-family: var(--font-mono);
+  font-size: var(--text-display);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Layout utilities ───────────────────────────────────────────── */
+.page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--pad);
+  padding-top: 20px;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 1200px;
+    padding: 24px 32px;
+  }
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  padding: 16px;
+}
+
+.card--raised {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  padding: 16px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  width: 100%;
+}
+
+/* ─── Signal colors ──────────────────────────────────────────────── */
+.bull  { color: var(--bull); }
+.bear  { color: var(--bear); }
+.caution { color: var(--caution); }
+.muted { color: var(--muted); }
+
+.bg-bull  { background: var(--bull-10); }
+.bg-bear  { background: var(--bear-10); }
+.bg-caution { background: var(--caution-10); }
+
+/* ─── Interactive targets (§11.8) ───────────────────────────────── */
+.tap-target {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+
+.tap-target:hover {
+  background: var(--bg-hover);
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--tech);
+  outline-offset: 2px;
+}
+
+/* ─── Filter chips ───────────────────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: var(--text-micro);
+  font-family: var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+  white-space: nowrap;
+}
+
+.chip:hover,
+.chip.active {
+  color: var(--ink);
+  border-color: var(--ink);
+  background: var(--bg-hover);
+}
+
+.chip.active {
+  color: var(--bull);
+  border-color: var(--bull);
+}
+
+/* ─── Scrollbars ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--dim); }
+
+/* ─── Loading shimmer ────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-hover)   50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+/* ─── Page entry animation ───────────────────────────────────────── */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: pageEnter 400ms var(--ease) both;
+}
+
+/* ─── Horizontal scroll row (global indices) ─────────────────────── */
+.scroll-row {
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.scroll-row::-webkit-scrollbar { display: none; }
+
+.scroll-row > * {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* ─── Desktop grid ───────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap);
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--gap);
+  }
+
+  .grid-2-1 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--gap);
+  }
+}
