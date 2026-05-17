@@ -1,142 +1,153 @@
-import { FearGreedDial } from "@/components/Market/FearGreedDial";
-import { MacroPillBar } from "@/components/Market/MacroPill";
-import { TopMovers } from "@/components/Market/TopMovers";
+import { KPIStrip } from "@/components/KPI/KPIStrip";
+import { SignalFeed } from "@/components/KPI/SignalFeed";
 import { RegionalGrid } from "@/components/Market/RegionalGrid";
+import { FearGreedDial } from "@/components/Market/FearGreedDial";
+import { TopMovers } from "@/components/Market/TopMovers";
 import { MOCK_MACRO, MOCK_STOCKS } from "@/lib/api/mock";
 import { fetchFearGreed } from "@/lib/api/feargreed";
 import { fetchThbRate, fetchThaiMonetary, fetchThaiRates } from "@/lib/api/bot";
 import { fetchMacro } from "@/lib/api/fred";
-import { fetchAllRegional, fetchYahooQuote } from "@/lib/api/yahoo";
+import { fetchAllRegional } from "@/lib/api/yahoo";
+import { buildSignalFeed } from "@/lib/signals";
 import { fmtNum, fmtPct, pctColor } from "@/lib/format";
 import type { MacroPill } from "@/lib/types";
 
 export const revalidate = 300;
 
 export default async function PulsePage() {
-  const [fearGreed, thb, macro, regional, botMonetary, botRates] = await Promise.all([
+  const [fearGreed, thb, macro, regional] = await Promise.all([
     fetchFearGreed(),
     fetchThbRate(),
     fetchMacro(),
     fetchAllRegional(),
-    fetchThaiMonetary(),
-    fetchThaiRates(),
   ]);
 
   const liveSet = regional.thai[0] ?? null;
+  const setPe = MOCK_MACRO.setPe;
 
-  const macroPill: MacroPill = {
-    fedRate: macro.usFedFundsRate  ?? MOCK_MACRO.fedRate,
-    thCpi:   MOCK_MACRO.thCpi,
-    setPe:   MOCK_MACRO.setPe,
-    cape:    MOCK_MACRO.cape,
-    thbUsd:  thb.usd,
+  // Build processed signals — highest value items first
+  const signals = buildSignalFeed({
+    fearGreed,
+    setPe,
+    fedRate: macro.usFedFundsRate ?? MOCK_MACRO.fedRate,
+    thbUsd: thb.usd,
+    watchlistStocks: MOCK_STOCKS.slice(0, 3),
+  });
+
+  // Best margin of safety from SET50 mock
+  const bestMos = MOCK_STOCKS.reduce((best, s) =>
+    s.marginOfSafety > best.marginOfSafety ? s : best, MOCK_STOCKS[0]);
+
+  const kpiData = {
+    fearGreed: fearGreed.score,
+    setPe,
+    fedRate: macro.usFedFundsRate ?? MOCK_MACRO.fedRate,
+    thbUsd: thb.usd,
+    bestMos: bestMos.marginOfSafety,
+    bestMosSymbol: bestMos.symbol,
+    grahamStocks: MOCK_STOCKS.filter(s => s.pe <= 15 && s.pb <= 1.5).length,
+    cape: MOCK_MACRO.cape,
   };
 
   return (
-    <div className="page page-enter">
-      {/* Mobile wordmark */}
-      <div style={{
-        fontFamily: "var(--font-display)",
-        fontSize: "0.875rem",
-        fontWeight: 700,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase" as const,
-        color: "var(--muted)",
-        marginBottom: 20,
-      }}>
-        SIAM MARKETS
-      </div>
+    <div style={{ paddingBottom: "var(--nav-h)" }}>
+      {/* KPI strip — always visible, personalized */}
+      <KPIStrip data={kpiData} />
 
-      {/* Hero — SET Index (live via Yahoo Finance) */}
-      <div className="card" style={{ marginBottom: "var(--gap)", padding: "20px" }}>
-        <div className="t-micro" style={{ marginBottom: 8 }}>SET INDEX · BANGKOK · LIVE</div>
-        {liveSet ? (
-          <>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
-              <span className="t-mono-display" style={{ fontSize: "2.5rem", lineHeight: 1 }}>
-                {fmtNum(liveSet.price, 2)}
-              </span>
-              <span
-                className="t-mono"
-                style={{ color: pctColor(liveSet.changePct), marginBottom: 6, fontSize: "1.1rem", fontWeight: 600 }}
-              >
-                {fmtPct(liveSet.changePct)}
-              </span>
-            </div>
-            <div style={{ marginTop: 12, display: "flex", gap: 20 }}>
-              <div>
-                <div className="t-micro">52W HIGH</div>
-                <div className="t-mono" style={{ color: "var(--muted)", marginTop: 2 }}>
-                  {fmtNum(liveSet.high52w, 2)}
+      <div className="page page-enter" style={{ paddingTop: 16 }}>
+
+        {/* SET Index hero */}
+        <div className="card" style={{ marginBottom: "var(--gap)", padding: "20px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
+            <div>
+              <div className="t-micro" style={{ marginBottom: 6 }}>SET INDEX · LIVE</div>
+              {liveSet ? (
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+                  <span className="t-mono-display" style={{ fontSize: "2.25rem", lineHeight: 1 }}>
+                    {fmtNum(liveSet.price, 2)}
+                  </span>
+                  <span className="t-mono" style={{
+                    color: pctColor(liveSet.changePct),
+                    marginBottom: 4,
+                    fontSize: "1.1rem",
+                    fontWeight: 600,
+                  }}>
+                    {fmtPct(liveSet.changePct)}
+                  </span>
                 </div>
-              </div>
-              <div>
-                <div className="t-micro">52W LOW</div>
-                <div className="t-mono" style={{ color: "var(--muted)", marginTop: 2 }}>
-                  {fmtNum(liveSet.low52w, 2)}
-                </div>
-              </div>
-              <div>
-                <div className="t-micro">CHANGE</div>
-                <div className="t-mono" style={{ color: pctColor(liveSet.changePct), marginTop: 2 }}>
-                  {liveSet.change > 0 ? "+" : ""}{fmtNum(liveSet.change, 2)}
-                </div>
-              </div>
+              ) : (
+                <div className="shimmer" style={{ height: 40, width: 180 }} />
+              )}
             </div>
-          </>
-        ) : (
-          <div className="shimmer" style={{ height: 60 }} />
-        )}
-      </div>
-
-      {/* Macro pill row — live Fed rate, BOT policy/MLR when subscribed */}
-      <div style={{ marginBottom: "var(--gap)" }}>
-        <MacroPillBar
-          data={macroPill}
-          botPolicyRate={botMonetary.policyRate}
-          botMlr={botRates.mlr}
-        />
-      </div>
-
-      {/* Regional markets — Thai + ASEAN + China + Global tabs */}
-      <div style={{ marginBottom: "var(--gap)" }}>
-        <div className="t-micro" style={{ marginBottom: 8 }}>REGIONAL MARKETS · LIVE</div>
-        <RegionalGrid
-          thai={regional.thai}
-          asean={regional.asean}
-          china={regional.china}
-          global={regional.global}
-        />
-      </div>
-
-      {/* THB / USD */}
-      <div className="card" style={{ marginBottom: "var(--gap)", padding: "12px 16px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div className="t-micro">THB / USD</div>
-            <div className="t-micro" style={{ marginTop: 2, color: "var(--dim)" }}>
-              Bank of Thailand rate · live
-            </div>
+            {liveSet && (
+              <div style={{ display: "flex", gap: 20 }}>
+                {[
+                  { label: "52W HIGH", value: fmtNum(liveSet.high52w, 2) },
+                  { label: "52W LOW",  value: fmtNum(liveSet.low52w, 2)  },
+                ].map(item => (
+                  <div key={item.label}>
+                    <div className="t-micro">{item.label}</div>
+                    <div className="t-mono" style={{ color: "var(--muted)", marginTop: 2 }}>{item.value}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="t-mono" style={{ fontSize: "1.25rem", fontWeight: 700 }}>
-            {thb.usd.toFixed(2)}
+
+          {/* Macro strip — single dense line */}
+          <div style={{
+            display: "flex",
+            gap: 16,
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: "1px solid var(--line)",
+            flexWrap: "wrap",
+          }}>
+            {[
+              { label: "FED",    value: `${(macro.usFedFundsRate ?? MOCK_MACRO.fedRate).toFixed(2)}%` },
+              { label: "THB",    value: thb.usd.toFixed(2) },
+              { label: "SET P/E",value: setPe.toFixed(1) },
+              { label: "CAPE",   value: MOCK_MACRO.cape.toFixed(1) },
+              { label: "F&G",    value: `${fearGreed.score}/100` },
+            ].map(item => (
+              <div key={item.label} style={{ display: "flex", gap: 6, alignItems: "baseline" }}>
+                <span className="t-micro">{item.label}</span>
+                <span className="t-mono" style={{ fontSize: "0.875rem", fontWeight: 600 }}>{item.value}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Fear & Greed — live */}
-      <div style={{ marginBottom: "var(--gap)" }}>
-        <FearGreedDial data={fearGreed} />
-      </div>
+        {/* Signal feed — Bloomberg-style intelligence */}
+        <div style={{ marginBottom: "var(--gap)" }}>
+          <SignalFeed signals={signals} maxVisible={3} />
+        </div>
 
-      {/* Top movers (SET50 — mock until ingestion) */}
-      <div style={{ marginBottom: "var(--gap)" }}>
-        <div className="t-micro" style={{ marginBottom: 8 }}>SET50 MOVERS</div>
-        <TopMovers stocks={MOCK_STOCKS} />
-      </div>
+        {/* Regional markets */}
+        <div style={{ marginBottom: "var(--gap)" }}>
+          <div className="t-micro" style={{ marginBottom: 8 }}>REGIONAL MARKETS · LIVE</div>
+          <RegionalGrid
+            thai={regional.thai}
+            asean={regional.asean}
+            china={regional.china}
+            global={regional.global}
+          />
+        </div>
 
-      <div className="t-micro" style={{ textAlign: "center", paddingBottom: 8 }}>
-        SET · ASEAN · China · US: live · SET50 movers: run ingestion for live prices
+        {/* Fear & Greed dial */}
+        <div style={{ marginBottom: "var(--gap)" }}>
+          <FearGreedDial data={fearGreed} />
+        </div>
+
+        {/* Top movers */}
+        <div style={{ marginBottom: "var(--gap)" }}>
+          <div className="t-micro" style={{ marginBottom: 8 }}>SET50 — TOP MOVERS</div>
+          <TopMovers stocks={MOCK_STOCKS} />
+        </div>
+
+        <div className="t-micro" style={{ textAlign: "center", paddingBottom: 8, color: "var(--dim)" }}>
+          KPIs update with market data · Run ingestion scripts for live SET50 prices
+        </div>
       </div>
     </div>
   );
