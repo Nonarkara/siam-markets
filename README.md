@@ -1,7 +1,7 @@
 <div align="center">
 
-<!-- Save the hero image as: public/assets/hero.jpg -->
-<img src="public/assets/hero.jpg" alt="Dr Non's Day Trading Super Brain — Thailand Market Command Center" width="100%" />
+<!-- Save the hero image as: public/assets/hero.png -->
+<img src="public/assets/hero.png" alt="Dr Non's Day Trading Super Brain — Thailand Market Command Center" width="100%" />
 
 </div>
 
@@ -320,7 +320,7 @@ siam-markets/
 │   ├── fundamentals.py         FMP → Supabase
 │   └── macro.py                FRED + World Bank → Supabase
 ├── RESEARCH.md                 18,000-word reference: APIs, techniques, risk math
-└── public/assets/hero.jpg      Hero image
+└── public/assets/hero.png      Hero image
 ```
 
 ---
