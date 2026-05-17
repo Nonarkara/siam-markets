@@ -4,7 +4,7 @@
   "staleExpiration": 31536000,
   "sourcePath": "/",
   "group": 1,
-  "bypassToken": "262a9d6790ae7baf0f232232a0c2a5ce",
+  "bypassToken": "0d601ca9abc1bdad0e767a132a305d35",
   "experimentalBypassFor": [
     {
       "type": "header",

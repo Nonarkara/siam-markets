@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ProfileBadge } from "@/components/KPI/ProfileBadge";
 
 const NAV_ITEMS = [
   { href: "/",          label: "Market Pulse" },
@@ -54,7 +55,7 @@ export function TopNav() {
       </Link>
 
       {/* Nav links */}
-      <div style={{ display: "flex", gap: 0, flex: 1 }}>
+      <div style={{ display: "flex", gap: 0, flex: 1, overflowX: "auto" }}>
         {NAV_ITEMS.map(({ href, label }) => {
           const active = pathname === href;
           return (
@@ -81,6 +82,11 @@ export function TopNav() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Profile mode badge */}
+      <div style={{ marginLeft: 16, flexShrink: 0 }}>
+        <ProfileBadge />
       </div>
     </nav>
   );
