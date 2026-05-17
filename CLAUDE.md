@@ -2,7 +2,7 @@
 
 Mobile-first financial intelligence dashboard — Thai market (SET) + global events, with day trading education, technical analysis, paper trading simulator, and Graham/Buffett/Munger value frameworks.
 
-Live: TBD (Cloudflare Pages)
+Live: https://nonarkara.org (Cloudflare Pages)
 
 ## Tech Stack
 

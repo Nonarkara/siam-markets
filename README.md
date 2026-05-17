@@ -16,7 +16,7 @@ KNOWLEDGE  ·  SYSTEM  ·  DISCIPLINE  ·  EDGE
 **SIAM MARKETS** is a market intelligence platform built for Thai retail investors and traders.  
 It doesn't just show you data — it puts different data sets on the same axis, so your brain can connect dots that spreadsheets can't.
 
-[![Live](https://img.shields.io/badge/LIVE-money.nonarkara.org-00c896?style=flat-square&labelColor=0d0d0d)](https://money.nonarkara.org)
+[![Live](https://img.shields.io/badge/LIVE-nonarkara.org-00c896?style=flat-square&labelColor=0d0d0d)](https://nonarkara.org)
 [![Stack](https://img.shields.io/badge/Next.js-16.2-0d0d0d?style=flat-square&labelColor=161616)](https://nextjs.org)
 [![Deploy](https://img.shields.io/badge/Cloudflare-Pages-f38020?style=flat-square&labelColor=0d0d0d)](https://pages.cloudflare.com)
 [![License](https://img.shields.io/badge/License-MIT-4a4a46?style=flat-square&labelColor=0d0d0d)](#)
@@ -383,6 +383,6 @@ Vietnam note                   — VN-Index has no free live feed (check SSI/VND
 MASTER THE MARKET  ·  CONTROL RISK  ·  COMPOUND GROWTH
 ```
 
-**[money.nonarkara.org](https://money.nonarkara.org)**
+**[nonarkara.org](https://nonarkara.org)**
 
 </div>
