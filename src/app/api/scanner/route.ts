@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { MOCK_STOCKS } from "@/lib/api/mock";
 import type { ApiResponse, StockFundamentals } from "@/lib/types";
 
+export const runtime = "edge";
+
 export const revalidate = 3600; // 1 hour
 
 export interface ScannerData {
