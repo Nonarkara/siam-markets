@@ -4,12 +4,12 @@ import { BottomNav } from "@/components/Nav/BottomNav";
 import { TopNav } from "@/components/Nav/TopNav";
 
 export const metadata: Metadata = {
-  title: "SIAM MARKETS",
-  description: "Thai market intelligence — Graham, Buffett, Munger frameworks applied to SET stocks and global events.",
-  keywords: ["Thailand", "SET", "stock market", "investing", "mutual funds", "RMF", "Thai ESG"],
+  title: "SIAM MARKETS — Trading Intelligence",
+  description: "Thai market intelligence with day trading education, technical analysis, paper trading simulator, and Graham/Buffett/Munger value frameworks.",
+  keywords: ["Thailand", "SET", "stock market", "day trading", "technical analysis", "investing", "paper trading", "Graham", "Buffett"],
   openGraph: {
-    title: "SIAM MARKETS",
-    description: "Long-term market intelligence for Thailand",
+    title: "SIAM MARKETS — Trading Intelligence",
+    description: "Day trading education + value investing for Thailand",
     type: "website",
   },
 };

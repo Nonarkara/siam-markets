@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/",          label: "Pulse",   icon: PulseIcon },
-  { href: "/events",    label: "Events",  icon: EventsIcon },
+  { href: "/trade",     label: "Trade",   icon: TradeIcon },
+  { href: "/simulate",  label: "Sim",     icon: SimIcon },
   { href: "/scanner",   label: "Scan",    icon: ScanIcon },
-  { href: "/portfolio", label: "Portfolio", icon: PortfolioIcon },
   { href: "/school",    label: "Learn",   icon: SchoolIcon },
 ] as const;
 
@@ -76,12 +76,22 @@ function PulseIcon({ active }: { active: boolean }) {
   );
 }
 
-function EventsIcon({ active }: { active: boolean }) {
+function TradeIcon({ active }: { active: boolean }) {
   return (
     <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <circle cx="12" cy="12" r="10" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      <path d="M12 20V10" />
+      <path d="M18 20V4" />
+      <path d="M6 20v-4" />
+    </svg>
+  );
+}
+
+function SimIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <rect x="2" y="3" width="20" height="14" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
     </svg>
   );
 }
@@ -93,17 +103,6 @@ function ScanIcon({ active }: { active: boolean }) {
       <line x1="9" y1="9" x2="15" y2="9" />
       <line x1="9" y1="12" x2="15" y2="12" />
       <line x1="9" y1="15" x2="12" y2="15" />
-    </svg>
-  );
-}
-
-function PortfolioIcon({ active }: { active: boolean }) {
-  return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <rect x="2" y="7" width="20" height="14" />
-      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-      <line x1="12" y1="12" x2="12" y2="16" />
-      <line x1="10" y1="14" x2="14" y2="14" />
     </svg>
   );
 }

@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/",          label: "Market Pulse" },
+  { href: "/trade",     label: "Trade Desk" },
+  { href: "/simulate",  label: "Simulator" },
   { href: "/events",    label: "World × Markets" },
   { href: "/scanner",   label: "Value Scanner" },
   { href: "/portfolio", label: "Portfolio & Tax" },
-  { href: "/school",    label: "Investment School" },
+  { href: "/school",    label: "Trading School" },
 ] as const;
 
 export function TopNav() {

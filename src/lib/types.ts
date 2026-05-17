@@ -142,6 +142,84 @@ export interface Concept {
   learnMore: string;     // 2–3 sentences deeper
 }
 
+// ─── Technical Analysis ──────────────────────────────────────────
+
+export interface OHLCV {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export interface SRLevel {
+  price: number;
+  touches: number;
+  strength: "weak" | "moderate" | "strong";
+}
+
+export interface TradeSignal {
+  type: "buy" | "sell" | "neutral";
+  confidence: number;
+  reasons: string[];
+  entry?: number;
+  stopLoss?: number;
+  target?: number;
+  riskReward?: number;
+}
+
+export type MarketRegime = "trending_up" | "trending_down" | "ranging" | "high_volatility";
+
+export type CandlePattern =
+  | "doji"
+  | "hammer"
+  | "shooting_star"
+  | "engulfing_bull"
+  | "engulfing_bear"
+  | "inside_bar"
+  | "none";
+
+// ─── Paper Trading ───────────────────────────────────────────────
+
+export interface SimulatedTrade {
+  id: string;
+  symbol: string;
+  direction: "long" | "short";
+  entryPrice: number;
+  exitPrice?: number;
+  stopLoss: number;
+  target: number;
+  quantity: number;
+  entryDate: string;
+  exitDate?: string;
+  status: "open" | "closed" | "stopped" | "targeted";
+  pnl?: number;
+  pnlPct?: number;
+  riskReward: number;
+  reason: string;
+  journal?: string;
+}
+
+export interface SimPortfolio {
+  cash: number;
+  initialCash: number;
+  trades: SimulatedTrade[];
+  equityCurve: { date: string; equity: number }[];
+}
+
+export interface PerformanceMetrics {
+  totalTrades: number;
+  winRate: number;
+  avgWin: number;
+  avgLoss: number;
+  profitFactor: number;
+  maxDrawdownPct: number;
+  sharpeRatio: number;
+  currentEquity: number;
+  totalReturnPct: number;
+}
+
 // ─── API response envelope ───────────────────────────────────────
 
 export interface ApiResponse<T> {

@@ -3,6 +3,8 @@ import { fetchWorldEvents } from "@/lib/api/gdelt";
 import { MOCK_EVENTS } from "@/lib/api/mock";
 import type { ApiResponse, WorldEvent } from "@/lib/types";
 
+export const runtime = "edge";
+
 export const revalidate = 900; // 15 minutes
 
 export async function GET(request: Request) {

@@ -8,7 +8,7 @@ export const revalidate = 3600;
 const SET_PE = 15.4;
 const CAPE = 34.2;
 
-const CONCEPTS: Concept[] = [
+const VALUE_CONCEPTS: Concept[] = [
   {
     id: "margin-of-safety",
     title: "Margin of Safety",
@@ -61,6 +61,69 @@ const CONCEPTS: Concept[] = [
   },
 ];
 
+const TRADING_CONCEPTS: Concept[] = [
+  {
+    id: "price-action",
+    title: "Price Action Trading",
+    subtitle: "Al Brooks' indicator-free method",
+    definition: "Read the market purely from candlesticks and price structure. No RSI, no MACD — just the story each bar tells about the battle between buyers and sellers.",
+    signal: "Every candle tells a story. A hammer at support with volume = buyers stepping in. A shooting star at resistance = sellers taking control.",
+    quote: "Trading is simple, but it is not easy. The hard part is controlling your emotions and following your rules.",
+    quoteAuthor: "Al Brooks",
+    learnMore: `Al Brooks, a former ophthalmologist turned full-time trader, lost all his money in his first 10 years. He now teaches that support and resistance are ZONES, not lines. His key insight: wait for the second entry (H2/L2) — if the first signal fails but the second confirms, probability is higher. Trade ranges at boundaries, trends on pullbacks.`,
+  },
+  {
+    id: "risk-management",
+    title: "The 1% Rule",
+    subtitle: "The only holy grail in trading",
+    definition: "Never risk more than 1-2% of your total capital on a single trade. This ensures that even a string of 10 losses cannot destroy your account.",
+    signal: "Position Size = Risk Amount / (Entry - Stop). With ฿1M account and 1% risk, you can lose 10 times in a row and still have ฿900K.",
+    quote: "Rule No. 1: Never lose money. Rule No. 2: Never forget Rule No. 1.",
+    quoteAuthor: "Warren Buffett",
+    learnMore: `Professional traders use the 1% rule religiously. A 1:2 risk-reward ratio means you can be wrong 60% of the time and still make money. The math: 40 wins × 2R = +80R, 60 losses × 1R = -60R, net = +20R. This is why risk management beats prediction.`,
+  },
+  {
+    id: "support-resistance",
+    title: "Support & Resistance Zones",
+    subtitle: "Where price decisions happen",
+    definition: "Support is a price level where buying pressure overcomes selling pressure. Resistance is where selling overcomes buying. These are zones, not precise lines — price can wick through before reversing.",
+    signal: "Trade at the edges, not the middle. Buy near support in ranges. Sell near resistance. In trends, buy pullbacks to previous resistance-turned-support.",
+    quote: "The trend is your friend until it ends.",
+    quoteAuthor: "Unknown (trader proverb)",
+    learnMore: `ICT (Inner Circle Trader) adds institutional context: liquidity grabs. Price often sweeps above/below key levels to trigger retail stop losses, then reverses. This is why stop placement should account for wicks, not just the level itself. Place stops beyond the zone, not on it.`,
+  },
+  {
+    id: "multi-timeframe",
+    title: "Multi-Timeframe Analysis",
+    subtitle: "Align three timeframes for edge",
+    definition: "Use a higher timeframe for trend direction, a trading timeframe for setup identification, and an execution timeframe for precise entry and stop placement.",
+    signal: "Daily chart says uptrend → 1H chart shows pullback → 5M chart gives hammer candle entry with tight stop.",
+    quote: "The higher timeframe is the boss. Never fight it.",
+    quoteAuthor: "ICT (Michael J. Huddleston)",
+    learnMore: `This is how professional traders avoid getting chopped. The daily/4H chart defines the bias. You only take long setups when the higher timeframe is bullish. Counter-trend trades need 2:1 better risk-reward to justify the lower probability. Timeframe alignment filters out 70% of bad trades.`,
+  },
+  {
+    id: "market-regime",
+    title: "Market Regime Detection",
+    subtitle: "Trade what the market is doing",
+    definition: "Markets are either trending, ranging, or in high volatility. Each regime requires a different strategy. Using a trend strategy in a range = death by a thousand cuts.",
+    signal: "Trending: follow momentum, buy pullbacks. Ranging: fade extremes, buy support, sell resistance. High vol: reduce size or sit out entirely.",
+    quote: "There is a time to go long, a time to go short, and a time to go fishing.",
+    quoteAuthor: "Jesse Livermore",
+    learnMore: `2026's best traders use regime detection as their first filter. Bollinger Band width < 2% = squeeze (volatility expansion coming). ADX > 40 = strong trend. ATR expanding = volatility rising, reduce position size by 50%. Adaptive bots that switch strategies by regime outperform static bots by 30%+.`,
+  },
+  {
+    id: "news-reaction",
+    title: "News Reaction Trading",
+    subtitle: "Trade the reaction, not the headline",
+    definition: "Markets do not move on news — they move on the DIFFERENCE between the news and what was expected. A 'bad' report that is less bad than feared = rally. A 'good' report priced in already = sell-off.",
+    signal: "Fade the initial move 15-30 minutes after earnings/FOMC. The real direction emerges after emotional traders are stopped out.",
+    quote: "Buy the rumor, sell the news. But the real money is in fading the overreaction.",
+    quoteAuthor: "Bernard Baruch",
+    learnMore: `Al Brooks says: stay out 15-30 minutes before and after major news. The initial spike is algorithmic and emotional. After that, price action reveals the true institutional bias. On the Trade Desk page, our news sentiment overlay scores headlines from -1 to +1 — combine this with technical levels for higher-probability entries.`,
+  },
+];
+
 export default async function SchoolPage() {
   const fearGreed = await fetchFearGreed();
   const todaySignal = `${fgLabel(fearGreed.label).toUpperCase()} at ${fearGreed.score}/100 — ${fgBuffettAdvice(fearGreed.label)}`;
@@ -68,9 +131,9 @@ export default async function SchoolPage() {
   return (
     <div className="page page-enter">
       <div style={{ marginBottom: 20 }}>
-        <h1 className="t-display" style={{ marginBottom: 6 }}>Investment School</h1>
+        <h1 className="t-display" style={{ marginBottom: 6 }}>Trading School</h1>
         <p className="t-body" style={{ color: "var(--muted)" }}>
-          Decades of wisdom from Graham, Buffett, and Munger — translated for the real world.
+          From value investing foundations to professional day trading techniques.
         </p>
       </div>
 
@@ -85,11 +148,42 @@ export default async function SchoolPage() {
         <div className="t-body" style={{ color: "var(--muted)", fontSize: "0.875rem" }}>{todaySignal}</div>
       </div>
 
-      {/* Concept cards */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)" }}>
-        {CONCEPTS.map((concept, i) => (
+      {/* Section: Day Trading */}
+      <div className="t-micro" style={{ marginBottom: 12, color: "var(--bull)" }}>
+        DAY TRADING FUNDAMENTALS
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)", marginBottom: "var(--gap)" }}>
+        {TRADING_CONCEPTS.map((concept, i) => (
           <ConceptCard key={concept.id} concept={concept} index={i} />
         ))}
+      </div>
+
+      {/* Section: Value Investing */}
+      <div className="t-micro" style={{ marginBottom: 12, color: "var(--tech)" }}>
+        VALUE INVESTING FOUNDATIONS
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)", marginBottom: "var(--gap)" }}>
+        {VALUE_CONCEPTS.map((concept, i) => (
+          <ConceptCard key={concept.id} concept={concept} index={i + TRADING_CONCEPTS.length} />
+        ))}
+      </div>
+
+      {/* Stats warning */}
+      <div
+        className="card"
+        style={{
+          background: "var(--bear-10)",
+          borderColor: "var(--bear)",
+          marginBottom: "var(--gap)",
+        }}
+      >
+        <div className="t-micro" style={{ color: "var(--bear)", marginBottom: 6 }}>THE BRUTAL TRUTH</div>
+        <div className="t-body" style={{ color: "var(--bear)", fontSize: "0.8rem", lineHeight: 1.6 }}>
+          ~90% of day traders lose money within the first year. ~80% quit within 2 years.
+          The 10% who survive share four traits: they risk 1-2% per trade, they journal every trade,
+          they have a defined edge, and they understand that psychology is 80% of the game.
+          This school exists to put you in the 10%.
+        </div>
       </div>
 
       {/* Attribution */}
@@ -105,9 +199,11 @@ export default async function SchoolPage() {
       >
         <div className="t-micro" style={{ marginBottom: 8 }}>SOURCE MATERIAL</div>
         <div className="t-body" style={{ color: "var(--muted)", fontSize: "0.8rem", lineHeight: 1.6 }}>
-          <em>The Intelligent Investor</em> — Benjamin Graham (1949) ·{" "}
-          <em>Berkshire Hathaway Annual Letters</em> — Warren Buffett (1965–2025) ·{" "}
-          <em>Poor Charlie&apos;s Almanack</em> — Charlie Munger
+          <em>The Intelligent Investor</em> — Benjamin Graham ·{" "}
+          <em>Brooks Trading Course</em> — Al Brooks ·{" "}
+          <em>ICT Mentorship</em> — Michael J. Huddleston ·{" "}
+          <em>Poor Charlie&apos;s Almanack</em> — Charlie Munger ·{" "}
+          <em>Berkshire Hathaway Annual Letters</em> — Warren Buffett
         </div>
       </div>
     </div>
@@ -115,7 +211,7 @@ export default async function SchoolPage() {
 }
 
 function ConceptCard({ concept, index }: { concept: Concept; index: number }) {
-  const ACCENT_COLORS = ["var(--bull)", "var(--caution)", "var(--tech)", "var(--bear)", "var(--bull)"];
+  const ACCENT_COLORS = ["var(--bull)", "var(--caution)", "var(--tech)", "var(--bear)", "var(--bull)", "var(--caution)", "var(--tech)", "var(--bear)", "var(--bull)", "var(--caution)", "var(--tech)"];
   const accent = ACCENT_COLORS[index % ACCENT_COLORS.length];
 
   return (
@@ -167,7 +263,7 @@ function ConceptCard({ concept, index }: { concept: Concept; index: number }) {
             borderLeft: `2px solid ${accent}`,
           }}
         >
-          <div className="t-micro" style={{ color: accent, marginBottom: 4 }}>CURRENT SIGNAL</div>
+          <div className="t-micro" style={{ color: accent, marginBottom: 4 }}>HOW TO APPLY</div>
           <div className="t-body" style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
             {concept.signal}
           </div>

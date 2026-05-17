@@ -1,0 +1,18 @@
+{
+  "runtime": "edge",
+  "name": "api/scanner",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "16.2.1"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "GZF904sh7o53v-Tbz-rwX",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "+UlPQWKA7s+Aj+Up7Yty8hOI90HCTnzVp5EaEnmzdGo=",
+    "__NEXT_PREVIEW_MODE_ID": "262a9d6790ae7baf0f232232a0c2a5ce",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "b6d7f40a8f6f03b7e1ae0e988d3414e70105b5993104149cc8acfcb6e43b56f0",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ce5e68556360d04b80f39f2a165861666c9f33bb76b64782fdaba48c76884a80"
+  }
+}

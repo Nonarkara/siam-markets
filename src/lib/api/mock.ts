@@ -3,7 +3,7 @@
  * Provides realistic SET50 data so the UI renders fully on first load.
  */
 
-import type { IndexQuote, StockFundamentals, WorldEvent, MacroPill } from "../types";
+import type { IndexQuote, StockFundamentals, WorldEvent, MacroPill, OHLCV } from "../types";
 import { grahamNumber, marginOfSafety } from "../graham";
 
 // ─── Mock Market Pulse ────────────────────────────────────────────
@@ -139,5 +139,73 @@ export const MOCK_EVENTS: WorldEvent[] = [
     country: "SG", countryName: "Singapore",
     sentiment: 0.22, setChangePct: 0.5, spxChangePct: 0.2,
     source: "channelnewsasia.com",
+  },
+];
+
+// ─── Mock OHLCV Data (60 days of simulated PTT.BK price action) ───
+
+function generateMockOHLCV(basePrice: number, days = 60, volatility = 0.02): OHLCV[] {
+  const data: OHLCV[] = [];
+  let price = basePrice;
+  const now = new Date();
+
+  for (let i = days; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+
+    // Skip weekends
+    if (date.getDay() === 0 || date.getDay() === 6) continue;
+
+    const change = (Math.random() - 0.48) * volatility * price;
+    const open = price;
+    const close = price + change;
+    const high = Math.max(open, close) + Math.random() * volatility * price * 0.5;
+    const low = Math.min(open, close) - Math.random() * volatility * price * 0.5;
+    const volume = Math.floor(1_000_000 + Math.random() * 5_000_000);
+
+    data.push({
+      date: date.toISOString().split("T")[0],
+      open: Number(open.toFixed(2)),
+      high: Number(high.toFixed(2)),
+      low: Number(low.toFixed(2)),
+      close: Number(close.toFixed(2)),
+      volume,
+    });
+
+    price = close;
+  }
+
+  return data;
+}
+
+export const MOCK_OHLCV_PTT: OHLCV[] = generateMockOHLCV(35.5, 60, 0.018);
+export const MOCK_OHLCV_ADVANC: OHLCV[] = generateMockOHLCV(232.0, 60, 0.015);
+export const MOCK_OHLCV_KBANK: OHLCV[] = generateMockOHLCV(141.0, 60, 0.016);
+
+// News sentiment mock for trading page
+export const MOCK_TRADING_NEWS = [
+  {
+    time: "10:30",
+    headline: "PTT announces Q2 production target increase",
+    sentiment: 0.35,
+    impact: "high",
+  },
+  {
+    time: "09:15",
+    headline: "Oil futures rise 1.2% on Middle East supply concerns",
+    sentiment: 0.22,
+    impact: "medium",
+  },
+  {
+    time: "08:45",
+    headline: "SET index opens lower on regional weakness",
+    sentiment: -0.18,
+    impact: "medium",
+  },
+  {
+    time: "Yesterday",
+    headline: "Energy ministry reviews renewable transition timeline",
+    sentiment: 0.08,
+    impact: "low",
   },
 ];
