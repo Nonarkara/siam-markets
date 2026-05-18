@@ -3,7 +3,7 @@
   "expiration": 86400,
   "staleExpiration": 31536000,
   "group": 4,
-  "bypassToken": "e3b92913a492b2e2c9562453146a9761",
+  "bypassToken": "896d62f996053a85cadea661ef690ef2",
   "experimentalBypassFor": [
     {
       "type": "header",
