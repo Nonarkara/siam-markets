@@ -39,6 +39,28 @@ export const REGIONAL_MARKETS = {
   ],
 } as const;
 
+// ─── Alternative Asset Classes ───────────────────────────────────
+
+export const ASSET_CLASS_MARKETS = [
+  { symbol: "GC=F",     name: "Gold",        unit: "USD/oz",  category: "commodity" },
+  { symbol: "SI=F",     name: "Silver",      unit: "USD/oz",  category: "commodity" },
+  { symbol: "CL=F",     name: "Oil WTI",     unit: "USD/bbl", category: "commodity" },
+  { symbol: "NG=F",     name: "Nat Gas",     unit: "USD/MMBtu", category: "commodity" },
+  { symbol: "HG=F",     name: "Copper",      unit: "USD/lb",  category: "commodity" },
+  { symbol: "BTC-USD",  name: "Bitcoin",     unit: "USD",     category: "crypto"    },
+  { symbol: "^VIX",     name: "VIX",         unit: "index",   category: "volatility"},
+  { symbol: "^TNX",     name: "US 10Y",      unit: "%",       category: "bonds"     },
+  { symbol: "^IRX",     name: "US 2Y",       unit: "%",       category: "bonds"     },
+  { symbol: "DX-Y.NYB", name: "USD Index",   unit: "index",   category: "currency"  },
+] as const;
+
+export async function fetchAssetClasses(): Promise<YahooQuote[]> {
+  const results = await Promise.all(
+    ASSET_CLASS_MARKETS.map(({ symbol, name }) => fetchYahooQuote(symbol, name)),
+  );
+  return results.filter((q): q is YahooQuote => q !== null);
+}
+
 // Vietnam has no reliable free feed — shown as a special placeholder
 export const VIETNAM_PLACEHOLDER = {
   symbol: "VNINDEX",
