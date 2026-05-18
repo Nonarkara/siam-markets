@@ -126,6 +126,130 @@ export async function fetchYahooQuote(
   }
 }
 
+// ─── Historical price series (for charts) ────────────────────────
+
+export interface HistoricalPoint {
+  date: string;       // "2025-01-15"
+  close: number;
+  volume?: number;
+  open?: number;
+  high?: number;
+  low?: number;
+}
+
+type HistoryRange = "1mo" | "3mo" | "6mo" | "1y" | "2y";
+type HistoryInterval = "1d" | "1wk";
+
+const histCache = new Map<string, { data: HistoricalPoint[]; ts: number }>();
+const HIST_TTL = 30 * 60 * 1000; // 30 min
+
+export async function fetchHistoricalPrices(
+  symbol: string,
+  range: HistoryRange = "1y",
+  interval: HistoryInterval = "1d",
+): Promise<HistoricalPoint[]> {
+  const key = `${symbol}:${range}:${interval}`;
+  const cached = histCache.get(key);
+  if (cached && Date.now() - cached.ts < HIST_TTL) return cached.data;
+
+  try {
+    const url = `${YAHOO_API}/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}`;
+    const res = await fetch(url, {
+      headers: HEADERS,
+      next: { revalidate: 1800 },
+    });
+    if (!res.ok) return [];
+
+    const json = await res.json();
+    const result = json?.chart?.result?.[0];
+    if (!result) return [];
+
+    const timestamps: number[] = result.timestamp ?? [];
+    const quotes = result.indicators?.quote?.[0] ?? {};
+    const closes: number[] = quotes.close ?? [];
+    const volumes: number[] = quotes.volume ?? [];
+    const opens: number[] = quotes.open ?? [];
+    const highs: number[] = quotes.high ?? [];
+    const lows: number[] = quotes.low ?? [];
+
+    const points: HistoricalPoint[] = [];
+    for (let i = 0; i < timestamps.length; i++) {
+      if (closes[i] == null) continue;
+      const date = new Date(timestamps[i] * 1000);
+      const dateStr = date.toISOString().split("T")[0];
+      points.push({
+        date: dateStr,
+        close: closes[i],
+        volume: volumes[i],
+        open: opens[i],
+        high: highs[i],
+        low: lows[i],
+      });
+    }
+
+    histCache.set(key, { data: points, ts: Date.now() });
+    return points;
+  } catch {
+    return [];
+  }
+}
+
+// Normalize prices to % change from first data point (for comparison charts)
+export function normalizeToPercentChange(points: HistoricalPoint[]): { date: string; pct: number }[] {
+  if (points.length === 0) return [];
+  const base = points[0].close;
+  return points.map(p => ({
+    date: p.date,
+    pct: ((p.close - base) / base) * 100,
+  }));
+}
+
+// ─── SET50 preset comparison groups ──────────────────────────────
+
+export const COMPARISON_GROUPS: Record<string, { label: string; symbols: { symbol: string; name: string }[] }> = {
+  banking: {
+    label: "BANKING",
+    symbols: [
+      { symbol: "KBANK.BK", name: "KBANK" },
+      { symbol: "SCB.BK",   name: "SCB"   },
+      { symbol: "BBL.BK",   name: "BBL"   },
+    ],
+  },
+  energy: {
+    label: "ENERGY",
+    symbols: [
+      { symbol: "PTT.BK",    name: "PTT"    },
+      { symbol: "PTTEP.BK",  name: "PTTEP"  },
+      { symbol: "GULF.BK",   name: "GULF"   },
+    ],
+  },
+  consumer: {
+    label: "CONSUMER",
+    symbols: [
+      { symbol: "CPALL.BK",  name: "CPALL"  },
+      { symbol: "HMPRO.BK",  name: "HMPRO"  },
+      { symbol: "MINT.BK",   name: "MINT"   },
+    ],
+  },
+  telecom: {
+    label: "TELECOM",
+    symbols: [
+      { symbol: "ADVANC.BK", name: "ADVANC" },
+      { symbol: "TRUE.BK",   name: "TRUE"   },
+    ],
+  },
+  value: {
+    label: "GRAHAM PICKS",
+    symbols: [
+      { symbol: "KBANK.BK",  name: "KBANK" },
+      { symbol: "BBL.BK",    name: "BBL"   },
+      { symbol: "PTT.BK",    name: "PTT"   },
+      { symbol: "SCC.BK",    name: "SCC"   },
+      { symbol: "RATCH.BK",  name: "RATCH" },
+    ],
+  },
+};
+
 export async function fetchRegionalGroup(
   group: keyof typeof REGIONAL_MARKETS,
 ): Promise<YahooQuote[]> {

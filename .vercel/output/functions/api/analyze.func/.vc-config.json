@@ -1,0 +1,18 @@
+{
+  "runtime": "edge",
+  "name": "api/analyze",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "16.2.1"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "gLXQnXroIeN7w3ePs-ZDi",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "8zBJjG+tE57RZyhoWtj7XG85M60Zxe7/6C989nw4aVw=",
+    "__NEXT_PREVIEW_MODE_ID": "a677204e059dcbfcffd2ce5de9574785",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "7c086719914c097d4294be515f095102b337c3e675861ec4f614efefebe6d656",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "6ad0d1e6b54312c2efecb6cd819fd7e2a4e2ea15008e1beec2c3c8b93ec19633"
+  }
+}
