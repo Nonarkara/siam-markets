@@ -1,5 +1,5 @@
 {
-  "timestamp": 1779083327534,
+  "timestamp": 1779089841946,
   "outputDir": ".vercel/output/static/_worker.js",
   "versions": {
     "@cloudflare/next-on-pages": "1.13.16"
@@ -22,11 +22,11 @@
               "version": "16.2.1"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kacW_ZLkwwynpdAKmwZet",
-              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "CuIkwjdex7t3vWUTcuKUhaEGhWuPITTnZWF0yFbg0sQ=",
-              "__NEXT_PREVIEW_MODE_ID": "e3b92913a492b2e2c9562453146a9761",
-              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "700dc500dfc4d7db480f06337b3db922e5215718e04c9d474d3a956e2f91c9d7",
-              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "9ccb527c14a921f6d28af82e63180bf6f01a5823aefb50cfc1b5d3a56026cc7c"
+              "__NEXT_BUILD_ID": "8dQTWPUquA8Y6g5X72LIG",
+              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Tp1FyCg+kOul6pQ6fN2mudOpz7mRkIFp3o/0Vw4hAP0=",
+              "__NEXT_PREVIEW_MODE_ID": "896d62f996053a85cadea661ef690ef2",
+              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "5ac11f074544d88b3c052399f901b76969002eaa8521293ab29ec82c8d3fd4c2",
+              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ecff34dbf9e2a856fa1eedc5f6060acabb1d7721e3b22fc390e55a73694a0a18"
             }
           },
           "route": {
@@ -51,11 +51,11 @@
               "version": "16.2.1"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kacW_ZLkwwynpdAKmwZet",
-              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "CuIkwjdex7t3vWUTcuKUhaEGhWuPITTnZWF0yFbg0sQ=",
-              "__NEXT_PREVIEW_MODE_ID": "e3b92913a492b2e2c9562453146a9761",
-              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "700dc500dfc4d7db480f06337b3db922e5215718e04c9d474d3a956e2f91c9d7",
-              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "9ccb527c14a921f6d28af82e63180bf6f01a5823aefb50cfc1b5d3a56026cc7c"
+              "__NEXT_BUILD_ID": "8dQTWPUquA8Y6g5X72LIG",
+              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Tp1FyCg+kOul6pQ6fN2mudOpz7mRkIFp3o/0Vw4hAP0=",
+              "__NEXT_PREVIEW_MODE_ID": "896d62f996053a85cadea661ef690ef2",
+              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "5ac11f074544d88b3c052399f901b76969002eaa8521293ab29ec82c8d3fd4c2",
+              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ecff34dbf9e2a856fa1eedc5f6060acabb1d7721e3b22fc390e55a73694a0a18"
             }
           },
           "route": {
@@ -80,11 +80,11 @@
               "version": "16.2.1"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kacW_ZLkwwynpdAKmwZet",
-              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "CuIkwjdex7t3vWUTcuKUhaEGhWuPITTnZWF0yFbg0sQ=",
-              "__NEXT_PREVIEW_MODE_ID": "e3b92913a492b2e2c9562453146a9761",
-              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "700dc500dfc4d7db480f06337b3db922e5215718e04c9d474d3a956e2f91c9d7",
-              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "9ccb527c14a921f6d28af82e63180bf6f01a5823aefb50cfc1b5d3a56026cc7c"
+              "__NEXT_BUILD_ID": "8dQTWPUquA8Y6g5X72LIG",
+              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Tp1FyCg+kOul6pQ6fN2mudOpz7mRkIFp3o/0Vw4hAP0=",
+              "__NEXT_PREVIEW_MODE_ID": "896d62f996053a85cadea661ef690ef2",
+              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "5ac11f074544d88b3c052399f901b76969002eaa8521293ab29ec82c8d3fd4c2",
+              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ecff34dbf9e2a856fa1eedc5f6060acabb1d7721e3b22fc390e55a73694a0a18"
             }
           },
           "route": {
@@ -291,8 +291,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -304,8 +304,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -515,8 +515,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -528,8 +528,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -738,8 +738,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -751,8 +751,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -962,8 +962,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -975,8 +975,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -1186,8 +1186,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -1199,8 +1199,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -1410,8 +1410,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -1423,8 +1423,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -1634,8 +1634,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -1647,8 +1647,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -1858,8 +1858,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -1871,8 +1871,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -2082,8 +2082,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -2095,8 +2095,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -2306,8 +2306,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -2319,8 +2319,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -2529,8 +2529,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -2542,8 +2542,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -2753,8 +2753,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -2766,8 +2766,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -2977,8 +2977,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -2990,8 +2990,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -3201,8 +3201,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -3214,8 +3214,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -3425,8 +3425,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -3438,8 +3438,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -3649,8 +3649,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -3662,8 +3662,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -4271,8 +4271,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -4284,8 +4284,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -4495,8 +4495,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -4508,8 +4508,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -4718,8 +4718,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -4731,8 +4731,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -4942,8 +4942,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -4955,8 +4955,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -5166,8 +5166,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -5179,8 +5179,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -5390,8 +5390,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -5403,8 +5403,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -5614,8 +5614,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -5627,8 +5627,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -5838,8 +5838,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -5851,8 +5851,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -6062,8 +6062,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -6075,8 +6075,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -6288,8 +6288,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -6301,8 +6301,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -6511,8 +6511,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -6524,8 +6524,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -6735,8 +6735,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -6748,8 +6748,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -6959,8 +6959,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -6972,8 +6972,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -7183,8 +7183,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -7196,8 +7196,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -7407,8 +7407,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -7420,8 +7420,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -7631,8 +7631,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -7644,8 +7644,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -7855,8 +7855,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -7868,8 +7868,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -8078,8 +8078,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -8091,8 +8091,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -8302,8 +8302,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -8315,8 +8315,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -8526,8 +8526,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -8539,8 +8539,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -8750,8 +8750,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -8763,8 +8763,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -8974,8 +8974,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -8987,8 +8987,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -9198,8 +9198,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -9211,8 +9211,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -9422,8 +9422,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -9435,8 +9435,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -9646,8 +9646,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -9659,8 +9659,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -9869,8 +9869,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -9882,8 +9882,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -10093,8 +10093,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -10106,8 +10106,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -10317,8 +10317,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -10330,8 +10330,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -10541,8 +10541,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -10554,8 +10554,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -10765,8 +10765,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -10778,8 +10778,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -10989,8 +10989,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -11002,8 +11002,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -11213,8 +11213,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -11226,8 +11226,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -11437,8 +11437,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -11450,8 +11450,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -11660,8 +11660,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -11673,8 +11673,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -11884,8 +11884,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -11897,8 +11897,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -12108,8 +12108,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -12121,8 +12121,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -12332,8 +12332,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -12345,8 +12345,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -12556,8 +12556,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -12569,8 +12569,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -12780,8 +12780,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -12793,8 +12793,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -13004,8 +13004,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -13017,8 +13017,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -13228,8 +13228,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -13241,8 +13241,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -13451,8 +13451,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -13464,8 +13464,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -13675,8 +13675,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -13688,8 +13688,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -13899,8 +13899,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -13912,8 +13912,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -14123,8 +14123,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -14136,8 +14136,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -14347,8 +14347,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -14360,8 +14360,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -14571,8 +14571,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -14584,8 +14584,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -14795,8 +14795,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -14808,8 +14808,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -15019,8 +15019,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -15032,8 +15032,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -15242,8 +15242,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -15255,8 +15255,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -15466,8 +15466,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -15479,8 +15479,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -15690,8 +15690,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -15703,8 +15703,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -15914,8 +15914,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -15927,8 +15927,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -16138,8 +16138,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -16151,8 +16151,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -16362,8 +16362,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -16375,8 +16375,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -16586,8 +16586,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -16599,8 +16599,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -16810,8 +16810,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -16823,8 +16823,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -17033,8 +17033,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -17046,8 +17046,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -17257,8 +17257,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -17270,8 +17270,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -17481,8 +17481,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -17494,8 +17494,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -17705,8 +17705,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -17718,8 +17718,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -17929,8 +17929,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -17942,8 +17942,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -18153,8 +18153,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -18166,8 +18166,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -18377,8 +18377,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -18390,8 +18390,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -18601,8 +18601,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -18614,8 +18614,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -18824,8 +18824,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -18837,8 +18837,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -19048,8 +19048,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -19061,8 +19061,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -19272,8 +19272,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -19285,8 +19285,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -19496,8 +19496,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -19509,8 +19509,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -19720,8 +19720,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -19733,8 +19733,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -19944,8 +19944,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -19957,8 +19957,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -20168,8 +20168,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -20181,8 +20181,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -20392,8 +20392,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -20405,8 +20405,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -20615,8 +20615,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -20628,8 +20628,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -20839,8 +20839,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -20852,8 +20852,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -21063,8 +21063,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -21076,8 +21076,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -21287,8 +21287,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -21300,8 +21300,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -21511,8 +21511,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -21524,8 +21524,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -21735,8 +21735,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -21748,8 +21748,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -21959,8 +21959,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -21972,8 +21972,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -22183,8 +22183,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -22196,8 +22196,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -22406,8 +22406,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -22419,8 +22419,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -22630,8 +22630,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -22643,8 +22643,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -22854,8 +22854,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -22867,8 +22867,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -23078,8 +23078,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -23091,8 +23091,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -23302,8 +23302,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -23315,8 +23315,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -23526,8 +23526,8 @@
               ".next/server/app/trade/page_client-reference-manifest.js": ".next/server/app/trade/page_client-reference-manifest.js",
               "package.json": "package.json",
               ".next/server/chunks/269.js": ".next/server/chunks/269.js",
-              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/markets/page_client-reference-manifest.js": ".next/server/app/markets/page_client-reference-manifest.js",
+              ".next/server/app/page_client-reference-manifest.js": ".next/server/app/page_client-reference-manifest.js",
               ".next/server/app/school/page_client-reference-manifest.js": ".next/server/app/school/page_client-reference-manifest.js",
               ".next/server/app/_not-found/page.js": ".next/server/app/_not-found/page.js",
               ".next/server/app/_global-error/page.js": ".next/server/app/_global-error/page.js",
@@ -23539,8 +23539,8 @@
               ".next/server/app/setup/page.js": ".next/server/app/setup/page.js",
               ".next/server/app/simulate/page.js": ".next/server/app/simulate/page.js",
               ".next/server/app/trade/page.js": ".next/server/app/trade/page.js",
-              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/markets/page.js": ".next/server/app/markets/page.js",
+              ".next/server/app/page.js": ".next/server/app/page.js",
               ".next/server/app/school/page.js": ".next/server/app/school/page.js"
             }
           },
@@ -23955,11 +23955,11 @@
               "version": "16.2.1"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kacW_ZLkwwynpdAKmwZet",
-              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "CuIkwjdex7t3vWUTcuKUhaEGhWuPITTnZWF0yFbg0sQ=",
-              "__NEXT_PREVIEW_MODE_ID": "e3b92913a492b2e2c9562453146a9761",
-              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "700dc500dfc4d7db480f06337b3db922e5215718e04c9d474d3a956e2f91c9d7",
-              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "9ccb527c14a921f6d28af82e63180bf6f01a5823aefb50cfc1b5d3a56026cc7c"
+              "__NEXT_BUILD_ID": "8dQTWPUquA8Y6g5X72LIG",
+              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Tp1FyCg+kOul6pQ6fN2mudOpz7mRkIFp3o/0Vw4hAP0=",
+              "__NEXT_PREVIEW_MODE_ID": "896d62f996053a85cadea661ef690ef2",
+              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "5ac11f074544d88b3c052399f901b76969002eaa8521293ab29ec82c8d3fd4c2",
+              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ecff34dbf9e2a856fa1eedc5f6060acabb1d7721e3b22fc390e55a73694a0a18"
             }
           },
           "route": {
@@ -23981,11 +23981,11 @@
               "version": "16.2.1"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kacW_ZLkwwynpdAKmwZet",
-              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "CuIkwjdex7t3vWUTcuKUhaEGhWuPITTnZWF0yFbg0sQ=",
-              "__NEXT_PREVIEW_MODE_ID": "e3b92913a492b2e2c9562453146a9761",
-              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "700dc500dfc4d7db480f06337b3db922e5215718e04c9d474d3a956e2f91c9d7",
-              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "9ccb527c14a921f6d28af82e63180bf6f01a5823aefb50cfc1b5d3a56026cc7c"
+              "__NEXT_BUILD_ID": "8dQTWPUquA8Y6g5X72LIG",
+              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Tp1FyCg+kOul6pQ6fN2mudOpz7mRkIFp3o/0Vw4hAP0=",
+              "__NEXT_PREVIEW_MODE_ID": "896d62f996053a85cadea661ef690ef2",
+              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "5ac11f074544d88b3c052399f901b76969002eaa8521293ab29ec82c8d3fd4c2",
+              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ecff34dbf9e2a856fa1eedc5f6060acabb1d7721e3b22fc390e55a73694a0a18"
             }
           },
           "route": {
@@ -24007,11 +24007,11 @@
               "version": "16.2.1"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kacW_ZLkwwynpdAKmwZet",
-              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "CuIkwjdex7t3vWUTcuKUhaEGhWuPITTnZWF0yFbg0sQ=",
-              "__NEXT_PREVIEW_MODE_ID": "e3b92913a492b2e2c9562453146a9761",
-              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "700dc500dfc4d7db480f06337b3db922e5215718e04c9d474d3a956e2f91c9d7",
-              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "9ccb527c14a921f6d28af82e63180bf6f01a5823aefb50cfc1b5d3a56026cc7c"
+              "__NEXT_BUILD_ID": "8dQTWPUquA8Y6g5X72LIG",
+              "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Tp1FyCg+kOul6pQ6fN2mudOpz7mRkIFp3o/0Vw4hAP0=",
+              "__NEXT_PREVIEW_MODE_ID": "896d62f996053a85cadea661ef690ef2",
+              "__NEXT_PREVIEW_MODE_SIGNING_KEY": "5ac11f074544d88b3c052399f901b76969002eaa8521293ab29ec82c8d3fd4c2",
+              "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ecff34dbf9e2a856fa1eedc5f6060acabb1d7721e3b22fc390e55a73694a0a18"
             }
           },
           "route": {
@@ -24029,6 +24029,8 @@
       "/500.html",
       "/500.rsc.json",
       "/500.segments/_tree.segment.rsc.json",
+      "/_next/static/8dQTWPUquA8Y6g5X72LIG/_buildManifest.js",
+      "/_next/static/8dQTWPUquA8Y6g5X72LIG/_ssgManifest.js",
       "/_next/static/chunks/31-93087fee17f67b56.js",
       "/_next/static/chunks/4bd1b696-215e5051988c3dde.js",
       "/_next/static/chunks/500-c99b8dfd3de17c86.js",
@@ -24043,9 +24045,9 @@
       "/_next/static/chunks/app/api/technical/route-6c2bd64931fd9443.js",
       "/_next/static/chunks/app/events/page-8a711da0c5340dae.js",
       "/_next/static/chunks/app/layout-374afe76d75aead5.js",
-      "/_next/static/chunks/app/markets/page-fd31988c24044d9c.js",
+      "/_next/static/chunks/app/markets/page-48b7712e1c73c9ee.js",
       "/_next/static/chunks/app/money/page-7e4992d020876a4b.js",
-      "/_next/static/chunks/app/page-4c833e6db6e2ade8.js",
+      "/_next/static/chunks/app/page-9e915436dae05078.js",
       "/_next/static/chunks/app/portfolio/page-23c4df079b103bf7.js",
       "/_next/static/chunks/app/scan/page-73d61eaae0cb42c7.js",
       "/_next/static/chunks/app/scanner/page-ea6cff46f4fe8a00.js",
@@ -24063,9 +24065,7 @@
       "/_next/static/chunks/next/dist/client/components/builtin/unauthorized-6c2bd64931fd9443.js",
       "/_next/static/chunks/polyfills-42372ed130431b0a.js",
       "/_next/static/chunks/webpack-9ca43f4ce1bb8938.js",
-      "/_next/static/css/6cee81b9c1de005c.css",
-      "/_next/static/kacW_ZLkwwynpdAKmwZet/_buildManifest.js",
-      "/_next/static/kacW_ZLkwwynpdAKmwZet/_ssgManifest.js",
+      "/_next/static/css/2dbefd4e8b60ba7b.css",
       "/_next/static/not-found.txt",
       "/assets/.DS_Store",
       "/assets/hero.png"
