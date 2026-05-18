@@ -24,11 +24,11 @@ function scoreToAngle(score: number): number {
 }
 
 function scoreColor(score: number): string {
-  if (score <= 20) return "#ff3b30";
-  if (score <= 40) return "#ff6b35";
-  if (score <= 60) return "#ff9500";
-  if (score <= 80) return "#86c83c";
-  return "#00c896";
+  if (score <= 20) return "#ff3b6f";
+  if (score <= 40) return "#ff6b6b";
+  if (score <= 60) return "#f59e0b";
+  if (score <= 80) return "#00f0a0";
+  return "#00f0ff";
 }
 
 export function FearGreedDial({ data }: Props) {
@@ -41,11 +41,11 @@ export function FearGreedDial({ data }: Props) {
   const color = scoreColor(score);
 
   const zones = [
-    { label: "Fear",    start: 180, end: 144, color: "#ff3b30" },
-    { label: "",        start: 144, end: 108, color: "#ff6b35" },
-    { label: "Neutral", start: 108, end: 72,  color: "#ff9500" },
-    { label: "",        start: 72,  end: 36,  color: "#86c83c" },
-    { label: "Greed",   start: 36,  end: 0,   color: "#00c896" },
+    { label: "Fear",    start: 180, end: 144, color: "#ff3b6f" },
+    { label: "",        start: 144, end: 108, color: "#ff6b6b" },
+    { label: "Neutral", start: 108, end: 72,  color: "#f59e0b" },
+    { label: "",        start: 72,  end: 36,  color: "#00f0a0" },
+    { label: "Greed",   start: 36,  end: 0,   color: "#00f0ff" },
   ];
 
   return (

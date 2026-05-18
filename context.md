@@ -1,4 +1,4 @@
-# SIAM MARKETS — Live Config
+# DayTraders — Live Config
 
 ## API Keys
 

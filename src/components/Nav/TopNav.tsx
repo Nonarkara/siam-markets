@@ -51,7 +51,7 @@ export function TopNav() {
           whiteSpace: "nowrap",
         }}
       >
-        SIAM MARKETS
+        DAYTRADERS
       </Link>
 
       <div style={{ display: "flex", flex: 1, gap: 0 }}>

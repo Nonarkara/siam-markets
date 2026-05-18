@@ -45,11 +45,11 @@ export function SignalCard({
     ctx.fillStyle = color;
     ctx.fillRect(4, 4, W - 8, 4);
 
-    // SIAM MARKETS wordmark
+    // DAYTRADERS wordmark
     ctx.font = "bold 18px 'IBM Plex Mono', monospace";
     ctx.fillStyle = "rgba(0,255,65,0.5)";
     ctx.textAlign = "left";
-    ctx.fillText("SIAM MARKETS · SIGNAL INTELLIGENCE", 40, 50);
+    ctx.fillText("DAYTRADERS · SIGNAL INTELLIGENCE", 40, 50);
 
     // Date
     ctx.font = "14px 'IBM Plex Mono', monospace";
@@ -121,7 +121,7 @@ export function SignalCard({
     ctx.font = "13px 'IBM Plex Mono', monospace";
     ctx.fillStyle = "rgba(0,255,65,0.25)";
     ctx.textAlign = "left";
-    ctx.fillText(`SRC: ${(source ?? "SIAM MARKETS").toUpperCase()} · money.nonarkara.org · BUILT IN THAILAND`, 40, H - 30);
+    ctx.fillText(`SRC: ${(source ?? "DAYTRADERS").toUpperCase()} · money.nonarkara.org · BUILT IN THAILAND`, 40, H - 30);
 
     // Metric tag (top right)
     if (metric) {
@@ -151,7 +151,7 @@ export function SignalCard({
       const file = new File([blob], "siam-signal.png", { type: "image/png" });
       if (navigator.share) {
         try {
-          await navigator.share({ files: [file], title: `SIAM MARKETS · ${title}` });
+          await navigator.share({ files: [file], title: `DAYTRADERS · ${title}` });
         } catch {
           downloadCard();
         }

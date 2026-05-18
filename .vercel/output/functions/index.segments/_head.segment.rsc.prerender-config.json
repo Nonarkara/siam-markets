@@ -3,7 +3,7 @@
   "expiration": 300,
   "staleExpiration": 31536000,
   "group": 1,
-  "bypassToken": "e01a06bed637cd4fec895fecd0eecee8",
+  "bypassToken": "bf7afe09ba25c0b8b6c4fb54450dc5a9",
   "fallback": {
     "type": "FileFsRef",
     "mode": 33188,

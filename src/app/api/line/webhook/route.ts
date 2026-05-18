@@ -1,5 +1,5 @@
 /**
- * SIAM MARKETS LINE Bot — Webhook handler
+ * DayTraders LINE Bot — Webhook handler
  * Edge-compatible: pure fetch, no SDK, Web Crypto for signature verification
  * Webhook URL: https://siam-markets.pages.dev/api/line/webhook
  *
@@ -119,7 +119,7 @@ async function handleMessage(text: string, replyToken: string, token: string) {
 
   // /help
   if (lower === "/help" || lower === "help" || lower === "ช่วยด้วย") {
-    await replyFlex(replyToken, "SIAM MARKETS Commands", buildHelpFlex(), token);
+    await replyFlex(replyToken, "DayTraders Commands", buildHelpFlex(), token);
     return;
   }
 
@@ -181,7 +181,7 @@ function buildBriefFlex(title: string, body: string, accentColor: string) {
       type: "box", layout: "vertical",
       backgroundColor: "#0d0d0d", paddingAll: "14px",
       contents: [
-        { type: "text", text: "SIAM MARKETS", size: "xs", color: "rgba(0,200,150,0.5)", weight: "bold", letterSpacing: "2px" },
+        { type: "text", text: "DAYTRADERS", size: "xs", color: "rgba(0,200,150,0.5)", weight: "bold", letterSpacing: "2px" },
         { type: "text", text: title, size: "md", color: accentColor, weight: "bold", margin: "sm" },
       ],
     },
@@ -227,7 +227,7 @@ function buildHelpFlex() {
       type: "box", layout: "vertical",
       backgroundColor: "#0d0d0d", paddingAll: "14px",
       contents: [
-        { type: "text", text: "SIAM MARKETS", size: "xs", color: "rgba(0,200,150,0.5)", weight: "bold" },
+        { type: "text", text: "DAYTRADERS", size: "xs", color: "rgba(0,200,150,0.5)", weight: "bold" },
         { type: "text", text: "Commands", size: "lg", color: "#00c896", weight: "bold", margin: "sm" },
       ],
     },
@@ -292,5 +292,5 @@ export async function POST(req: Request) {
 
 // LINE verifies the webhook with a GET request — respond 200
 export async function GET() {
-  return NextResponse.json({ status: "SIAM MARKETS LINE Bot active" });
+  return NextResponse.json({ status: "DayTraders LINE Bot active" });
 }

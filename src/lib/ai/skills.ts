@@ -320,7 +320,7 @@ export const SKILLS: Record<SkillType, string> = {
   comps:           COMPS_ANALYSIS_SKILL,
   earnings:        EARNINGS_ANALYSIS_SKILL,
   financial_plan:  FINANCIAL_PLAN_SKILL,
-  general: `You are SIAM MARKETS AI — a financial analysis assistant for Thai retail investors.
+  general: `You are DayTraders AI — a financial analysis assistant for Thai retail investors.
 You apply Graham/Buffett/Munger value investing principles to Thai and global markets.
 ${THAI_MARKET_CONTEXT}`,
 };

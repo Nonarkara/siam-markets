@@ -13,7 +13,7 @@
 KNOWLEDGE  ·  SYSTEM  ·  DISCIPLINE  ·  EDGE
 ```
 
-**SIAM MARKETS** is a market intelligence platform built for Thai retail investors and traders.  
+**DayTraders** is a market intelligence platform built for Thai retail investors and traders.  
 It doesn't just show you data — it puts different data sets on the same axis, so your brain can connect dots that spreadsheets can't.
 
 [![Live](https://img.shields.io/badge/LIVE-nonarkara.org-00c896?style=flat-square&labelColor=0d0d0d)](https://nonarkara.org)
@@ -31,7 +31,7 @@ Most dashboards show you one thing at a time.
 
 Price on one screen. Macro on another. Sentiment buried in a news feed. Regional markets in a separate tab. The human brain can't connect data that isn't physically on the same surface at the same time.
 
-**SIAM MARKETS puts everything on the same axis.**
+**DayTraders puts everything on the same axis.**
 
 When the US Fed rate moves — you see the SET reaction, the THB response, and the Fear & Greed shift simultaneously. When China markets fall 2% before Bangkok opens — you see it next to the SET historical reaction pattern. When the BOT holds the policy rate — you see the lending rate band it's operating inside, alongside the sector that benefits most.
 

@@ -6,11 +6,11 @@ import { SetupGate } from "@/components/KPI/SetupGate";
 import { LangProvider } from "@/lib/i18n/useLang";
 
 export const metadata: Metadata = {
-  title: "SIAM MARKETS",
+  title: "DayTraders",
   description: "Thai market intelligence — personalized KPIs, Bloomberg-style signals, Graham/Buffett/Munger frameworks. ดัชนีการลงทุนไทย.",
   keywords: ["Thailand", "SET", "stock market", "investing", "mutual funds", "RMF", "Thai ESG", "กองทุน", "หุ้น"],
   openGraph: {
-    title: "SIAM MARKETS",
+    title: "DayTraders",
     description: "Market intelligence that knows what you want · ตลาดการลงทุนที่รู้ใจคุณ",
     type: "website",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0d0d0d",
+  themeColor: "#050508",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
