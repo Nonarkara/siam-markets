@@ -38,19 +38,28 @@ async function fetchSeries(seriesId: string, limit = 1): Promise<number | null> 
 
 export interface MacroData {
   usFedFundsRate: number | null;   // FEDFUNDS
-  usCpi: number | null;            // CPIAUCSL YoY %
+  usCpi: number | null;            // CPIAUCSL index level
   usUnemployment: number | null;   // UNRATE
   us10YTreasury: number | null;    // GS10
-  usdIndex: number | null;         // DTWEXBGS (USD index)
+  usdIndex: number | null;         // DTWEXBGS
+  // Enhanced indicators
+  yieldCurveSpread: number | null; // T10Y2Y — pre-computed 10Y-2Y spread
+  vix: number | null;              // VIXCLS — fear gauge
+  consumerSentiment: number | null; // UMCSENT — Michigan Consumer Sentiment
+  cfnai: number | null;            // CFNAI — Chicago Fed National Activity Index
 }
 
 export async function fetchMacro(): Promise<MacroData> {
-  const [fedRate, cpi, unemp, treasury, usdIdx] = await Promise.all([
+  const [fedRate, cpi, unemp, treasury, usdIdx, t10y2y, vix, umcsent, cfnai] = await Promise.all([
     fetchSeries("FEDFUNDS"),
     fetchSeries("CPIAUCSL"),
     fetchSeries("UNRATE"),
     fetchSeries("GS10"),
     fetchSeries("DTWEXBGS"),
+    fetchSeries("T10Y2Y"),     // yield curve spread (pre-computed)
+    fetchSeries("VIXCLS"),     // VIX daily
+    fetchSeries("UMCSENT"),    // U of Michigan consumer sentiment
+    fetchSeries("CFNAI"),      // Chicago Fed National Activity Index
   ]);
 
   return {
@@ -59,5 +68,9 @@ export async function fetchMacro(): Promise<MacroData> {
     usUnemployment: unemp,
     us10YTreasury: treasury,
     usdIndex: usdIdx,
+    yieldCurveSpread: t10y2y,
+    vix,
+    consumerSentiment: umcsent,
+    cfnai,
   };
 }
