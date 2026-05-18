@@ -24,17 +24,23 @@ import {
 } from "./api/intelligence/logic";
 import { ThailandPanel } from "@/components/Thailand/ThailandPanel";
 import { fetchThaiGdpHistory, THAILAND_PROFILE, THAI_SECTORS, THAILAND_GLOBAL_RANKINGS } from "@/lib/api/thailand-economy";
+import { DigitalEconomyPanel } from "@/components/Thailand/DigitalEconomyPanel";
+import {
+  THAILAND_DIGITAL_KPIS, THAI_DIGITAL_STACK, DIGITAL_MARKETS,
+  fetchGlobalAIQuotes,
+} from "@/lib/api/thailand-digital";
 
 export const revalidate = 300;
 
 export default async function DeskPage() {
-  const [fearGreed, thb, macro, regional, assetClasses, thaiGdpHistory] = await Promise.all([
+  const [fearGreed, thb, macro, regional, assetClasses, thaiGdpHistory, globalAi] = await Promise.all([
     fetchFearGreed(),
     fetchThbRate(),
     fetchMacro(),
     fetchAllRegional(),
     fetchAssetClasses(),
     fetchThaiGdpHistory(1980),
+    fetchGlobalAIQuotes(),
   ]);
 
   // Compute intelligence directly on the server
@@ -258,6 +264,30 @@ export default async function DeskPage() {
               profile={THAILAND_PROFILE}
               sectors={THAI_SECTORS}
               rankings={THAILAND_GLOBAL_RANKINGS}
+            />
+          </div>
+
+          {/* ─── DIGITAL ECONOMY × AI ────────────────────────────── */}
+          <div style={{ marginTop: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <div style={{
+                width: 8,
+                height: 8,
+                background: "#a78bfa",
+                boxShadow: "0 0 8px rgba(167,139,250,0.6)",
+              }} />
+              <span className="t-future" style={{ color: "#a78bfa", letterSpacing: "0.15em" }}>
+                ⚡ Digital Economy × AI — Thailand to The World
+              </span>
+            </div>
+            <div style={{ fontSize: "0.75rem", color: "var(--dim)", paddingLeft: 18, marginBottom: 12 }}>
+              Thai digital stack · Global AI mega-caps · Market scale comparison
+            </div>
+            <DigitalEconomyPanel
+              kpis={THAILAND_DIGITAL_KPIS}
+              thaiStack={THAI_DIGITAL_STACK}
+              globalAi={globalAi}
+              markets={DIGITAL_MARKETS}
             />
           </div>
 
