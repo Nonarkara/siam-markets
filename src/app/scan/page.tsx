@@ -5,6 +5,7 @@ import { GrahamMetrics } from "@/components/Value/GrahamMetrics";
 import { RiskMetricsTable } from "@/components/Market/RiskMetricsTable";
 import { SectorHeatmap } from "@/components/Market/SectorHeatmap";
 import { AnalysisPanel } from "@/components/AI/AnalysisPanel";
+import { StockCompareTool } from "@/components/Charts/StockCompareTool";
 import { MOCK_STOCKS } from "@/lib/api/mock";
 import { safetyZone, setValuationContext } from "@/lib/graham";
 import { fmtNum, pctColor } from "@/lib/format";
@@ -12,7 +13,7 @@ import type { StockFundamentals } from "@/lib/types";
 
 const SET_PE = 15.4;
 
-const TABS = ["VALUE SCANNER", "RISK METRICS", "SECTORS", "AI ANALYSIS"] as const;
+const TABS = ["VALUE SCANNER", "CHARTS", "RISK METRICS", "SECTORS", "AI ANALYSIS"] as const;
 type Tab = typeof TABS[number];
 
 export default function ScanPage() {
@@ -145,6 +146,7 @@ export default function ScanPage() {
         </>
       )}
 
+      {tab === "CHARTS" && <StockCompareTool />}
       {tab === "RISK METRICS" && <RiskMetricsTable stocks={MOCK_STOCKS} topN={15} />}
       {tab === "SECTORS" && <SectorHeatmap stocks={MOCK_STOCKS} />}
       {tab === "AI ANALYSIS" && (
