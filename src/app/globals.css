@@ -1,43 +1,53 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 
 /* ─── Design Tokens ─────────────────────────────────────────────── */
 :root {
-  /* Surfaces */
-  --bg:          #0d0d0d;
-  --bg-raised:   #161616;
-  --bg-surface:  #1e1e1e;
-  --bg-hover:    #242424;
+  /* Surfaces — deeper void */
+  --bg:          #050508;
+  --bg-raised:   #0c0c12;
+  --bg-surface:  #111118;
+  --bg-hover:    #1a1a24;
+  --bg-glass:    rgba(17, 17, 24, 0.72);
 
   /* Type */
-  --ink:    #e8e8e8;
-  --muted:  #888884;
-  --dim:    #4a4a46;
+  --ink:    #e8e8f0;
+  --muted:  #7a7a8a;
+  --dim:    #4a4a5a;
 
   /* Borders */
-  --line:     #2a2a2a;
-  --line-dim: #1e1e1e;
+  --line:     #1e1e2e;
+  --line-dim: #151520;
 
-  /* Signal palette */
-  --bull:    #00c896;   /* gain, growth, buy */
-  --bear:    #ff3b30;   /* loss, danger, sell */
-  --caution: #ff9500;   /* watch, neutral */
-  --tech:    #007aff;   /* UI chrome, links */
+  /* Signal palette — neon futurism */
+  --bull:    #00f0a0;   /* gain, growth, buy — neon emerald */
+  --bear:    #ff3b6f;   /* loss, danger, sell — neon rose */
+  --caution: #f59e0b;   /* watch, neutral — amber */
+  --tech:    #00f0ff;   /* UI chrome, links — cyan neon */
+  --violet:  #8b5cf6;   /* secondary accent */
+
+  /* Glow colors */
+  --bull-glow:  rgba(0, 240, 160, 0.25);
+  --bear-glow:  rgba(255, 59, 111, 0.25);
+  --tech-glow:  rgba(0, 240, 255, 0.25);
+  --caution-glow: rgba(245, 158, 11, 0.25);
 
   /* Bull/bear with opacity */
-  --bull-10:  rgba(0, 200, 150, 0.10);
-  --bull-20:  rgba(0, 200, 150, 0.20);
-  --bear-10:  rgba(255, 59, 48, 0.10);
-  --bear-20:  rgba(255, 59, 48, 0.20);
-  --caution-10: rgba(255, 149, 0, 0.10);
+  --bull-10:  rgba(0, 240, 160, 0.10);
+  --bull-20:  rgba(0, 240, 160, 0.20);
+  --bear-10:  rgba(255, 59, 111, 0.10);
+  --bear-20:  rgba(255, 59, 111, 0.20);
+  --caution-10: rgba(245, 158, 11, 0.10);
+  --tech-10: rgba(0, 240, 255, 0.10);
 
-  /* Typography scale — three sizes only (§11.7) */
-  --text-display: 2rem;       /* 32px — page titles, hero numbers */
-  --text-body:    0.875rem;   /* 14px — labels, captions, data */
-  --text-micro:   0.6875rem;  /* 11px — eyebrows, timestamps */
+  /* Typography scale */
+  --text-display: 2rem;
+  --text-body:    0.875rem;
+  --text-micro:   0.6875rem;
 
   /* Fonts */
   --font-display: "Josefin Sans", system-ui, sans-serif;
+  --font-future:  "Orbitron", "Josefin Sans", system-ui, sans-serif;
   --font-body:    "Source Sans 3", system-ui, sans-serif;
   --font-mono:    "IBM Plex Mono", "Courier New", monospace;
 
@@ -46,11 +56,11 @@
   --dur:  240ms;
 
   /* Layout */
-  --nav-h: 64px;       /* mobile bottom nav height */
-  --top-h: 52px;       /* desktop top nav height */
-  --pad:   16px;       /* page horizontal padding */
-  --gap:   12px;       /* card gap */
-  --radius: 0px;       /* zero border-radius — always */
+  --nav-h: 64px;
+  --top-h: 52px;
+  --pad:   16px;
+  --gap:   12px;
+  --radius: 0px;
 }
 
 /* ─── Reset ─────────────────────────────────────────────────────── */
@@ -58,7 +68,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  border-radius: 0 !important;   /* enforce zero — no exceptions */
+  border-radius: 0 !important;
 }
 
 html {
@@ -94,6 +104,14 @@ body {
   line-height: 1.1;
 }
 
+.t-future {
+  font-family: var(--font-future);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .t-body {
   font-family: var(--font-body);
   font-size: var(--text-body);
@@ -120,6 +138,34 @@ body {
   font-size: var(--text-display);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* ─── Futuristic glow text ───────────────────────────────────────── */
+.glow-text {
+  text-shadow: 0 0 8px var(--tech-glow), 0 0 20px var(--tech-glow);
+}
+
+.glow-text-bull {
+  text-shadow: 0 0 8px var(--bull-glow), 0 0 20px var(--bull-glow);
+}
+
+.glow-text-bear {
+  text-shadow: 0 0 8px var(--bear-glow), 0 0 20px var(--bear-glow);
+}
+
+/* ─── Glassmorphism card ─────────────────────────────────────────── */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+}
+
+.glass--accent {
+  background: linear-gradient(135deg, rgba(0,240,255,0.04) 0%, rgba(139,92,246,0.03) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,240,255,0.15);
 }
 
 /* ─── Layout utilities ───────────────────────────────────────────── */
@@ -149,6 +195,25 @@ body {
   padding: 16px;
 }
 
+.card--glow {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  padding: 16px;
+  position: relative;
+}
+
+.card--glow::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(135deg, rgba(0,240,255,0.15), transparent 40%, transparent 60%, rgba(139,92,246,0.1));
+  z-index: -1;
+  pointer-events: none;
+}
+
 .divider {
   height: 1px;
   background: var(--line);
@@ -164,8 +229,9 @@ body {
 .bg-bull  { background: var(--bull-10); }
 .bg-bear  { background: var(--bear-10); }
 .bg-caution { background: var(--caution-10); }
+.bg-tech { background: var(--tech-10); }
 
-/* ─── Interactive targets (§11.8) ───────────────────────────────── */
+/* ─── Interactive targets ───────────────────────────────────────── */
 .tap-target {
   display: inline-flex;
   align-items: center;
@@ -209,13 +275,13 @@ a:focus-visible,
 .chip:hover,
 .chip.active {
   color: var(--ink);
-  border-color: var(--ink);
-  background: var(--bg-hover);
+  border-color: var(--tech);
+  background: var(--tech-10);
+  box-shadow: 0 0 8px var(--tech-glow);
 }
 
 .chip.active {
-  color: var(--bull);
-  border-color: var(--bull);
+  color: var(--tech);
 }
 
 /* ─── Scrollbars ─────────────────────────────────────────────────── */
@@ -250,7 +316,46 @@ a:focus-visible,
   animation: pageEnter 400ms var(--ease) both;
 }
 
-/* ─── Horizontal scroll row (global indices) ─────────────────────── */
+/* ─── Fade in ────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 300ms var(--ease) both;
+}
+
+/* ─── Pulse glow ─────────────────────────────────────────────────── */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 4px var(--tech-glow); }
+  50% { box-shadow: 0 0 12px var(--tech-glow), 0 0 24px var(--tech-glow); }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* ─── Scanline effect ────────────────────────────────────────────── */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scanline-overlay::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(180deg, transparent, rgba(0,240,255,0.03), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Horizontal scroll row ──────────────────────────────────────── */
 .scroll-row {
   display: flex;
   gap: var(--gap);
@@ -286,5 +391,9 @@ a:focus-visible,
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: var(--gap);
+  }
+
+  .intel-grid {
+    grid-template-columns: 1.2fr 1fr;
   }
 }

@@ -81,7 +81,7 @@ export default function SetupPage() {
           color: "var(--muted)",
           marginBottom: 4,
         }}>
-          SIAM MARKETS
+          DAYTRADERS
         </div>
         <div className="t-micro">SETUP — {step}/2</div>
       </div>

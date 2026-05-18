@@ -169,7 +169,7 @@ export function MorningSignal() {
                 subtext="Bangkok 09:55 · SET Opens 10:00"
                 implication={headline ?? ""}
                 color="var(--caution)"
-                source="SIAM MARKETS AI"
+                source="DAYTRADERS AI"
                 metric="MORNING"
               />
             </div>
