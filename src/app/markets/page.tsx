@@ -1,3 +1,4 @@
+import { LiveTVGrid } from "@/components/TV/LiveTVGrid";
 import { AssetClassGrid } from "@/components/Market/AssetClassGrid";
 import { RegionalGrid } from "@/components/Market/RegionalGrid";
 import { YieldCurvePanel } from "@/components/Market/YieldCurvePanel";
@@ -34,6 +35,11 @@ export default async function MarketsPage() {
       <div className="t-display" style={{ marginBottom: 4 }}>Markets</div>
       <div className="t-body" style={{ color: "var(--muted)", marginBottom: 20 }}>
         Every market that moves Thailand — regional, global, commodities, bonds, crypto.
+      </div>
+
+      <Divider label="LIVE FINANCIAL TV" />
+      <div style={{ marginBottom: 16 }}>
+        <LiveTVGrid />
       </div>
 
       <Divider label="REGIONAL MARKETS · LIVE" />

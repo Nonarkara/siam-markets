@@ -1,4 +1,5 @@
 import { KPIStrip } from "@/components/KPI/KPIStrip";
+import { TVChannelStrip } from "@/components/TV/TVChannelStrip";
 import { CompactMacroStrip } from "@/components/Dashboard/CompactMacroStrip";
 import { DashboardGrid } from "@/components/Dashboard/DashboardGrid";
 import { MOCK_MACRO, MOCK_STOCKS } from "@/lib/api/mock";
@@ -66,6 +67,9 @@ export default async function DeskPage() {
         cape={MOCK_MACRO.cape}
         fgScore={fearGreed.score}
       />
+
+      {/* TV channel strip — quick access to live streams */}
+      <TVChannelStrip />
 
       {/* Dashboard grid — command center */}
       <DashboardGrid
