@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
+import { PortfolioTracker } from "@/components/Portfolio/PortfolioTracker";
 
-const TABS = ["TAX CALCULATOR", "10-YEAR PROJECTION", "INVESTMENT SCHOOL"] as const;
+const TABS = ["MY PORTFOLIO", "TAX CALCULATOR", "10-YEAR PROJECTION", "INVESTMENT SCHOOL"] as const;
 type Tab = typeof TABS[number];
 
 // Compact school concepts — 5 cards in accordion style
@@ -93,6 +94,7 @@ export default function MoneyPage() {
         ))}
       </div>
 
+      {tab === "MY PORTFOLIO" && <PortfolioTracker />}
       {tab === "TAX CALCULATOR" && <TaxCalc />}
 
       {tab === "10-YEAR PROJECTION" && (

@@ -1,0 +1,18 @@
+{
+  "runtime": "edge",
+  "name": "api/tv-streams",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "16.2.1"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "o7yY7S8fAqC3yFgLp5QMK",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "XRLqHQPHOsYq0PXdeR5ZDVI7h8evyaEJ1k/w9gtYOIk=",
+    "__NEXT_PREVIEW_MODE_ID": "e01a06bed637cd4fec895fecd0eecee8",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "9b6238b6a9bb84b63587d31f7c64d0c9816a38df53abdc433458b25cd162cbe4",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "75b5a697cbbe3920a405f08a5c93aa7ecd722598103b52fda39b4fa5cfa8dd38"
+  }
+}
