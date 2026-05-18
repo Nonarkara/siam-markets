@@ -1,5 +1,6 @@
 import { KPIStrip } from "@/components/KPI/KPIStrip";
 import { TVChannelStrip } from "@/components/TV/TVChannelStrip";
+import { MorningSignal } from "@/components/Dashboard/MorningSignal";
 import { CompactMacroStrip } from "@/components/Dashboard/CompactMacroStrip";
 import { DashboardGrid } from "@/components/Dashboard/DashboardGrid";
 import { MOCK_MACRO, MOCK_STOCKS } from "@/lib/api/mock";
@@ -68,7 +69,10 @@ export default async function DeskPage() {
         fgScore={fearGreed.score}
       />
 
-      {/* TV channel strip — quick access to live streams */}
+      {/* Morning signal — daily habit trigger */}
+      <MorningSignal />
+
+      {/* TV channel strip */}
       <TVChannelStrip />
 
       {/* Dashboard grid — command center */}

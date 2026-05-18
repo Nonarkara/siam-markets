@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ProfileBadge } from "@/components/KPI/ProfileBadge";
+import { LangToggle } from "@/components/KPI/LangToggle";
 
 const NAV = [
   { href: "/",        label: "DESK"    },
@@ -81,7 +82,10 @@ export function TopNav() {
         })}
       </div>
 
-      <ProfileBadge />
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <LangToggle />
+        <ProfileBadge />
+      </div>
     </nav>
   );
 }
