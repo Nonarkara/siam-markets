@@ -3,7 +3,7 @@
   globalThis._ENTRIES = {};
 /**/;self.__RSC_SERVER_MANIFEST="{\"node\":{},\"edge\":{},\"encryptionKey\":\"process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY\"}"
 /**/;globalThis.__RSC_MANIFEST=(globalThis.__RSC_MANIFEST||{});globalThis.__RSC_MANIFEST["/api/technical/route"]={"moduleLoading":{"prefix":"/_next/"},"ssrModuleMapping":{},"edgeSSRModuleMapping":{},"clientModules":{},"entryCSSFiles":{"/Users/nonarkara/Projects/dashboards/day trading/src/app/api/technical/route":[]},"rscModuleMapping":{},"edgeRscModuleMapping":{}};
-/**/;globalThis.__BUILD_MANIFEST={polyfillFiles:["static/chunks/polyfills-42372ed130431b0a.js"],devFiles:[],lowPriorityFiles:["static/3osgtSOC7JG-LVPol4VeN/_buildManifest.js","static/3osgtSOC7JG-LVPol4VeN/_ssgManifest.js"],rootMainFiles:["static/chunks/webpack-9ca43f4ce1bb8938.js","static/chunks/4bd1b696-215e5051988c3dde.js","static/chunks/794-4d0b7b700451cc43.js","static/chunks/main-app-e32707abd3818974.js"],rootMainFilesTree:{},pages:{"/_app":[]}};
+/**/;globalThis.__BUILD_MANIFEST={polyfillFiles:["static/chunks/polyfills-42372ed130431b0a.js"],devFiles:[],lowPriorityFiles:["static/ZlxztoMmCdMOPsYAzPeRG/_buildManifest.js","static/ZlxztoMmCdMOPsYAzPeRG/_ssgManifest.js"],rootMainFiles:["static/chunks/webpack-9ca43f4ce1bb8938.js","static/chunks/4bd1b696-215e5051988c3dde.js","static/chunks/794-4d0b7b700451cc43.js","static/chunks/main-app-e32707abd3818974.js"],rootMainFilesTree:{},pages:{"/_app":[]}};
 /**/;self.__REACT_LOADABLE_MANIFEST="{}";
 /**/;self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{},"appUsingSizeAdjust":false,"pagesUsingSizeAdjust":false}';
 /**/;self.__INTERCEPTION_ROUTE_REWRITE_MANIFEST="[]";
