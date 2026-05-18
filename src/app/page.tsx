@@ -22,16 +22,19 @@ import {
   REGIMES,
   dnaSimilarity,
 } from "./api/intelligence/logic";
+import { ThailandPanel } from "@/components/Thailand/ThailandPanel";
+import { fetchThaiGdpHistory, THAILAND_PROFILE, THAI_SECTORS, THAILAND_GLOBAL_RANKINGS } from "@/lib/api/thailand-economy";
 
 export const revalidate = 300;
 
 export default async function DeskPage() {
-  const [fearGreed, thb, macro, regional, assetClasses] = await Promise.all([
+  const [fearGreed, thb, macro, regional, assetClasses, thaiGdpHistory] = await Promise.all([
     fetchFearGreed(),
     fetchThbRate(),
     fetchMacro(),
     fetchAllRegional(),
     fetchAssetClasses(),
+    fetchThaiGdpHistory(1980),
   ]);
 
   // Compute intelligence directly on the server
@@ -232,6 +235,30 @@ export default async function DeskPage() {
                 <MorningSignal />
               </div>
             </div>
+          </div>
+
+          {/* ─── THAILAND ECONOMY ─────────────────────────────── */}
+          <div style={{ marginTop: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <div style={{
+                width: 8,
+                height: 8,
+                background: "var(--caution)",
+                boxShadow: "0 0 8px rgba(255,149,0,0.6)",
+              }} />
+              <span className="t-future" style={{ color: "var(--caution)", letterSpacing: "0.15em" }}>
+                🇹🇭 Thailand — The Economy Behind The Market
+              </span>
+            </div>
+            <div style={{ fontSize: "0.75rem", color: "var(--dim)", paddingLeft: 18, marginBottom: 12 }}>
+              GDP growth · Tourism · Medical tourism · Agriculture · Global rankings
+            </div>
+            <ThailandPanel
+              gdpHistory={thaiGdpHistory}
+              profile={THAILAND_PROFILE}
+              sectors={THAI_SECTORS}
+              rankings={THAILAND_GLOBAL_RANKINGS}
+            />
           </div>
 
           {/* Legacy dashboard grid below intelligence */}
