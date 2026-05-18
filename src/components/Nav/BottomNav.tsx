@@ -3,13 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_ITEMS = [
-  { href: "/",          label: "Pulse",   icon: PulseIcon },
-  { href: "/trade",     label: "Trade",   icon: TradeIcon },
-  { href: "/simulate",  label: "Sim",     icon: SimIcon },
-  { href: "/scanner",   label: "Scan",    icon: ScanIcon },
-  { href: "/school",    label: "Learn",   icon: SchoolIcon },
+const NAV = [
+  { href: "/",        label: "DESK",    icon: DeskIcon    },
+  { href: "/markets", label: "MARKETS", icon: MarketsIcon },
+  { href: "/scan",    label: "SCAN",    icon: ScanIcon    },
+  { href: "/trade",   label: "TRADE",   icon: TradeIcon   },
+  { href: "/money",   label: "MONEY",   icon: MoneyIcon   },
 ] as const;
+
+function isActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname.startsWith(href);
+}
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -20,9 +25,7 @@ export function BottomNav() {
       aria-label="Main navigation"
       style={{
         position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
+        bottom: 0, left: 0, right: 0,
         height: "var(--nav-h)",
         background: "var(--bg-raised)",
         borderTop: "1px solid var(--line)",
@@ -30,8 +33,8 @@ export function BottomNav() {
         zIndex: 100,
       }}
     >
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href;
+      {NAV.map(({ href, label, icon: Icon }) => {
+        const active = isActive(pathname, href);
         return (
           <Link
             key={href}
@@ -46,16 +49,16 @@ export function BottomNav() {
               color: active ? "var(--bull)" : "var(--dim)",
               textDecoration: "none",
               minHeight: "var(--nav-h)",
-              transition: "color 200ms var(--ease)",
+              transition: "color 180ms var(--ease)",
+              borderTop: active ? "2px solid var(--bull)" : "2px solid transparent",
             }}
           >
             <Icon active={active} />
             <span style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "0.6rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              fontWeight: active ? 600 : 400,
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.5rem",
+              letterSpacing: "0.08em",
+              fontWeight: active ? 700 : 400,
             }}>
               {label}
             </span>
@@ -66,52 +69,50 @@ export function BottomNav() {
   );
 }
 
-// ─── Icons (SVG, 20×20) ──────────────────────────────────────────
+// ─── Icons ───────────────────────────────────────────────────────
 
-function PulseIcon({ active }: { active: boolean }) {
+function DeskIcon({ active }: { active: boolean }) {
   return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
     </svg>
   );
 }
 
-function TradeIcon({ active }: { active: boolean }) {
+function MarketsIcon({ active }: { active: boolean }) {
   return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <path d="M12 20V10" />
-      <path d="M18 20V4" />
-      <path d="M6 20v-4" />
-    </svg>
-  );
-}
-
-function SimIcon({ active }: { active: boolean }) {
-  return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <rect x="2" y="3" width="20" height="14" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
     </svg>
   );
 }
 
 function ScanIcon({ active }: { active: boolean }) {
   return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <rect x="3" y="3" width="18" height="18" />
-      <line x1="9" y1="9" x2="15" y2="9" />
-      <line x1="9" y1="12" x2="15" y2="12" />
-      <line x1="9" y1="15" x2="12" y2="15" />
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" />
     </svg>
   );
 }
 
-function SchoolIcon({ active }: { active: boolean }) {
+function TradeIcon({ active }: { active: boolean }) {
   return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
+    </svg>
+  );
+}
+
+function MoneyIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <rect x="2" y="7" width="20" height="14" />
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+      <circle cx="12" cy="14" r="2" />
     </svg>
   );
 }
