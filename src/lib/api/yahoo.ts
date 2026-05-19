@@ -39,6 +39,44 @@ export const REGIONAL_MARKETS = {
   ],
 } as const;
 
+// ─── World financial centers (for the Braun world clock map) ──────
+// Cities ordered by longitude (west → east), live index + tz offset.
+export const WORLD_FINANCIAL_CENTERS = [
+  { id: "lax",    city: "Los Angeles", country: "US",      flag: "🇺🇸", lon: -118.24, tz: "America/Los_Angeles", tzOffset: -8, index: "^GSPC",   indexLabel: "S&P 500"  },
+  { id: "nyc",    city: "New York",    country: "US",      flag: "🇺🇸", lon:  -74.00, tz: "America/New_York",    tzOffset: -5, index: "^DJI",    indexLabel: "Dow"      },
+  { id: "spo",    city: "São Paulo",   country: "Brazil",  flag: "🇧🇷", lon:  -46.63, tz: "America/Sao_Paulo",   tzOffset: -3, index: "^BVSP",   indexLabel: "Bovespa"  },
+  { id: "lon",    city: "London",      country: "UK",      flag: "🇬🇧", lon:   -0.13, tz: "Europe/London",       tzOffset:  0, index: "^FTSE",   indexLabel: "FTSE 100" },
+  { id: "fra",    city: "Frankfurt",   country: "Germany", flag: "🇩🇪", lon:    8.68, tz: "Europe/Berlin",       tzOffset:  1, index: "^GDAXI",  indexLabel: "DAX"      },
+  { id: "mow",    city: "Moscow",      country: "Russia",  flag: "🇷🇺", lon:   37.62, tz: "Europe/Moscow",       tzOffset:  3, index: "IMOEX.ME",indexLabel: "MOEX"     },
+  { id: "dxb",    city: "Dubai",       country: "UAE",     flag: "🇦🇪", lon:   55.27, tz: "Asia/Dubai",          tzOffset:  4, index: "^TASI.SR",indexLabel: "Tadawul"  },
+  { id: "bom",    city: "Mumbai",      country: "India",   flag: "🇮🇳", lon:   72.88, tz: "Asia/Kolkata",        tzOffset: 5.5,index: "^BSESN",  indexLabel: "Sensex"   },
+  { id: "bkk",    city: "Bangkok",     country: "Thailand",flag: "🇹🇭", lon:  100.50, tz: "Asia/Bangkok",        tzOffset:  7, index: "^SET.BK", indexLabel: "SET"      },
+  { id: "sin",    city: "Singapore",   country: "Singapore",flag: "🇸🇬",lon:  103.85, tz: "Asia/Singapore",      tzOffset:  8, index: "^STI",    indexLabel: "STI"      },
+  { id: "hkg",    city: "Hong Kong",   country: "HK",      flag: "🇭🇰", lon:  114.16, tz: "Asia/Hong_Kong",      tzOffset:  8, index: "^HSI",    indexLabel: "Hang Seng"},
+  { id: "sha",    city: "Shanghai",    country: "China",   flag: "🇨🇳", lon:  121.47, tz: "Asia/Shanghai",       tzOffset:  8, index: "000001.SS", indexLabel: "SSE"    },
+  { id: "tyo",    city: "Tokyo",       country: "Japan",   flag: "🇯🇵", lon:  139.69, tz: "Asia/Tokyo",          tzOffset:  9, index: "^N225",   indexLabel: "Nikkei"   },
+  { id: "syd",    city: "Sydney",      country: "Australia",flag: "🇦🇺",lon:  151.21, tz: "Australia/Sydney",    tzOffset: 10, index: "^AXJO",   indexLabel: "ASX 200"  },
+] as const;
+
+export async function fetchWorldCenters(): Promise<Array<{ id: string; city: string; flag: string; lon: number; tzOffset: number; indexLabel: string; price: number; changePct: number } | null>> {
+  return Promise.all(
+    WORLD_FINANCIAL_CENTERS.map(async (c) => {
+      const quote = await fetchYahooQuote(c.index, c.indexLabel);
+      if (!quote) return null;
+      return {
+        id: c.id,
+        city: c.city,
+        flag: c.flag,
+        lon: c.lon,
+        tzOffset: c.tzOffset,
+        indexLabel: c.indexLabel,
+        price: quote.price,
+        changePct: quote.changePct,
+      };
+    }),
+  );
+}
+
 // ─── Alternative Asset Classes ───────────────────────────────────
 
 export const ASSET_CLASS_MARKETS = [

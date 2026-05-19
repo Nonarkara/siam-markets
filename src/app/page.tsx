@@ -6,7 +6,8 @@ import { MOCK_MACRO, MOCK_STOCKS } from "@/lib/api/mock";
 import { fetchFearGreed } from "@/lib/api/feargreed";
 import { fetchThbRate } from "@/lib/api/bot";
 import { fetchMacro } from "@/lib/api/fred";
-import { fetchAllRegional, fetchAssetClasses } from "@/lib/api/yahoo";
+import { fetchAllRegional, fetchAssetClasses, fetchWorldCenters } from "@/lib/api/yahoo";
+import { WorldMarketClock, type FinancialCenter } from "@/components/WorldMarketClock/WorldMarketClock";
 import { buildSignalFeed } from "@/lib/signals";
 import { QuantumRadar } from "@/components/Intelligence/QuantumRadar";
 import { AnomalyStream } from "@/components/Intelligence/AnomalyStream";
@@ -33,7 +34,7 @@ import {
 export const revalidate = 300;
 
 export default async function DeskPage() {
-  const [fearGreed, thb, macro, regional, assetClasses, thaiGdpHistory, globalAi] = await Promise.all([
+  const [fearGreed, thb, macro, regional, assetClasses, thaiGdpHistory, globalAi, worldCentersRaw] = await Promise.all([
     fetchFearGreed(),
     fetchThbRate(),
     fetchMacro(),
@@ -41,7 +42,12 @@ export default async function DeskPage() {
     fetchAssetClasses(),
     fetchThaiGdpHistory(1980),
     fetchGlobalAIQuotes(),
+    fetchWorldCenters(),
   ]);
+
+  const worldCenters: FinancialCenter[] = worldCentersRaw.filter(
+    (c): c is FinancialCenter => c !== null,
+  );
 
   // Compute intelligence directly on the server
   const dna = computeMarketDNA(macro, fearGreed, thb, assetClasses, regional);
@@ -122,6 +128,13 @@ export default async function DeskPage() {
           cape={MOCK_MACRO.cape}
           fgScore={fearGreed.score}
         />
+
+        {/* ─── WORLD MARKET CLOCK — Braun GMT Weltzeit homage ───── */}
+        {worldCenters.length > 0 && (
+          <div style={{ padding: "16px 0", background: "#050505" }}>
+            <WorldMarketClock centers={worldCenters} />
+          </div>
+        )}
 
         {/* ─── INTELLIGENCE COMMAND CENTER ───────────────────────── */}
         <div className="page page-enter" style={{ paddingTop: 20 }}>
