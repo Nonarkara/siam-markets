@@ -16,6 +16,40 @@ npm run build            # production build
 npm run type-check       # tsc --noEmit — run before every commit
 ```
 
+## Design Heritage (Hardcoded — Dr Non's Lineage)
+
+This dashboard descends directly from **Dieter Rams** and **Braun**. Every new
+component must answer "would this fit on a 1965 Braun travel clock?" before
+it ships. If a thing is decorative — remove it. If a thing is informational —
+expose it with mathematical precision. This is not a stylistic preference.
+It's the project's DNA. Apply Rams' 10 principles to every UI decision:
+
+1. **Innovative** — but never novelty for novelty's sake
+2. **Useful** — every element must inform a decision
+3. **Aesthetic** — calm, never loud
+4. **Understandable** — self-explanatory, no manual needed
+5. **Unobtrusive** — recede when not needed
+6. **Honest** — never inflate; never hide
+7. **Long-lasting** — avoids trend
+8. **Thorough down to the last detail** — pixel alignment, kerning, hairline weights
+9. **Environmentally friendly** — minimal weight, fast loads
+10. **As little design as possible** — *less, but better* (weniger, aber besser)
+
+Visual cues that belong to this heritage:
+- Black or near-black backgrounds (#0d0d0d, never gradient)
+- Hairline borders (1px, low-opacity white)
+- Generous whitespace
+- Helvetica / grotesque sans (Source Sans 3 is the project's stand-in)
+- Monospace for all numerals (IBM Plex Mono)
+- Single high-contrast accent — Braun yellow (#ffd000) or Braun orange (#ff5e00)
+  may appear sparingly as a "second hand" callout. Never as a fill.
+- Lowercase labels for cities/places when matching the GMT Weltzeit reference
+- Dots as honest position markers (not decorative bullets)
+- Vertical hairlines as the *only* "map" — geography is the timezone grid
+
+Components that explicitly inherit this: `WorldMarketClock`, `TerminalChart`,
+`CompactMacroStrip`. New components should reference these as templates.
+
 ## Design System
 
 ### Palette (Financial Dark)
@@ -32,6 +66,10 @@ npm run type-check       # tsc --noEmit — run before every commit
 --bear: #ff3b30;         /* loss, sell signal */
 --caution: #ff9500;      /* watch, neutral */
 --tech: #007aff;         /* UI chrome */
+
+/* Braun accents — sparing, "second hand" callouts only */
+--braun-yellow: #ffd000;
+--braun-orange: #ff5e00;
 ```
 
 ### Typography (3 sizes — §11.7)
