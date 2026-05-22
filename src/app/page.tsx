@@ -1,55 +1,72 @@
-import { KPIStrip } from "@/components/KPI/KPIStrip";
-import { MorningSignal } from "@/components/Dashboard/MorningSignal";
-import { CompactMacroStrip } from "@/components/Dashboard/CompactMacroStrip";
-import { DashboardGrid } from "@/components/Dashboard/DashboardGrid";
-import { MOCK_MACRO, MOCK_STOCKS } from "@/lib/api/mock";
-import { fetchFearGreed } from "@/lib/api/feargreed";
-import { fetchThbRate } from "@/lib/api/bot";
-import { fetchMacro } from "@/lib/api/fred";
-import { fetchAllRegional, fetchAssetClasses, fetchWorldCenters } from "@/lib/api/yahoo";
 import { WorldMarketClock, type FinancialCenter } from "@/components/WorldMarketClock/WorldMarketClock";
-import { buildSignalFeed } from "@/lib/signals";
+import { SubwayStatusBar } from "@/components/Subway/SubwayStatusBar";
+import { SubwayQuadrant } from "@/components/Subway/SubwayQuadrant";
+import { SectorMomentum } from "@/components/Subway/SectorMomentum";
+import { ForeignFlow } from "@/components/Subway/ForeignFlow";
+import { DividendLeaderboard } from "@/components/Subway/DividendLeaderboard";
+import { EarningsCountdown } from "@/components/Subway/EarningsCountdown";
+import { CommodityMicro } from "@/components/Subway/CommodityMicro";
 import { QuantumRadar } from "@/components/Intelligence/QuantumRadar";
 import { AnomalyStream } from "@/components/Intelligence/AnomalyStream";
 import { PatternResonance } from "@/components/Intelligence/PatternResonance";
 import { NarrativeReality } from "@/components/Intelligence/NarrativeReality";
 import { FlowMatrix } from "@/components/Intelligence/FlowMatrix";
-import { ParticleField } from "@/components/Intelligence/ParticleField";
+import { VIXCurve } from "@/components/Market/VIXCurve";
+import { EconCalendar } from "@/components/Intelligence/EconCalendar";
+import { SmartMoneyTracker } from "@/components/PainPoints/SmartMoneyTracker";
+import { SentimentDivergence } from "@/components/PainPoints/SentimentDivergence";
+import { GammaExposureProxy } from "@/components/PainPoints/GammaExposureProxy";
+import { SectorHeatmap } from "@/components/Market/SectorHeatmap";
+import { RiskMetricsTable } from "@/components/Market/RiskMetricsTable";
+import { PortfolioTracker } from "@/components/Portfolio/PortfolioTracker";
+import { PortfolioQuadrantSummary } from "@/components/Portfolio/PortfolioQuadrantSummary";
+import { TaxCalc } from "@/components/Portfolio/TaxCalc";
+import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
+import { MorningSignal } from "@/components/Dashboard/MorningSignal";
+import { CompactTradeSignal } from "@/components/Trade/CompactTradeSignal";
+import { SimulatorStatus } from "@/components/Trade/SimulatorStatus";
+import { StockScannerTable } from "@/components/StockDetail/StockScannerTable";
 import {
-  computeMarketDNA,
-  detectAnomalies,
-  computeNarrativeReality,
-  computeFlowMatrix,
-  REGIMES,
-  dnaSimilarity,
+  MOCK_MACRO, MOCK_STOCKS, MOCK_SMART_MONEY_FLOWS,
+  MOCK_SENTIMENT_DIVERGENCE, MOCK_GAMMA_CHAIN,
+} from "@/lib/api/mock";
+import { fetchFearGreed } from "@/lib/api/feargreed";
+import { fetchThbRate } from "@/lib/api/bot";
+import { fetchMacro } from "@/lib/api/fred";
+import { fetchAllRegional, fetchAssetClasses, fetchWorldCenters, WORLD_FINANCIAL_CENTERS } from "@/lib/api/yahoo";
+import {
+  computeMarketDNA, detectAnomalies, computeNarrativeReality,
+  computeFlowMatrix, REGIMES, dnaSimilarity,
 } from "./api/intelligence/logic";
-import { ThailandPanel } from "@/components/Thailand/ThailandPanel";
-import { fetchThaiGdpHistory, THAILAND_PROFILE, THAI_SECTORS, THAILAND_GLOBAL_RANKINGS } from "@/lib/api/thailand-economy";
-import { DigitalEconomyPanel } from "@/components/Thailand/DigitalEconomyPanel";
-import {
-  THAILAND_DIGITAL_KPIS, THAI_DIGITAL_STACK, DIGITAL_MARKETS,
-  fetchGlobalAIQuotes,
-} from "@/lib/api/thailand-digital";
+import { QuadrantLayout } from "@/components/Quadrant/QuadrantLayout";
+import { fmtNum, fmtPct, pctClass, pctColor } from "@/lib/format";
+import Link from "next/link";
 
 export const revalidate = 300;
 
+// ─── Mock earnings calendar ──────────────────────────────────────
+const MOCK_EARNINGS = [
+  { symbol: "PTT.BK", name: "PTT", date: "2026-05-22", sector: "ENERGY", expectedEps: 2.85, prevEps: 2.72 },
+  { symbol: "SCB.BK", name: "SCB X", date: "2026-05-26", sector: "BANKING", expectedEps: 3.10, prevEps: 2.95 },
+  { symbol: "AOT.BK", name: "Airports of Thailand", date: "2026-05-28", sector: "TOURISM", expectedEps: 1.45, prevEps: 1.22 },
+  { symbol: "CPALL.BK", name: "CP All", date: "2026-06-02", sector: "RETAIL", expectedEps: 0.92, prevEps: 0.88 },
+  { symbol: "DELTA.BK", name: "Delta Electronics", date: "2026-06-05", sector: "TECH", expectedEps: 5.20, prevEps: 4.85 },
+  { symbol: "CPF.BK", name: "Charoen Pokphand Foods", date: "2026-06-09", sector: "AGRI", expectedEps: 1.15, prevEps: 0.98 },
+];
+
 export default async function DeskPage() {
-  const [fearGreed, thb, macro, regional, assetClasses, thaiGdpHistory, globalAi, worldCentersRaw] = await Promise.all([
-    fetchFearGreed(),
-    fetchThbRate(),
-    fetchMacro(),
-    fetchAllRegional(),
-    fetchAssetClasses(),
-    fetchThaiGdpHistory(1980),
-    fetchGlobalAIQuotes(),
-    fetchWorldCenters(),
+  const [fearGreed, thb, macro, regional, assetClasses, worldCentersRaw] = await Promise.all([
+    fetchFearGreed(), fetchThbRate(), fetchMacro(),
+    fetchAllRegional(), fetchAssetClasses(), fetchWorldCenters(),
   ]);
 
-  const worldCenters: FinancialCenter[] = worldCentersRaw.filter(
-    (c): c is FinancialCenter => c !== null,
-  );
+  const worldCenters: FinancialCenter[] = worldCentersRaw.map((c, i) => {
+    if (c) return c as FinancialCenter;
+    const f = WORLD_FINANCIAL_CENTERS[i];
+    return { id: f.id, city: f.city, flag: f.flag, lon: f.lon, tzOffset: f.tzOffset, indexLabel: f.indexLabel, price: 0, changePct: 0 };
+  });
 
-  // Compute intelligence directly on the server
+  // Intelligence computation
   const dna = computeMarketDNA(macro, fearGreed, thb, assetClasses, regional);
   const anomalies = detectAnomalies(macro, fearGreed, assetClasses, regional);
   const setChange = regional.thai[0]?.changePct ?? -0.62;
@@ -61,34 +78,12 @@ export default async function DeskPage() {
     similarity: Math.round(dnaSimilarity(dna.scores, r.dna) * 100),
   })).sort((a, b) => b.similarity - a.similarity);
 
-  const liveSet = regional.thai[0] ?? null;
   const setPe = MOCK_MACRO.setPe;
   const us10y = assetClasses.find(a => a.symbol === "^TNX")?.price ?? null;
   const us2y = assetClasses.find(a => a.symbol === "^IRX")?.price ?? null;
 
-  const signals = buildSignalFeed({
-    fearGreed,
-    setPe,
-    fedRate: macro.usFedFundsRate ?? MOCK_MACRO.fedRate,
-    thbUsd: thb.usd,
-    watchlistStocks: MOCK_STOCKS.slice(0, 3),
-  });
-
-  const bestMos = MOCK_STOCKS.reduce((best, s) =>
-    s.marginOfSafety > best.marginOfSafety ? s : best, MOCK_STOCKS[0]);
-
-  const kpiData = {
-    fearGreed: fearGreed.score,
-    setPe,
-    fedRate: macro.usFedFundsRate ?? MOCK_MACRO.fedRate,
-    thbUsd: thb.usd,
-    bestMos: bestMos.marginOfSafety,
-    bestMosSymbol: bestMos.symbol,
-    grahamStocks: MOCK_STOCKS.filter(s => s.pe <= 15 && s.pb <= 1.5).length,
-    cape: MOCK_MACRO.cape,
-  };
-
-  const sortedStocks = [...MOCK_STOCKS].sort((a, b) => b.marginOfSafety - a.marginOfSafety);
+  const bestMos = MOCK_STOCKS.reduce((best, s) => s.marginOfSafety > best.marginOfSafety ? s : best, MOCK_STOCKS[0]);
+  const grahamCount = MOCK_STOCKS.filter(s => s.pe <= 15 && s.pb <= 1.5).length;
 
   const marketDNA = {
     dimensions: ["Value", "Momentum", "Liquid", "Sentiment", "Volatility", "Diverge"],
@@ -97,246 +92,318 @@ export default async function DeskPage() {
     regimeConfidence: dna.confidence,
     historicalAvg: [52, 55, 50, 50, 45, 30],
   };
-  const pattern = {
-    bestMatch: allMatches[0].regime,
-    similarity: allMatches[0].similarity,
-    allMatches,
-  };
-  const narrative = narrativeReality;
-  const flows = flowMatrix;
+  const pattern = { bestMatch: allMatches[0].regime, similarity: allMatches[0].similarity, allMatches };
+
+  // Key assets
+  const gold = assetClasses.find(a => a.symbol === "GC=F");
+  const oil = assetClasses.find(a => a.symbol === "CL=F");
+  const btc = assetClasses.find(a => a.symbol === "BTC-USD");
+  const vixQ = assetClasses.find(a => a.symbol === "^VIX");
+  const spx = regional.global.find(q => q.symbol === "^GSPC");
+  const n225 = regional.global.find(q => q.symbol === "^N225");
+
+  // Commodity micro data
+  const commodityData = [
+    ...(gold ? [{ symbol: "GC=F", name: "GOLD", price: gold.price, changePct: gold.changePct ?? 0, unit: "$/oz" }] : []),
+    ...(oil ? [{ symbol: "CL=F", name: "WTI", price: oil.price, changePct: oil.changePct ?? 0, unit: "$/bbl" }] : []),
+    { symbol: "RUBBER", name: "RUBBER", price: 58.5, changePct: 1.2, unit: "฿/kg" },
+    { symbol: "SUGAR", name: "SUGAR", price: 18.4, changePct: -0.8, unit: "¢/lb" },
+    ...(btc ? [{ symbol: "BTC", name: "BTC", price: btc.price, changePct: btc.changePct ?? 0, unit: "$" }] : []),
+  ];
+
+  const sortedStocks = [...MOCK_STOCKS].sort((a, b) => b.marginOfSafety - a.marginOfSafety);
 
   return (
-    <div style={{ paddingBottom: "var(--nav-h)", position: "relative" }}>
-      {/* Ambient particle background */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-        <ParticleField />
-      </div>
+    <>
+      {/* ═══════════════════════════════════════════════════════════════
+          SUBWAY STATUS BAR · All lines in one scannable strip
+          ═══════════════════════════════════════════════════════════════ */}
+      <SubwayStatusBar
+        setChange={setChange}
+        setPe={setPe}
+        vix={macro.vix}
+        thbUsd={thb.usd}
+        fearGreed={fearGreed.score}
+        fedRate={macro.usFedFundsRate ?? MOCK_MACRO.fedRate}
+        us10y={us10y}
+        us2y={us2y}
+        yieldSpread={macro.yieldCurveSpread}
+        cape={MOCK_MACRO.cape}
+        grahamCount={grahamCount}
+        bestMos={bestMos.marginOfSafety}
+        bestMosSymbol={bestMos.symbol}
+        anomalyCount={anomalies.length}
+        narrativeVerdict={narrativeReality?.verdict}
+        macroEventsToday={3}
+      />
 
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* KPI strip — always visible */}
-        <KPIStrip data={kpiData} />
+      {/* ═══════════════════════════════════════════════════════════════
+          WORLD CLOCK · Braun GMT strip
+          ═══════════════════════════════════════════════════════════════ */}
+      <WorldMarketClock centers={worldCenters} />
 
-        {/* Macro strip */}
-        <CompactMacroStrip
-          fedRate={macro.usFedFundsRate ?? MOCK_MACRO.fedRate}
-          us10y={us10y}
-          us2y={us2y}
-          yieldSpread={macro.yieldCurveSpread}
-          vix={macro.vix}
-          thbUsd={thb.usd}
-          setPe={setPe}
-          cape={MOCK_MACRO.cape}
-          fgScore={fearGreed.score}
-        />
-
-        {/* ─── WORLD MARKET CLOCK — Braun GMT Weltzeit homage ───── */}
-        {worldCenters.length > 0 && (
-          <div style={{ padding: "16px 0", background: "#050505" }}>
-            <WorldMarketClock centers={worldCenters} />
-          </div>
-        )}
-
-        {/* ─── INTELLIGENCE COMMAND CENTER ───────────────────────── */}
-        <div className="page page-enter" style={{ paddingTop: 20 }}>
-          {/* Section header */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 4,
-            }}>
-              <div style={{
-                width: 8,
-                height: 8,
-                background: "var(--tech)",
-                boxShadow: "0 0 8px var(--tech-glow)",
-              }} />
-              <span className="t-future" style={{ color: "var(--tech)", letterSpacing: "0.15em" }}>
-                Market Intelligence Engine
-              </span>
-            </div>
-            <div style={{
-              fontSize: "0.75rem",
-              color: "var(--dim)",
-              paddingLeft: 18,
-            }}>
-              Pattern recognition · Anomaly detection · Narrative analysis
-            </div>
-          </div>
-
-          {/* Desktop: 2-column grid | Mobile: single column */}
-          <div style={{
-            display: "grid",
-            gap: "var(--gap)",
-          }} className="intel-grid">
-            {/* LEFT COLUMN */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)" }}>
-              {/* Market DNA Radar */}
-              <div className="card--glow" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div style={{ width: "100%", marginBottom: 12 }}>
-                  <span className="t-micro" style={{ color: "var(--tech)" }}>MARKET DNA · 6-AXIS FINGERPRINT</span>
-                </div>
-                <QuantumRadar
-                  dimensions={marketDNA.dimensions}
-                  scores={marketDNA.scores}
-                  historicalAvg={marketDNA.historicalAvg}
-                  regime={marketDNA.regime}
-                  confidence={marketDNA.regimeConfidence}
-                />
+      <QuadrantLayout>
+        {/* ═══════════════════════════════════════════════════════════════
+            Q1 · PULSE LINE (GREEN) — Live market data, flows, commodities
+            ═══════════════════════════════════════════════════════════════ */}
+        <SubwayQuadrant title="PULSE" lineColor="var(--bull)" href="/markets" badge="LIVE">
+          {/* Regional + Assets — dense dual table, no card wrappers */}
+          <div style={{ display: "flex", borderBottom: "1px solid var(--line-dim)" }}>
+            {/* Regional */}
+            <div style={{ flex: 1, minWidth: 0, borderRight: "1px solid var(--line-dim)" }}>
+              <div className="t-micro" style={{ padding: "4px 10px", color: "var(--dim)", letterSpacing: "0.14em" }}>
+                REGIONAL
               </div>
-
-              {/* Pattern Resonance */}
-              {pattern && (
-                <div className="card--glow">
-                  <PatternResonance
-                    bestMatch={pattern.bestMatch}
-                    similarity={pattern.similarity}
-                    allMatches={pattern.allMatches}
-                  />
-                </div>
-              )}
-
-              {/* Flow Matrix */}
-              {flows.length > 0 && (
-                <div className="card--glow">
-                  <div className="t-micro" style={{ marginBottom: 10, color: "var(--violet)" }}>
-                    CROSS-ASSET FLOW MATRIX
-                  </div>
-                  <FlowMatrix flows={flows} />
-                </div>
-              )}
-            </div>
-
-            {/* RIGHT COLUMN */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)" }}>
-              {/* Anomaly Stream */}
-              <div className="card--glow">
-                <div style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 10,
+              {[...regional.thai.slice(0, 1), ...regional.asean.slice(0, 2), ...regional.china.slice(0, 2)].map((q, i, arr) => (
+                <div key={q.symbol} style={{
+                  display: "grid", gridTemplateColumns: "1fr auto auto",
+                  gap: 8, alignItems: "center",
+                  padding: "3px 10px",
+                  borderBottom: i < arr.length - 1 ? "1px solid var(--line-dim)" : "none",
+                  minHeight: 22,
                 }}>
-                  <span className="t-micro" style={{ color: "var(--bear)" }}>
-                    ANOMALY DETECTION
-                  </span>
-                  <span style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.6rem",
-                    color: anomalies.length > 0 ? "var(--bear)" : "var(--dim)",
-                    border: `1px solid ${anomalies.length > 0 ? "var(--bear)" : "var(--line)"}`,
-                    padding: "1px 5px",
-                  }}>
-                    {anomalies.length} ALERT{anomalies.length !== 1 ? "S" : ""}
-                  </span>
+                  <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{q.name}</span>
+                  <span className="t-mono" style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--ink)" }}>{fmtNum(q.price, 0)}</span>
+                  <span className={`t-mono ${pctClass(q.changePct)}`} style={{ fontSize: "0.5625rem" }}>{fmtPct(q.changePct)}</span>
                 </div>
-                <AnomalyStream anomalies={anomalies} />
+              ))}
+            </div>
+            {/* Assets */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="t-micro" style={{ padding: "4px 10px", color: "var(--dim)", letterSpacing: "0.14em" }}>
+                ASSETS
               </div>
-
-              {/* Narrative Reality Check */}
-              {narrative && (
-                <div className="card--glow">
-                  <NarrativeReality
-                    topic={narrative.topic}
-                    narrativeTone={narrative.narrativeTone}
-                    narrativeVolume={narrative.narrativeVolume}
-                    measuredValue={narrative.measuredValue}
-                    measuredContext={narrative.measuredContext}
-                    verdict={narrative.verdict}
-                    verdictColor={narrative.verdictColor}
-                  />
+              {[gold, oil, btc, vixQ].filter(Boolean).map(asset => (
+                <div key={asset!.symbol} style={{
+                  display: "grid", gridTemplateColumns: "1fr auto auto",
+                  gap: 8, alignItems: "center",
+                  padding: "3px 10px",
+                  borderBottom: "1px solid var(--line-dim)",
+                  minHeight: 22,
+                }}>
+                  <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{asset!.name}</span>
+                  <span className="t-mono" style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--ink)" }}>
+                    {asset!.price > 10000 ? `$${(asset!.price / 1000).toFixed(1)}K` :
+                     asset!.price > 100 ? `$${fmtNum(asset!.price, 1)}` : `$${fmtNum(asset!.price, 3)}`}
+                  </span>
+                  <span className={`t-mono ${pctClass(asset!.changePct)}`} style={{ fontSize: "0.5625rem" }}>{fmtPct(asset!.changePct)}</span>
                 </div>
-              )}
-
-              {/* Morning Signal */}
-              <div className="card--glow">
-                <MorningSignal />
-              </div>
+              ))}
+              {/* Global futures */}
+              {[spx, n225].filter(Boolean).map(q => (
+                <div key={q!.symbol} style={{
+                  display: "grid", gridTemplateColumns: "1fr auto auto",
+                  gap: 8, alignItems: "center",
+                  padding: "3px 10px",
+                  borderBottom: "1px solid var(--line-dim)",
+                  minHeight: 22,
+                }}>
+                  <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{q!.name}</span>
+                  <span className="t-mono" style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--ink)" }}>{fmtNum(q!.price, 0)}</span>
+                  <span className={`t-mono ${pctClass(q!.changePct)}`} style={{ fontSize: "0.5625rem" }}>{fmtPct(q!.changePct)}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* ─── THAILAND ECONOMY ─────────────────────────────── */}
-          <div style={{ marginTop: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <div style={{
-                width: 8,
-                height: 8,
-                background: "var(--caution)",
-                boxShadow: "0 0 8px rgba(255,149,0,0.6)",
-              }} />
-              <span className="t-future" style={{ color: "var(--caution)", letterSpacing: "0.15em" }}>
-                🇹🇭 Thailand — The Economy Behind The Market
-              </span>
+          {/* Foreign flow */}
+          <ForeignFlow flows={MOCK_SMART_MONEY_FLOWS} />
+
+          {/* Commodity micro */}
+          <CommodityMicro commodities={commodityData} />
+
+          {/* Smart money */}
+          <div style={{ padding: "6px 10px" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", letterSpacing: "0.14em", marginBottom: 4 }}>
+              SMART MONEY · 14D
             </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--dim)", paddingLeft: 18, marginBottom: 12 }}>
-              GDP growth · Tourism · Medical tourism · Agriculture · Global rankings
-            </div>
-            <ThailandPanel
-              gdpHistory={thaiGdpHistory}
-              profile={THAILAND_PROFILE}
-              sectors={THAI_SECTORS}
-              rankings={THAILAND_GLOBAL_RANKINGS}
-            />
+            <SmartMoneyTracker flows={MOCK_SMART_MONEY_FLOWS} />
+          </div>
+        </SubwayQuadrant>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            Q2 · SCAN LINE (BLUE) — Value scanner, sectors, signals
+            ═══════════════════════════════════════════════════════════════ */}
+        <SubwayQuadrant title="SCAN" lineColor="var(--tech)" href="/scan" badge={`${grahamCount} BUYS`}>
+          {/* Value scanner — clickable dense table with modal */}
+          <StockScannerTable stocks={sortedStocks} />
+
+          {/* Sector momentum */}
+          <SectorMomentum stocks={MOCK_STOCKS.map(s => ({ symbol: s.symbol, sector: s.sector, price: s.price, changePct: (Math.random() * 4 - 1.5) }))} />
+
+          {/* Dividend leaderboard */}
+          <DividendLeaderboard stocks={MOCK_STOCKS} topN={5} />
+
+          {/* Earnings countdown */}
+          <EarningsCountdown earnings={MOCK_EARNINGS} />
+
+          {/* Gamma + Trade signal + Risk */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>GAMMA EXPOSURE · SET50</div>
+            <GammaExposureProxy chain={MOCK_GAMMA_CHAIN} underlyingName="SET50" />
           </div>
 
-          {/* ─── DIGITAL ECONOMY × AI ────────────────────────────── */}
-          <div style={{ marginTop: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <div style={{
-                width: 8,
-                height: 8,
-                background: "#a78bfa",
-                boxShadow: "0 0 8px rgba(167,139,250,0.6)",
-              }} />
-              <span className="t-future" style={{ color: "#a78bfa", letterSpacing: "0.15em" }}>
-                ⚡ Digital Economy × AI — Thailand to The World
-              </span>
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--dim)", paddingLeft: 18, marginBottom: 12 }}>
-              Thai digital stack · Global AI mega-caps · Market scale comparison
-            </div>
-            <DigitalEconomyPanel
-              kpis={THAILAND_DIGITAL_KPIS}
-              thaiStack={THAI_DIGITAL_STACK}
-              globalAi={globalAi}
-              markets={DIGITAL_MARKETS}
-            />
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>TRADE SIGNAL</div>
+            <CompactTradeSignal />
           </div>
 
-          {/* Legacy dashboard grid below intelligence */}
-          <div style={{ marginTop: 24 }}>
+          <div style={{ padding: "6px 10px" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>RISK METRICS</div>
+            <RiskMetricsTable stocks={MOCK_STOCKS} topN={5} />
+          </div>
+        </SubwayQuadrant>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            Q3 · INTEL LINE (YELLOW) — AI analysis, anomalies, macro
+            ═══════════════════════════════════════════════════════════════ */}
+        <SubwayQuadrant title="INTEL" lineColor="var(--braun-yellow, #ffd000)" href="/events" badge={`${anomalies.length} ALERTS`}>
+          {/* Anomaly alerts — compact badges at top */}
+          {anomalies.length > 0 && (
             <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 12,
+              padding: "4px 10px",
+              background: "var(--bear-10)",
+              borderBottom: "1px solid var(--line-dim)",
+              display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center",
             }}>
-              <div style={{
-                width: 8,
-                height: 8,
-                background: "var(--bull)",
-                boxShadow: "0 0 8px var(--bull-glow)",
-              }} />
-              <span className="t-future" style={{ color: "var(--bull)", letterSpacing: "0.15em" }}>
-                Market Data Feed
+              <span className="t-micro" style={{ color: "var(--bear)", fontWeight: 700 }}>● ALERTS</span>
+              {anomalies.slice(0, 3).map(a => (
+                <span key={a.id} className="t-mono" style={{ fontSize: "0.5625rem", color: "var(--bear)", border: "1px solid var(--bear)", padding: "0 4px" }}>
+                  {a.title}
+                </span>
+              ))}
+              {anomalies.length > 3 && (
+                <span className="t-micro" style={{ color: "var(--dim)" }}>+{anomalies.length - 3} more</span>
+              )}
+            </div>
+          )}
+
+          {/* Narrative reality one-liner */}
+          {narrativeReality && (
+            <div style={{
+              padding: "4px 10px",
+              borderBottom: "1px solid var(--line-dim)",
+              background: "var(--caution-10)",
+            }}>
+              <span className="t-micro" style={{ color: "var(--caution)", fontWeight: 700 }}>NARRATIVE · </span>
+              <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--ink)" }}>
+                {narrativeReality.verdict}
               </span>
             </div>
-            <DashboardGrid
-              liveSet={liveSet}
-              fearGreed={fearGreed}
-              assetClasses={assetClasses}
-              regionalAsean={regional.asean}
-              regionalChina={regional.china}
-              signals={signals}
-              topStocks={sortedStocks}
-              yieldSpread={macro.yieldCurveSpread ?? (us10y && us2y ? us10y - us2y : null)}
-              vix={macro.vix}
-              cfnai={macro.cfnai}
+          )}
+
+          {/* Sentiment divergence */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>SENTIMENT DIVERGENCE</div>
+            <SentimentDivergence data={MOCK_SENTIMENT_DIVERGENCE} assetName="SET50" />
+          </div>
+
+          {/* Market DNA radar */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>MARKET DNA</div>
+            <QuantumRadar
+              dimensions={marketDNA.dimensions}
+              scores={marketDNA.scores}
+              historicalAvg={marketDNA.historicalAvg}
+              regime={marketDNA.regime}
+              confidence={marketDNA.regimeConfidence}
             />
           </div>
-        </div>
-      </div>
-    </div>
+
+          {/* Pattern + Flow */}
+          {pattern && (
+            <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+              <PatternResonance
+                bestMatch={pattern.bestMatch}
+                similarity={pattern.similarity}
+                allMatches={pattern.allMatches}
+              />
+            </div>
+          )}
+          {flowMatrix.length > 0 && (
+            <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>CROSS-ASSET FLOW</div>
+              <FlowMatrix flows={flowMatrix} />
+            </div>
+          )}
+
+          {/* VIX + Econ calendar */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>VIX TERM STRUCTURE</div>
+            <VIXCurve compact />
+          </div>
+
+          <div style={{ padding: "6px 10px" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>MACRO CALENDAR</div>
+            <EconCalendar compact />
+          </div>
+        </SubwayQuadrant>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            Q4 · MONEY LINE (ORANGE) — Portfolio, tax, projection, learning
+            ═══════════════════════════════════════════════════════════════ */}
+        <SubwayQuadrant title="MONEY" lineColor="var(--caution)" href="/money">
+          {/* Dream portfolio */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+              <span className="t-micro" style={{ color: "var(--dim)", letterSpacing: "0.14em" }}>DREAM PORTFOLIO · 2020–2026</span>
+              <span className="t-micro" style={{ color: "var(--braun-yellow, #ffd000)", border: "1px solid var(--braun-yellow, #ffd000)", padding: "0 4px", fontSize: "0.5rem" }}>EDU</span>
+            </div>
+            <PortfolioQuadrantSummary />
+          </div>
+
+          {/* Holdings */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>YOUR HOLDINGS</div>
+            <PortfolioTracker />
+          </div>
+
+          {/* Tax */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>TAX CALCULATOR</div>
+            <TaxCalc />
+          </div>
+
+          {/* Projection */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>10-YEAR PROJECTION</div>
+            <ProjectionChart initialAmount={500_000} monthlyContribution={10_000} />
+          </div>
+
+          {/* Morning signal + Simulator */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <MorningSignal />
+          </div>
+
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>PAPER TRADING</div>
+            <SimulatorStatus />
+          </div>
+
+          {/* Education transfer cards */}
+          <div style={{ padding: "6px 10px", borderBottom: "1px solid var(--line-dim)" }}>
+            <Link href="/plan" style={{ textDecoration: "none" }}>
+              <div style={{ borderLeft: "3px solid var(--braun-yellow, #ffd000)", padding: "6px 10px", background: "var(--bg)" }}>
+                <div className="t-micro" style={{ color: "var(--braun-yellow, #ffd000)", marginBottom: 2 }}>RICH DAD WISDOM</div>
+                <div className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
+                  Savers are losers. Inflation eats cash. Build assets →
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          <div style={{ padding: "6px 10px" }}>
+            <Link href="/scan" style={{ textDecoration: "none" }}>
+              <div style={{ borderLeft: "3px solid var(--bull)", padding: "6px 10px", background: "var(--bg)" }}>
+                <div className="t-micro" style={{ color: "var(--bull)", marginBottom: 2 }}>MARGIN OF SAFETY · GRAHAM</div>
+                <div className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
+                  Buy only when price is far below true value. {grahamCount} SET stocks in buy zone →
+                </div>
+              </div>
+            </Link>
+          </div>
+        </SubwayQuadrant>
+      </QuadrantLayout>
+    </>
   );
 }

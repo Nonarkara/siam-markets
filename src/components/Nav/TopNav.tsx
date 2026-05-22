@@ -4,13 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ProfileBadge } from "@/components/KPI/ProfileBadge";
 import { LangToggle } from "@/components/KPI/LangToggle";
+import { ThemeToggle } from "@/components/Theme/ThemeToggle";
 
 const NAV = [
-  { href: "/",        label: "DESK"    },
-  { href: "/markets", label: "MARKETS" },
-  { href: "/scan",    label: "SCAN"    },
-  { href: "/trade",   label: "TRADE"   },
-  { href: "/money",   label: "MONEY"   },
+  { href: "/",          label: "DESK"     },
+  { href: "/plan",      label: "PLAN"     },
+  { href: "/markets",   label: "MARKETS"  },
+  { href: "/funds",     label: "FUNDS"    },
+  { href: "/scan",      label: "SCAN"     },
+  { href: "/trade",     label: "TRADE"    },
+  { href: "/money",     label: "MONEY"    },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -83,6 +86,7 @@ export function TopNav() {
       </div>
 
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <ThemeToggle />
         <LangToggle />
         <ProfileBadge />
       </div>

@@ -4,11 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/",        label: "DESK",    icon: DeskIcon    },
-  { href: "/markets", label: "MARKETS", icon: MarketsIcon },
-  { href: "/scan",    label: "SCAN",    icon: ScanIcon    },
-  { href: "/trade",   label: "TRADE",   icon: TradeIcon   },
-  { href: "/money",   label: "MONEY",   icon: MoneyIcon   },
+  { href: "/",          label: "DESK",     icon: DeskIcon     },
+  { href: "/plan",      label: "PLAN",     icon: PlanIcon     },
+  { href: "/markets",   label: "MARKETS",  icon: MarketsIcon  },
+  { href: "/funds",     label: "FUNDS",    icon: FundsIcon    },
+  { href: "/scan",      label: "SCAN",     icon: ScanIcon     },
+  { href: "/trade",     label: "TRADE",    icon: TradeIcon    },
+  { href: "/money",     label: "MONEY",    icon: MoneyIcon    },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -99,6 +101,19 @@ function ScanIcon({ active }: { active: boolean }) {
   );
 }
 
+function NewsroomIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <rect x="2" y="5" width="20" height="14" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="19" x2="12" y2="21" />
+      <line x1="6" y1="9" x2="10" y2="9" />
+      <line x1="6" y1="12" x2="14" y2="12" />
+      <line x1="6" y1="15" x2="12" y2="15" />
+    </svg>
+  );
+}
+
 function TradeIcon({ active }: { active: boolean }) {
   return (
     <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
@@ -113,6 +128,26 @@ function MoneyIcon({ active }: { active: boolean }) {
       <rect x="2" y="7" width="20" height="14" />
       <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
       <circle cx="12" cy="14" r="2" />
+    </svg>
+  );
+}
+
+function PlanIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 17l10 5 10-5" />
+      <path d="M2 12l10 5 10-5" />
+    </svg>
+  );
+}
+
+function FundsIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <rect x="3" y="12" width="4" height="9" />
+      <rect x="10" y="7" width="4" height="14" />
+      <rect x="17" y="3" width="4" height="18" />
     </svg>
   );
 }

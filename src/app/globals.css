@@ -1,53 +1,62 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
-/* ─── Design Tokens ─────────────────────────────────────────────── */
+/* ─── Design Tokens · Braun / Rams Financial Dark ────────────────────
+   Hardcoded heritage: Dieter Rams' "as little design as possible."
+   Calm, hairline-bordered, single accent. No neon, no glow, no glass.
+─────────────────────────────────────────────────────────────────── */
 :root {
-  /* Surfaces — deeper void */
-  --bg:          #050508;
-  --bg-raised:   #0c0c12;
-  --bg-surface:  #111118;
-  --bg-hover:    #1a1a24;
-  --bg-glass:    rgba(17, 17, 24, 0.72);
+  /* Surfaces — near-black, Braun matte */
+  --bg:          #0d0d0d;
+  --bg-raised:   #161616;
+  --bg-surface:  #1e1e1e;
+  --bg-hover:    #242424;
+  --bg-glass:    #1e1e1e;          /* alias for legacy class names; no transparency */
 
   /* Type */
-  --ink:    #e8e8f0;
-  --muted:  #7a7a8a;
-  --dim:    #4a4a5a;
+  --ink:    #e8e8e8;
+  --muted:  #888884;
+  --dim:    #4a4a46;
 
-  /* Borders */
-  --line:     #1e1e2e;
-  --line-dim: #151520;
+  /* Borders — hairline only */
+  --line:     #2a2a2a;
+  --line-dim: #1f1f1f;
 
-  /* Signal palette — neon futurism */
-  --bull:    #00f0a0;   /* gain, growth, buy — neon emerald */
-  --bear:    #ff3b6f;   /* loss, danger, sell — neon rose */
-  --caution: #f59e0b;   /* watch, neutral — amber */
-  --tech:    #00f0ff;   /* UI chrome, links — cyan neon */
-  --violet:  #8b5cf6;   /* secondary accent */
+  /* Signal palette — Braun functional (calm, never neon) */
+  --bull:    #00c896;              /* gain — emerald */
+  --bear:    #ff3b30;              /* loss — Apple alert red */
+  --caution: #ff9500;              /* watch — Apple warning amber */
+  --tech:    #007aff;              /* UI chrome — precision blue */
+  --violet:  #6e6e8a;              /* legacy alias — muted, not neon */
 
-  /* Glow colors */
-  --bull-glow:  rgba(0, 240, 160, 0.25);
-  --bear-glow:  rgba(255, 59, 111, 0.25);
-  --tech-glow:  rgba(0, 240, 255, 0.25);
-  --caution-glow: rgba(245, 158, 11, 0.25);
+  /* Heritage accent — Braun travel-clock yellow.
+     Use SPARINGLY: noon line, single emphasis dot. Never as a fill. */
+  --braun-yellow: #ffd000;
+  --braun-orange: #ff6900;
 
-  /* Bull/bear with opacity */
-  --bull-10:  rgba(0, 240, 160, 0.10);
-  --bull-20:  rgba(0, 240, 160, 0.20);
-  --bear-10:  rgba(255, 59, 111, 0.10);
-  --bear-20:  rgba(255, 59, 111, 0.20);
-  --caution-10: rgba(245, 158, 11, 0.10);
-  --tech-10: rgba(0, 240, 255, 0.10);
+  /* Glow tokens — kept as transparent no-ops so legacy selectors don't break.
+     Per design heritage, no element should actually emit a glow. */
+  --bull-glow:    transparent;
+  --bear-glow:    transparent;
+  --tech-glow:    transparent;
+  --caution-glow: transparent;
 
-  /* Typography scale */
-  --text-display: 2rem;
-  --text-body:    0.875rem;
-  --text-micro:   0.6875rem;
+  /* Tinted backgrounds — used for row highlights, not glow */
+  --bull-10:    rgba(0, 200, 150, 0.10);
+  --bull-20:    rgba(0, 200, 150, 0.18);
+  --bear-10:    rgba(255, 59, 48, 0.10);
+  --bear-20:    rgba(255, 59, 48, 0.18);
+  --caution-10: rgba(255, 149, 0, 0.10);
+  --tech-10:    rgba(0, 122, 255, 0.10);
 
-  /* Fonts */
+  /* Typography scale — three sizes only (§11.7) */
+  --text-display: 2rem;            /* 32px */
+  --text-body:    0.875rem;        /* 14px */
+  --text-micro:   0.6875rem;       /* 11px */
+
+  /* Fonts — banned font list excludes Roboto/Inter/Poppins etc. (§11.10) */
   --font-display: "Josefin Sans", system-ui, sans-serif;
-  --font-future:  "Orbitron", "Josefin Sans", system-ui, sans-serif;
+  --font-future:  "Josefin Sans", system-ui, sans-serif;   /* alias to display — no Orbitron */
   --font-body:    "Source Sans 3", system-ui, sans-serif;
   --font-mono:    "IBM Plex Mono", "Courier New", monospace;
 
@@ -63,7 +72,80 @@
   --radius: 0px;
 }
 
-/* ─── Reset ─────────────────────────────────────────────────────── */
+/* ─── Theme · Light · paper / Braun museum catalog ────────────────
+   Off-white paper, slate-black ink, sober accents. Same hierarchy. */
+:root[data-theme="light"] {
+  --bg:          #f7f6f1;
+  --bg-raised:   #ffffff;
+  --bg-surface:  #ece9e2;
+  --bg-hover:    #e0ddd5;
+  --bg-glass:    #ffffff;
+
+  --ink:    #14110f;
+  --muted:  #5a5650;
+  --dim:    #9a958a;
+
+  --line:     #c8c3b8;
+  --line-dim: #ddd8cc;
+
+  --bull:    #008b5a;
+  --bear:    #c41e1e;
+  --caution: #b06a00;
+  --tech:    #0050cc;
+  --violet:  #6a6878;
+
+  --braun-yellow: #d4a900;
+  --braun-orange: #cc4f00;
+
+  --bull-10:    rgba(0, 139, 90, 0.12);
+  --bull-20:    rgba(0, 139, 90, 0.20);
+  --bear-10:    rgba(196, 30, 30, 0.10);
+  --bear-20:    rgba(196, 30, 30, 0.18);
+  --caution-10: rgba(176, 106, 0, 0.10);
+  --tech-10:    rgba(0, 80, 204, 0.10);
+}
+
+/* ─── Theme · Inverted · OLED high-contrast (night-trader) ────────
+   Pure black void, pure white type, accents pushed brighter. */
+:root[data-theme="inverted"] {
+  --bg:          #000000;
+  --bg-raised:   #0a0a0a;
+  --bg-surface:  #161616;
+  --bg-hover:    #1c1c1c;
+  --bg-glass:    #161616;
+
+  --ink:    #ffffff;
+  --muted:  #b8b8b8;
+  --dim:    #6a6a6a;
+
+  --line:     #3a3a3a;
+  --line-dim: #2a2a2a;
+
+  --bull:    #00ff9a;
+  --bear:    #ff5040;
+  --caution: #ffb800;
+  --tech:    #00b8ff;
+  --violet:  #8a8aff;
+
+  --braun-yellow: #ffe400;
+  --braun-orange: #ff7a1a;
+
+  --bull-10:    rgba(0, 255, 154, 0.12);
+  --bull-20:    rgba(0, 255, 154, 0.22);
+  --bear-10:    rgba(255, 80, 64, 0.12);
+  --bear-20:    rgba(255, 80, 64, 0.22);
+  --caution-10: rgba(255, 184, 0, 0.12);
+  --tech-10:    rgba(0, 184, 255, 0.12);
+}
+
+/* Match OS-level dark/light on first paint when no explicit choice */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+  }
+}
+
+/* ─── Reset · zero border-radius enforced (§11.6) ────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -105,7 +187,8 @@ body {
 }
 
 .t-future {
-  font-family: var(--font-future);
+  /* Aliased to body micro caps — no sci-fi face */
+  font-family: var(--font-body);
   font-size: var(--text-micro);
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -140,32 +223,19 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── Futuristic glow text ───────────────────────────────────────── */
-.glow-text {
-  text-shadow: 0 0 8px var(--tech-glow), 0 0 20px var(--tech-glow);
-}
-
-.glow-text-bull {
-  text-shadow: 0 0 8px var(--bull-glow), 0 0 20px var(--bull-glow);
-}
-
+/* ─── Legacy glow selectors — neutralised, kept callable ─────────── */
+.glow-text,
+.glow-text-bull,
 .glow-text-bear {
-  text-shadow: 0 0 8px var(--bear-glow), 0 0 20px var(--bear-glow);
+  text-shadow: none;
 }
 
-/* ─── Glassmorphism card ─────────────────────────────────────────── */
-.glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--line);
-}
-
+.glass,
 .glass--accent {
-  background: linear-gradient(135deg, rgba(0,240,255,0.04) 0%, rgba(139,92,246,0.03) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0,240,255,0.15);
+  background: var(--bg-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid var(--line);
 }
 
 /* ─── Layout utilities ───────────────────────────────────────────── */
@@ -177,9 +247,26 @@ body {
 }
 
 @media (min-width: 1024px) {
+  /* Desktop: lock <main> to the viewport. Each route is a framed
+     dashboard — no body scroll, only internal scroll inside .page or
+     individually-marked panels. */
+  main#main-content {
+    height: calc(100dvh - var(--top-h));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Inside the framed main, .page becomes the route's scroll container
+     so dense content can still overflow gracefully without bouncing
+     the whole window. */
   .page {
-    max-width: 1200px;
-    padding: 24px 32px;
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 18px 24px;
+    scrollbar-gutter: stable;
   }
 }
 
@@ -195,23 +282,15 @@ body {
   padding: 16px;
 }
 
+/* card--glow neutralised: identical to .card, no gradient ring */
 .card--glow {
   background: var(--bg-surface);
   border: 1px solid var(--line);
   padding: 16px;
-  position: relative;
 }
 
 .card--glow::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
-  background: linear-gradient(135deg, rgba(0,240,255,0.15), transparent 40%, transparent 60%, rgba(139,92,246,0.1));
-  z-index: -1;
-  pointer-events: none;
+  content: none;
 }
 
 .divider {
@@ -221,17 +300,17 @@ body {
 }
 
 /* ─── Signal colors ──────────────────────────────────────────────── */
-.bull  { color: var(--bull); }
-.bear  { color: var(--bear); }
+.bull    { color: var(--bull); }
+.bear    { color: var(--bear); }
 .caution { color: var(--caution); }
-.muted { color: var(--muted); }
+.muted   { color: var(--muted); }
 
-.bg-bull  { background: var(--bull-10); }
-.bg-bear  { background: var(--bear-10); }
+.bg-bull    { background: var(--bull-10); }
+.bg-bear    { background: var(--bear-10); }
 .bg-caution { background: var(--caution-10); }
-.bg-tech { background: var(--tech-10); }
+.bg-tech    { background: var(--tech-10); }
 
-/* ─── Interactive targets ───────────────────────────────────────── */
+/* ─── Interactive targets — ≥44px (§11.8) ────────────────────────── */
 .tap-target {
   display: inline-flex;
   align-items: center;
@@ -268,7 +347,7 @@ a:focus-visible,
   border: 1px solid var(--line);
   background: transparent;
   cursor: pointer;
-  transition: all var(--dur) var(--ease);
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
   white-space: nowrap;
 }
 
@@ -277,7 +356,6 @@ a:focus-visible,
   color: var(--ink);
   border-color: var(--tech);
   background: var(--tech-10);
-  box-shadow: 0 0 8px var(--tech-glow);
 }
 
 .chip.active {
@@ -326,34 +404,18 @@ a:focus-visible,
   animation: fadeIn 300ms var(--ease) both;
 }
 
-/* ─── Pulse glow ─────────────────────────────────────────────────── */
+/* ─── Pulse — kept as opacity-only, no glow ──────────────────────── */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 4px var(--tech-glow); }
-  50% { box-shadow: 0 0 12px var(--tech-glow), 0 0 24px var(--tech-glow); }
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
 }
 
 .pulse-glow {
   animation: pulseGlow 2s ease-in-out infinite;
 }
 
-/* ─── Scanline effect ────────────────────────────────────────────── */
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-.scanline-overlay::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(180deg, transparent, rgba(0,240,255,0.03), transparent);
-  animation: scanline 8s linear infinite;
-  pointer-events: none;
-  z-index: 9999;
-}
+/* ─── Scanline overlay neutralised ───────────────────────────────── */
+.scanline-overlay::after { content: none; }
 
 /* ─── Horizontal scroll row ──────────────────────────────────────── */
 .scroll-row {
@@ -371,6 +433,212 @@ a:focus-visible,
 .scroll-row > * {
   flex-shrink: 0;
   scroll-snap-align: start;
+}
+
+/* ─── Quadrant Dashboard Layout ─────────────────────────────────── */
+.quadrant-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--line);
+}
+
+.quadrant-panel {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.quadrant-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.quadrant-header-title {
+  font-family: var(--font-body);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  flex: 1;
+}
+
+.quadrant-header-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+}
+
+.quadrant-header-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--tech);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  transition: opacity 180ms var(--ease);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+}
+
+.quadrant-header-link:hover {
+  opacity: 1;
+}
+
+.quadrant-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim) transparent;
+}
+
+/* Desktop: 2×2 quadrants — viewport minus top nav minus 56px world clock banner */
+@media (min-width: 1024px) {
+  .quadrant-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: calc(100dvh - var(--top-h) - 56px);
+    overflow: hidden;
+  }
+
+  .quadrant-panel {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .quadrant-content {
+    padding: 14px;
+  }
+}
+
+/* ─── Viewport-locked dashboard page (desktop) ───────────────────
+   Mobile keeps natural scroll. Desktop locks the route to the viewport
+   minus the top nav (and any banner the page renders before .dashboard-page).
+   The page body becomes the only thing that can scroll, and only inside
+   designated panels. */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dashboard-page__header {
+  flex-shrink: 0;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+
+.dashboard-page__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-page {
+    height: calc(100dvh - var(--top-h));
+    overflow: hidden;
+  }
+  .dashboard-page__header {
+    padding: 10px 24px 8px;
+  }
+}
+
+/* Panel — a single scrollable region inside .dashboard-page__body */
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel__header {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.panel__body--flush { padding: 0; }
+
+/* ─── Tabs · sub-dashboards inside a page ─────────────────────── */
+.tabs-bar {
+  display: flex;
+  gap: 0;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 0 16px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.tab:hover {
+  color: var(--ink);
+  background: var(--bg-hover);
+}
+
+.tab--active {
+  color: var(--tech);
+  border-bottom-color: var(--tech);
+  font-weight: 700;
+}
+
+.tabs-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1023px) {
+  .tabs-body { overflow: visible; }
 }
 
 /* ─── Desktop grid ───────────────────────────────────────────────── */
@@ -396,4 +664,72 @@ a:focus-visible,
   .intel-grid {
     grid-template-columns: 1.2fr 1fr;
   }
+}
+
+/* ─── FundSearch / Scanner / Modal responsive rows ──────────────── */
+
+/* Mobile-first: stack the info on top, metrics row below.
+   Desktop ≥ 720px: full 6-column row. */
+.fund-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.fund-row__info { grid-column: 1 / -1; }
+.fund-row__metric { text-align: right; }
+.fund-row__check { text-align: center; }
+
+@media (min-width: 720px) {
+  .fund-row {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+  }
+  .fund-row__info { grid-column: auto; }
+}
+
+/* Tag chip — hairline border, colored text, transparent background.
+   Replaces black-on-neon fills (§11.10 contrast, §14 one-amber). */
+.chip-tag {
+  border: 1px solid currentColor;
+  padding: 1px 6px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: transparent;
+  display: inline-block;
+}
+
+/* Scanner table — collapse to 2-col on mobile.
+   Cells with .hide-mobile are hidden on small screens, shown ≥ 720px. */
+.scanner-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 4px;
+  align-items: center;
+}
+.hide-mobile { display: none; }
+@media (min-width: 720px) {
+  .scanner-row {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  }
+  .hide-mobile { display: inline-block; }
+}
+
+/* StockDetailModal metrics — 2-col on mobile, 4-col on desktop. */
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (min-width: 720px) {
+  .metric-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* FundPortfolio summary stats — 2-col on mobile, 4-col on desktop. */
+.portfolio-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (min-width: 720px) {
+  .portfolio-stats { grid-template-columns: repeat(4, 1fr); }
 }
