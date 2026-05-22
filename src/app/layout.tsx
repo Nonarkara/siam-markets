@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/Nav/BottomNav";
 import { TopNav } from "@/components/Nav/TopNav";
 import { SetupGate } from "@/components/KPI/SetupGate";
 import { LangProvider } from "@/lib/i18n/useLang";
+import { APP_VERSION } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "DayTraders",
@@ -39,6 +40,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           <div className="mobile-only">
             <BottomNav />
+          </div>
+
+          <div
+            className="mobile-only"
+            aria-hidden
+            style={{
+              position: "fixed",
+              top: 6,
+              right: 10,
+              zIndex: 200,
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.55rem",
+              color: "var(--dim)",
+              letterSpacing: "0.08em",
+              pointerEvents: "none",
+            }}
+          >
+            v{APP_VERSION}
           </div>
         </LangProvider>
 

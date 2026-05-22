@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SignalCard } from "@/components/Share/SignalCard";
+import type { ForecastApiResponse } from "@/app/api/forecast/route";
 
 interface MorningBrief {
   text: string;
@@ -10,11 +11,15 @@ interface MorningBrief {
 
 const STORAGE_KEY = "siam_morning_brief";
 const TTL = 4 * 60 * 60 * 1000; // 4 hours
+const FORECAST_TTL = 60 * 60 * 1000; // 1 hour — daily model, no need to refetch often
+const FORECAST_KEY = "siam_morning_forecast";
 
 export function MorningSignal() {
   const [brief, setBrief]     = useState<MorningBrief | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen]       = useState(false);
+  const [forecast, setForecast] = useState<ForecastApiResponse | null>(null);
+  const [forecastLoading, setForecastLoading] = useState(false);
 
   // Load cached brief on mount
   useEffect(() => {
@@ -31,6 +36,38 @@ export function MorningSignal() {
     const h = parseInt(bangkokHour);
     if (h === 9 || h === 10) fetchBrief();
   }, []);
+
+  // Load forecast lazily — only when the panel opens.
+  useEffect(() => {
+    if (!open || forecast || forecastLoading) return;
+    const cached = localStorage.getItem(FORECAST_KEY);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached) as ForecastApiResponse;
+        if (Date.now() - new Date(parsed.asOf).getTime() < FORECAST_TTL) {
+          setForecast(parsed);
+          return;
+        }
+      } catch {}
+    }
+    fetchForecast();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  async function fetchForecast() {
+    setForecastLoading(true);
+    try {
+      const res = await fetch("/api/forecast?symbol=%5ESET.BK&horizon=5");
+      if (!res.ok) throw new Error("forecast api");
+      const data = (await res.json()) as ForecastApiResponse;
+      setForecast(data);
+      localStorage.setItem(FORECAST_KEY, JSON.stringify(data));
+    } catch {
+      setForecast(null);
+    } finally {
+      setForecastLoading(false);
+    }
+  }
 
   async function fetchBrief() {
     setLoading(true);
@@ -135,47 +172,202 @@ export function MorningSignal() {
         </div>
       </button>
 
-      {/* Expanded — full brief */}
-      {open && brief && (
+      {/* Expanded — brief (if generated) + always-on probabilistic projection */}
+      {open && (
         <div style={{ borderTop: "1px solid var(--line)", padding: "14px 16px" }}>
-          <div className="t-body" style={{
-            whiteSpace: "pre-wrap",
-            lineHeight: 1.7,
-            fontSize: "0.8125rem",
-            color: "var(--muted)",
-          }}>
-            {brief.text}
-          </div>
+          {brief && (
+            <div className="t-body" style={{
+              whiteSpace: "pre-wrap",
+              lineHeight: 1.7,
+              fontSize: "0.8125rem",
+              color: "var(--muted)",
+            }}>
+              {brief.text}
+            </div>
+          )}
+
+          <ForecastBlock forecast={forecast} loading={forecastLoading} onRefresh={fetchForecast} />
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
             <div className="t-micro" style={{ color: "var(--dim)" }}>
-              {new Date(brief.generatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" })} BKK · Powered by Claude
+              {brief
+                ? `${new Date(brief.generatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" })} BKK · Powered by Claude`
+                : "Generate AI brief above — projection runs independently"}
             </div>
             <div style={{ display: "flex", gap: 6 }}>
-              <button
-                onClick={fetchBrief}
-                style={{
-                  background: "none", border: "1px solid var(--line)",
-                  color: "var(--dim)", fontFamily: "var(--font-mono)",
-                  fontSize: "0.55rem", padding: "3px 8px",
-                  cursor: "pointer", minHeight: 24, letterSpacing: "0.06em",
-                }}
-              >
-                REFRESH
-              </button>
-              <SignalCard
-                title="Morning Market Brief"
-                value={new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                subtext="Bangkok 09:55 · SET Opens 10:00"
-                implication={headline ?? ""}
-                color="var(--caution)"
-                source="DAYTRADERS AI"
-                metric="MORNING"
-              />
+              {brief && (
+                <button
+                  onClick={fetchBrief}
+                  style={{
+                    background: "none", border: "1px solid var(--line)",
+                    color: "var(--dim)", fontFamily: "var(--font-mono)",
+                    fontSize: "0.55rem", padding: "3px 8px",
+                    cursor: "pointer", minHeight: 24, letterSpacing: "0.06em",
+                  }}
+                >
+                  REFRESH
+                </button>
+              )}
+              {brief && (
+                <SignalCard
+                  title="Morning Market Brief"
+                  value={new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  subtext="Bangkok 09:55 · SET Opens 10:00"
+                  implication={headline ?? ""}
+                  color="var(--caution)"
+                  source="DAYTRADERS AI"
+                  metric="MORNING"
+                />
+              )}
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Probabilistic projection (TimesFM) ──────────────────────────────
+// Renders median + 80% band + P(touch) — never a directional verb.
+// If forecast is null or loading, fail quiet — the brief still reads fine.
+
+function ForecastBlock({
+  forecast,
+  loading,
+  onRefresh,
+}: {
+  forecast: ForecastApiResponse | null;
+  loading: boolean;
+  onRefresh: () => void;
+}) {
+  if (loading && !forecast) {
+    return (
+      <div style={{
+        marginTop: 14, paddingTop: 12, borderTop: "1px solid var(--line)",
+        fontFamily: "var(--font-mono)", fontSize: "0.6rem",
+        color: "var(--dim)", letterSpacing: "0.06em",
+      }}>
+        LOADING PROBABILISTIC PROJECTION…
+      </div>
+    );
+  }
+  if (!forecast) return null;
+
+  const f       = forecast.forecast;
+  const last    = f.horizon - 1;
+  const median  = f.median[last];
+  const p10     = f.quantiles.p10[last];
+  const p90     = f.quantiles.p90[last];
+  const stub    = f.source === "stub";
+
+  const pAbove1 = forecast.probabilities.above1pct;
+  const pBelow1 = forecast.probabilities.below1pct;
+
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+  const pct = (p: number) => `${Math.round(p * 100)}%`;
+
+  return (
+    <div style={{
+      marginTop: 14, paddingTop: 12, borderTop: "1px solid var(--line)",
+      display: "flex", flexDirection: "column", gap: 10,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{
+          fontFamily: "var(--font-mono)", fontSize: "0.55rem",
+          color: "var(--tech)", fontWeight: 700, letterSpacing: "0.08em",
+          border: "1px solid var(--tech)", padding: "2px 6px",
+        }}>
+          {stub ? "BASELINE" : "TIMESFM"}
+        </span>
+        <span style={{
+          fontFamily: "var(--font-mono)", fontSize: "0.55rem",
+          color: "var(--muted)", letterSpacing: "0.06em",
+        }}>
+          SET · {f.horizon}-DAY PROBABILISTIC PROJECTION
+        </span>
+      </div>
+
+      <div style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1,
+        background: "var(--line)", border: "1px solid var(--line)",
+      }}>
+        <ProjectionCell
+          label="MEDIAN T+5"
+          value={fmt(median)}
+          accent="var(--ink)"
+        />
+        <ProjectionCell
+          label="80% BAND"
+          value={`${fmt(p10)} – ${fmt(p90)}`}
+          accent="var(--muted)"
+        />
+        <ProjectionCell
+          label={`P(TOUCH > ${fmt(forecast.lastClose * 1.01)})`}
+          value={pct(pAbove1)}
+          accent="var(--bull)"
+        />
+      </div>
+
+      <div style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1,
+        background: "var(--line)", border: "1px solid var(--line)",
+      }}>
+        <ProjectionCell
+          label="LAST CLOSE"
+          value={fmt(forecast.lastClose)}
+          accent="var(--muted)"
+        />
+        <ProjectionCell
+          label={`P(BREAK < ${fmt(forecast.lastClose * 0.99)})`}
+          value={pct(pBelow1)}
+          accent="var(--bear)"
+        />
+      </div>
+
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        fontFamily: "var(--font-mono)", fontSize: "0.55rem",
+        color: "var(--dim)", letterSpacing: "0.06em",
+      }}>
+        <span>
+          {stub
+            ? "STUB BACKEND · NAIVE LAST-VALUE BASELINE · ADD HUGGINGFACE_API_TOKEN FOR TIMESFM"
+            : `MODEL: ${f.model.toUpperCase()} · PROBABILISTIC CONTEXT, NOT A TRADE SIGNAL`}
+        </span>
+        <button
+          onClick={onRefresh}
+          style={{
+            background: "none", border: "1px solid var(--line)",
+            color: "var(--dim)", fontFamily: "var(--font-mono)",
+            fontSize: "0.55rem", padding: "3px 8px",
+            cursor: "pointer", minHeight: 24, letterSpacing: "0.06em",
+          }}
+        >
+          REFRESH
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ProjectionCell({ label, value, accent }: { label: string; value: string; accent: string }) {
+  return (
+    <div style={{
+      background: "var(--bg-raised)", padding: "8px 10px",
+      display: "flex", flexDirection: "column", gap: 4,
+    }}>
+      <div className="t-micro" style={{
+        fontFamily: "var(--font-mono)", fontSize: "0.55rem",
+        color: "var(--dim)", letterSpacing: "0.06em",
+      }}>
+        {label}
+      </div>
+      <div style={{
+        fontFamily: "var(--font-mono)", fontSize: "0.875rem",
+        color: accent, fontWeight: 600,
+      }}>
+        {value}
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ProfileBadge } from "@/components/KPI/ProfileBadge";
 import { LangToggle } from "@/components/KPI/LangToggle";
+import { APP_VERSION } from "@/lib/version";
 
 const NAV = [
   { href: "/",        label: "DESK"    },
@@ -41,6 +42,9 @@ export function TopNav() {
       <Link
         href="/"
         style={{
+          display: "inline-flex",
+          alignItems: "baseline",
+          gap: 8,
           fontFamily: "var(--font-display)",
           fontSize: "0.9375rem",
           fontWeight: 700,
@@ -52,6 +56,15 @@ export function TopNav() {
         }}
       >
         DAYTRADERS
+        <span style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "0.55rem",
+          color: "var(--dim)",
+          letterSpacing: "0.08em",
+          fontWeight: 500,
+        }}>
+          v{APP_VERSION}
+        </span>
       </Link>
 
       <div style={{ display: "flex", flex: 1, gap: 0 }}>
