@@ -59,7 +59,7 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
             </div>
           </div>
           <div className="t-micro" style={{ color: "var(--dim)", letterSpacing: "0.14em" }}>
-            DATA · 5-MIN REVALIDATE
+            Updated every 5 minutes · Research Preview
           </div>
         </div>
       </div>
@@ -181,7 +181,7 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
             },
             {
               id: "causality",
-              label: "CAUSALITY",
+              label: "DRIVERS",
               badge: "GRANGER",
               content: (
                 <Scroller>
@@ -236,7 +236,7 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
             },
             {
               id: "news",
-              label: "WORLD NEWS",
+              label: "NEWS",
               badge: "LIVE",
               content: (
                 <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
@@ -286,7 +286,7 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
             },
             {
               id: "satellite",
-              label: "SATELLITE",
+              label: "RISK DATA",
               badge: "GISTDA·S2",
               content: (
                 <Scroller>

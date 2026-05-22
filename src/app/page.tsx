@@ -131,6 +131,19 @@ export default async function DeskPage() {
           ═══════════════════════════════════════════════════════════════ */}
       <WorldMarketClock centers={worldCenters} />
 
+      {/* Timestamp + quadrant guide */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "3px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0,
+      }}>
+        <span className="t-micro" style={{ color: "var(--dim)" }}>
+          PULSE = prices · BUYS = value stocks · INTEL = signals · PORTFOLIO = your money
+        </span>
+        <span className="t-micro" style={{ color: "var(--dim)", fontFamily: "var(--font-mono)" }}>
+          {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })}
+        </span>
+      </div>
+
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <QuadrantLayout>
           {/* ═══════════════════════════════════════════════════════════════

@@ -65,18 +65,22 @@ export function SubwayQuadrant({ title, lineColor, children, href, badge }: Prop
               letterSpacing: "0.1em",
             }}
           >
-            FULL →
+            {href === "/markets" ? "ALL MARKETS →" :
+             href === "/scan" ? "ALL BUYS →" :
+             href === "/events" ? "ALL ALERTS →" :
+             href === "/money" ? "PORTFOLIO →" : "FULL →"}
           </Link>
         )}
       </div>
 
-      {/* Content — flush to edges, scrollable */}
+      {/* Content — slight padding so text doesn't touch border */}
       <div style={{
         flex: 1,
         minHeight: 0,
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
+        padding: "4px 6px",
       }}>
         {children}
       </div>

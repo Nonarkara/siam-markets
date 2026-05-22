@@ -7,14 +7,14 @@ import { LangToggle } from "@/components/KPI/LangToggle";
 import { ThemeToggle } from "@/components/Theme/ThemeToggle";
 
 const NAV = [
-  { href: "/",          label: "DESK"     },
-  { href: "/plan",      label: "PLAN"     },
-  { href: "/markets",   label: "MARKETS"  },
-  { href: "/funds",     label: "FUNDS"    },
-  { href: "/scan",      label: "SCAN"     },
-  { href: "/backtest",  label: "BACKTEST" },
-  { href: "/trade",     label: "TRADE"    },
-  { href: "/money",     label: "MONEY"    },
+  { href: "/",          label: "DESK"      },
+  { href: "/markets",   label: "MARKETS"   },
+  { href: "/scan",      label: "BUYS"      },
+  { href: "/funds",     label: "FUNDS"     },
+  { href: "/newsroom",  label: "LIVE"      },
+  { href: "/money",     label: "PORTFOLIO" },
+  { href: "/plan",      label: "PLAN"      },
+  { href: "/trade",     label: "TRADE"     },
 ] as const;
 
 function isActive(pathname: string, href: string) {

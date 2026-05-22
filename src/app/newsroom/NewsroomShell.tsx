@@ -108,7 +108,7 @@ export function NewsroomShell() {
               <span style={{
                 width: 6, height: 6, background: "var(--bear)", display: "inline-block",
               }} />
-              <span className="t-micro" style={{ color: "var(--bear)" }}>● LIVE</span>
+              <span className="t-micro" style={{ color: "var(--bull)" }}>● LIVE</span>
               <span className="t-micro" style={{ color: "var(--dim)" }}>{hero.lang}</span>
               <span className="t-micro" style={{ color: "var(--dim)" }}>{hero.regionGroup}</span>
             </div>

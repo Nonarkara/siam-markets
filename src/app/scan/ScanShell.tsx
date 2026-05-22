@@ -50,7 +50,7 @@ function CompactTimeline({ symbol, name, sector }: { symbol: string; name: strin
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 2, padding: "4px 12px", borderTop: "1px solid var(--line-dim)", overflowX: "auto" }}>
-      <span className="t-micro" style={{ color: "var(--dim)", marginRight: 6, flexShrink: 0 }}>TIMELINE</span>
+      <span className="t-micro" style={{ color: "var(--dim)", marginRight: 6, flexShrink: 0 }}>SIMULATED</span>
       {years.map((y, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
           <div style={{ width: 6, height: 6, background: y.c }} />
@@ -97,7 +97,8 @@ export function ScanShell() {
         display: "flex", alignItems: "center", gap: 10, padding: "5px 12px",
         borderBottom: "1px solid var(--line)", flexShrink: 0, flexWrap: "wrap",
       }}>
-        <span className="t-micro" style={{ color: "var(--dim)" }}>MARKET</span>
+        <span className="t-mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--ink)", marginRight: 8 }}>VALUE SCANNER</span>
+        <span className="t-micro" style={{ color: "var(--dim)", marginRight: 8 }}>MARKET</span>
         {(["thai", "global"] as const).map(m => (
           <button
             key={m}
@@ -124,8 +125,17 @@ export function ScanShell() {
         >
           {SECTORS.map(s => <option key={s} value={s}>{s === "all" ? "ALL SECTORS" : s.toUpperCase()}</option>)}
         </select>
-        <span className="t-micro" style={{ color: "var(--dim)", marginLeft: "auto" }}>
-          {filtered.length} STOCKS · {filtered.filter(s => s.marginOfSafety > 0).length} BUY ZONES
+        <span className="t-micro" style={{ color: "var(--dim)", marginLeft: "auto", maxWidth: 280, textAlign: "right" }}>
+          {filtered.length} stocks · {filtered.filter(s => s.marginOfSafety > 0).length} below Graham value
+        </span>
+      </div>
+
+      {/* Human-readable explanation */}
+      <div style={{ padding: "4px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0, background: "var(--bg-raised)" }}>
+        <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
+          <strong style={{ color: "var(--ink)" }}>MOS</strong> = Margin of Safety — how far below true value a stock trades.
+          <strong style={{ color: "var(--ink)" }}> Graham №</strong> = estimated fair value.
+          Green = meets Buffett criteria.
         </span>
       </div>
 

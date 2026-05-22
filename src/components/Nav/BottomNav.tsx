@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/",          label: "DESK",     icon: DeskIcon     },
-  { href: "/plan",      label: "PLAN",     icon: PlanIcon     },
-  { href: "/markets",   label: "MARKETS",  icon: MarketsIcon  },
-  { href: "/funds",     label: "FUNDS",    icon: FundsIcon    },
-  { href: "/scan",      label: "SCAN",     icon: ScanIcon     },
-  { href: "/backtest",  label: "BACKTEST", icon: BacktestIcon },
-  { href: "/trade",     label: "TRADE",    icon: TradeIcon    },
-  { href: "/money",     label: "MONEY",    icon: MoneyIcon    },
+  { href: "/",          label: "DESK",      icon: DeskIcon     },
+  { href: "/markets",   label: "MARKETS",   icon: MarketsIcon  },
+  { href: "/scan",      label: "BUYS",      icon: ScanIcon     },
+  { href: "/funds",     label: "FUNDS",     icon: FundsIcon    },
+  { href: "/newsroom",  label: "LIVE",      icon: NewsroomIcon },
+  { href: "/money",     label: "PORTFOLIO", icon: MoneyIcon    },
+  { href: "/plan",      label: "PLAN",      icon: PlanIcon     },
+  { href: "/trade",     label: "TRADE",     icon: TradeIcon    },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -59,7 +59,7 @@ export function BottomNav() {
             <Icon active={active} />
             <span style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "0.5rem",
+              fontSize: "0.625rem",
               letterSpacing: "0.08em",
               fontWeight: active ? 700 : 400,
             }}>
