@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { SimulatedTrade, SimPortfolio, PerformanceMetrics } from "@/lib/types";
 import { enterTrade, closeTrade, checkOpenTrades, calculateMetrics, calculatePositionSize } from "@/lib/trading";
 import { MOCK_OHLCV_PTT, MOCK_OHLCV_ADVANC, MOCK_OHLCV_KBANK } from "@/lib/api/mock";
@@ -15,6 +15,8 @@ const STOCKS = [
 const TABS = ["Open Trades", "History", "Performance"] as const;
 type Tab = typeof TABS[number];
 
+const STORAGE_KEY = "siam_sim_portfolio";
+
 function createInitialPortfolio(): SimPortfolio {
   const now = new Date().toISOString();
   return {
@@ -25,8 +27,24 @@ function createInitialPortfolio(): SimPortfolio {
   };
 }
 
+function loadPortfolio(): SimPortfolio {
+  if (typeof window === "undefined") return createInitialPortfolio();
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return createInitialPortfolio();
+  try {
+    return JSON.parse(raw) as SimPortfolio;
+  } catch {
+    return createInitialPortfolio();
+  }
+}
+
 export default function SimulatePage() {
-  const [portfolio, setPortfolio] = useState<SimPortfolio>(createInitialPortfolio);
+  const [portfolio, setPortfolio] = useState<SimPortfolio>(loadPortfolio);
+
+  // Persist to localStorage on every change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(portfolio));
+  }, [portfolio]);
   const [tab, setTab] = useState<Tab>("Open Trades");
   const [symbol, setSymbol] = useState("PTT.BK");
   const [direction, setDirection] = useState<"long" | "short">("long");

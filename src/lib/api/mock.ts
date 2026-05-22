@@ -182,6 +182,51 @@ export const MOCK_OHLCV_PTT: OHLCV[] = generateMockOHLCV(35.5, 60, 0.018);
 export const MOCK_OHLCV_ADVANC: OHLCV[] = generateMockOHLCV(232.0, 60, 0.015);
 export const MOCK_OHLCV_KBANK: OHLCV[] = generateMockOHLCV(141.0, 60, 0.016);
 
+// ─── Smart Money Flow Mock (14-day foreign/institutional flow) ───
+
+export const MOCK_SMART_MONEY_FLOWS = [
+  { date: "2026-05-05", foreignBuy: 3200, foreignSell: 2800, blockBuy: 450, blockSell: 320, institutionalBuy: 1800, institutionalSell: 1600 },
+  { date: "2026-05-06", foreignBuy: 2900, foreignSell: 3100, blockBuy: 380, blockSell: 410, institutionalBuy: 1700, institutionalSell: 1900 },
+  { date: "2026-05-07", foreignBuy: 3500, foreignSell: 2600, blockBuy: 520, blockSell: 280, institutionalBuy: 2100, institutionalSell: 1500 },
+  { date: "2026-05-08", foreignBuy: 4100, foreignSell: 2400, blockBuy: 610, blockSell: 250, institutionalBuy: 2400, institutionalSell: 1400 },
+  { date: "2026-05-09", foreignBuy: 3800, foreignSell: 2700, blockBuy: 480, blockSell: 310, institutionalBuy: 2200, institutionalSell: 1600 },
+  { date: "2026-05-12", foreignBuy: 4200, foreignSell: 2300, blockBuy: 650, blockSell: 220, institutionalBuy: 2500, institutionalSell: 1300 },
+  { date: "2026-05-13", foreignBuy: 3900, foreignSell: 2500, blockBuy: 580, blockSell: 260, institutionalBuy: 2300, institutionalSell: 1450 },
+  { date: "2026-05-14", foreignBuy: 3600, foreignSell: 2900, blockBuy: 420, blockSell: 380, institutionalBuy: 2000, institutionalSell: 1750 },
+  { date: "2026-05-15", foreignBuy: 3300, foreignSell: 3100, blockBuy: 390, blockSell: 420, institutionalBuy: 1850, institutionalSell: 1900 },
+  { date: "2026-05-16", foreignBuy: 4500, foreignSell: 2100, blockBuy: 720, blockSell: 190, institutionalBuy: 2600, institutionalSell: 1200 },
+  { date: "2026-05-17", foreignBuy: 4800, foreignSell: 1900, blockBuy: 810, blockSell: 170, institutionalBuy: 2800, institutionalSell: 1100 },
+  { date: "2026-05-18", foreignBuy: 4400, foreignSell: 2200, blockBuy: 690, blockSell: 210, institutionalBuy: 2550, institutionalSell: 1350 },
+  { date: "2026-05-19", foreignBuy: 4100, foreignSell: 2500, blockBuy: 580, blockSell: 290, institutionalBuy: 2300, institutionalSell: 1550 },
+];
+
+// ─── Sentiment Divergence Mock (14-day sentiment vs price) ────────
+
+export const MOCK_SENTIMENT_DIVERGENCE = [
+  { date: "2026-05-05", newsSentiment: 0.15, socialSentiment: 0.22, priceChange: 0.8, volumeRatio: 1.1 },
+  { date: "2026-05-06", newsSentiment: -0.05, socialSentiment: 0.08, priceChange: -0.3, volumeRatio: 0.9 },
+  { date: "2026-05-07", newsSentiment: 0.25, socialSentiment: 0.18, priceChange: 1.2, volumeRatio: 1.3 },
+  { date: "2026-05-08", newsSentiment: 0.35, socialSentiment: 0.30, priceChange: 0.5, volumeRatio: 1.0 },
+  { date: "2026-05-09", newsSentiment: 0.20, socialSentiment: 0.15, priceChange: -0.2, volumeRatio: 0.8 },
+  { date: "2026-05-12", newsSentiment: -0.10, socialSentiment: -0.05, priceChange: -0.8, volumeRatio: 1.2 },
+  { date: "2026-05-13", newsSentiment: -0.25, socialSentiment: -0.18, priceChange: -1.1, volumeRatio: 1.4 },
+  { date: "2026-05-14", newsSentiment: -0.35, socialSentiment: -0.28, priceChange: -0.4, volumeRatio: 1.1 },
+  { date: "2026-05-15", newsSentiment: -0.20, socialSentiment: -0.12, priceChange: 0.3, volumeRatio: 0.9 },
+  { date: "2026-05-16", newsSentiment: -0.08, socialSentiment: 0.02, priceChange: 0.9, volumeRatio: 1.3 },
+  { date: "2026-05-17", newsSentiment: 0.05, socialSentiment: 0.10, priceChange: 1.1, volumeRatio: 1.5 },
+  { date: "2026-05-18", newsSentiment: 0.12, socialSentiment: 0.08, priceChange: -0.5, volumeRatio: 1.2 },
+  { date: "2026-05-19", newsSentiment: -0.15, socialSentiment: -0.10, priceChange: -0.9, volumeRatio: 1.4 },
+];
+
+// ─── Gamma Exposure Mock (SET50 options proxy) ────────────────────
+
+export const MOCK_GAMMA_CHAIN = {
+  underlyingPrice: 890.5,
+  strikes: [860, 870, 880, 890, 900, 910, 920],
+  callOi: [1200, 2100, 3500, 5800, 4200, 2800, 1600],
+  putOi: [800, 1500, 2800, 5200, 3800, 2200, 1100],
+};
+
 // News sentiment mock for trading page
 export const MOCK_TRADING_NEWS = [
   {

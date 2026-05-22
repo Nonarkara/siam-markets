@@ -22,20 +22,39 @@ export const REGIONAL_MARKETS = {
     { symbol: "^SET.BK", name: "SET Index",  flag: "🇹🇭", region: "Thailand" },
   ],
   asean: [
-    { symbol: "^KLSE",   name: "KLCI",       flag: "🇲🇾", region: "Malaysia"  },
-    { symbol: "^JKSE",   name: "IDX",        flag: "🇮🇩", region: "Indonesia" },
-    { symbol: "^STI",    name: "STI",        flag: "🇸🇬", region: "Singapore" },
-    { symbol: "^TWII",   name: "TAIEX",      flag: "🇹🇼", region: "Taiwan"   },
+    { symbol: "^KLSE",   name: "KLCI",       flag: "🇲🇾", region: "Malaysia"   },
+    { symbol: "^JKSE",   name: "IDX",        flag: "🇮🇩", region: "Indonesia"  },
+    { symbol: "^STI",    name: "STI",        flag: "🇸🇬", region: "Singapore"  },
+    { symbol: "^TWII",   name: "TAIEX",      flag: "🇹🇼", region: "Taiwan"     },
+    { symbol: "PSEI.PS", name: "PSEi",       flag: "🇵🇭", region: "Philippines"},
+    { symbol: "^KS11",   name: "KOSPI",      flag: "🇰🇷", region: "Korea"      },
   ],
   china: [
-    { symbol: "000001.SS", name: "Shanghai",  flag: "🇨🇳", region: "China (SH)"   },
+    { symbol: "000001.SS", name: "Shanghai",  flag: "🇨🇳", region: "China (SH)"  },
     { symbol: "000300.SS", name: "CSI 300",   flag: "🇨🇳", region: "China (CSI)" },
     { symbol: "^HSI",      name: "Hang Seng", flag: "🇭🇰", region: "Hong Kong"   },
   ],
   global: [
-    { symbol: "^GSPC",  name: "S&P 500", flag: "🇺🇸", region: "US"    },
-    { symbol: "^N225",  name: "Nikkei",  flag: "🇯🇵", region: "Japan" },
-    { symbol: "^IXIC",  name: "Nasdaq",  flag: "🇺🇸", region: "US"   },
+    { symbol: "^GSPC",      name: "S&P 500",   flag: "🇺🇸", region: "US"          },
+    { symbol: "^IXIC",      name: "Nasdaq",    flag: "🇺🇸", region: "US"          },
+    { symbol: "^GSPTSE",    name: "TSX",       flag: "🇨🇦", region: "Canada"      },
+    { symbol: "^MXX",       name: "BMV IPC",   flag: "🇲🇽", region: "Mexico"      },
+    { symbol: "^BVSP",      name: "Bovespa",   flag: "🇧🇷", region: "Brazil"      },
+    { symbol: "^FTSE",      name: "FTSE 100",  flag: "🇬🇧", region: "UK"          },
+    { symbol: "^GDAXI",     name: "DAX",       flag: "🇩🇪", region: "Germany"     },
+    { symbol: "^FCHI",      name: "CAC 40",    flag: "🇫🇷", region: "France"      },
+    { symbol: "^AEX",       name: "AEX",       flag: "🇳🇱", region: "Netherlands" },
+    { symbol: "^SSMI",      name: "SMI",       flag: "🇨🇭", region: "Switzerland" },
+    { symbol: "^IBEX",      name: "IBEX 35",   flag: "🇪🇸", region: "Spain"       },
+    { symbol: "FTSEMIB.MI", name: "FTSE MIB",  flag: "🇮🇹", region: "Italy"       },
+    { symbol: "^OMX",       name: "OMX 30",    flag: "🇸🇪", region: "Sweden"      },
+    { symbol: "IMOEX.ME",   name: "MOEX",     flag: "🇷🇺", region: "Russia"      },
+    { symbol: "^TA125.TA",  name: "TA 125",    flag: "🇮🇱", region: "Israel"      },
+    { symbol: "^TASI.SR",   name: "Tadawul",   flag: "🇸🇦", region: "Saudi"       },
+    { symbol: "^JN0U.JO",   name: "JSE Top 40",flag: "🇿🇦", region: "S. Africa"   },
+    { symbol: "^N225",      name: "Nikkei",    flag: "🇯🇵", region: "Japan"       },
+    { symbol: "^BSESN",     name: "Sensex",    flag: "🇮🇳", region: "India"       },
+    { symbol: "^AXJO",      name: "ASX 200",   flag: "🇦🇺", region: "Australia"   },
   ],
 } as const;
 
@@ -90,6 +109,15 @@ export const ASSET_CLASS_MARKETS = [
   { symbol: "^TNX",     name: "US 10Y",      unit: "%",       category: "bonds"     },
   { symbol: "^IRX",     name: "US 2Y",       unit: "%",       category: "bonds"     },
   { symbol: "DX-Y.NYB", name: "USD Index",   unit: "index",   category: "currency"  },
+  // FX crosses — added for the world-map FX layer
+  { symbol: "EURUSD=X", name: "EUR/USD",     unit: "rate",    category: "fx"        },
+  { symbol: "GBPUSD=X", name: "GBP/USD",     unit: "rate",    category: "fx"        },
+  { symbol: "USDJPY=X", name: "USD/JPY",     unit: "rate",    category: "fx"        },
+  { symbol: "USDCNY=X", name: "USD/CNY",     unit: "rate",    category: "fx"        },
+  { symbol: "USDINR=X", name: "USD/INR",     unit: "rate",    category: "fx"        },
+  { symbol: "AUDUSD=X", name: "AUD/USD",     unit: "rate",    category: "fx"        },
+  { symbol: "USDBRL=X", name: "USD/BRL",     unit: "rate",    category: "fx"        },
+  { symbol: "USDTHB=X", name: "USD/THB",     unit: "rate",    category: "fx"        },
 ] as const;
 
 export async function fetchAssetClasses(): Promise<YahooQuote[]> {
@@ -311,4 +339,47 @@ export async function fetchAllRegional(): Promise<{
     fetchRegionalGroup("global"),
   ]);
   return { thai, asean, china, global };
+}
+
+// ─── History (sparklines + multi-timeframe %) ─────────────────────
+
+export interface HistoryPoint { t: number; c: number }
+
+/** Fetch daily-close history from Yahoo's chart endpoint. Falls back to []. */
+export async function fetchHistory(symbol: string, range: "1mo" | "3mo" | "6mo" | "1y" = "6mo"): Promise<HistoryPoint[]> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; SiamMarkets/1.0)",
+        "Accept": "application/json",
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return [];
+    const data = await res.json() as {
+      chart?: { result?: Array<{
+        timestamp?: number[];
+        indicators?: { quote?: Array<{ close?: (number | null)[] }> };
+      }> };
+    };
+    const r = data.chart?.result?.[0];
+    const ts = r?.timestamp ?? [];
+    const cs = r?.indicators?.quote?.[0]?.close ?? [];
+    const out: HistoryPoint[] = [];
+    for (let i = 0; i < ts.length; i++) {
+      const c = cs[i];
+      if (c != null && isFinite(c)) out.push({ t: ts[i] * 1000, c });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchHistories(symbols: string[], range: "1mo" | "3mo" | "6mo" | "1y" = "6mo"): Promise<Record<string, HistoryPoint[]>> {
+  const results = await Promise.all(symbols.map(s => fetchHistory(s, range).then(h => [s, h] as const)));
+  const out: Record<string, HistoryPoint[]> = {};
+  for (const [s, h] of results) out[s] = h;
+  return out;
 }

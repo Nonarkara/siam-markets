@@ -2,16 +2,16 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/Nav/BottomNav";
 import { TopNav } from "@/components/Nav/TopNav";
-import { SetupGate } from "@/components/KPI/SetupGate";
 import { LangProvider } from "@/lib/i18n/useLang";
+import { THEME_INIT_SCRIPT } from "@/components/Theme/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "DayTraders",
-  description: "Thai market intelligence — personalized KPIs, Bloomberg-style signals, Graham/Buffett/Munger frameworks. ดัชนีการลงทุนไทย.",
-  keywords: ["Thailand", "SET", "stock market", "investing", "mutual funds", "RMF", "Thai ESG", "กองทุน", "หุ้น"],
+  title: "DayTraders — Your Money, Visualized",
+  description: "Financial intelligence for everyone. From first paycheck to freedom — visualize, plan, and invest with Graham, Buffett, and Kiyosaki principles.",
+  keywords: ["Thailand", "SET", "stock market", "investing", "mutual funds", "RMF", "Thai ESG", "กองทุน", "หุ้น", "financial literacy", "wealth planner"],
   openGraph: {
-    title: "DayTraders",
-    description: "Market intelligence that knows what you want · ตลาดการลงทุนที่รู้ใจคุณ",
+    title: "DayTraders — Your Money, Visualized",
+    description: "Financial intelligence for everyone. Plan, visualize, and invest.",
     type: "website",
   },
 };
@@ -24,11 +24,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <LangProvider>
-          <SetupGate />
-
           <div className="lg-only">
             <TopNav />
           </div>

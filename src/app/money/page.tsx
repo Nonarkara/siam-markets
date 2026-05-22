@@ -1,160 +1,178 @@
 "use client";
 
-import { useState } from "react";
+/**
+ * MONEY — viewport-locked, tabbed Portfolio Statement.
+ *
+ *   SUMMARY · HOLDINGS · PERFORMANCE · TAX · PROJECTION
+ *
+ * Sources Dr Non's real Phillip Fund SuperMart statement (acct G7159).
+ * Layout mirrors the Phillip PDF schema but is denser, viewport-fit,
+ * Braun-themed, and sortable.
+ */
+
+import { useMemo } from "react";
+import { Tabs } from "@/components/Tabs/Tabs";
 import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
-import { PortfolioTracker } from "@/components/Portfolio/PortfolioTracker";
+import { PerfectPortfolio } from "@/components/Portfolio/PerfectPortfolio";
+import {
+  PortfolioSummaryView,
+  HoldingsTableView,
+  PerformanceView,
+} from "@/components/Portfolio/PortfolioStatement";
+import {
+  HOLDINGS,
+  computeSummary,
+  PORTFOLIO_AS_OF,
+  PORTFOLIO_ACCOUNT,
+  PORTFOLIO_OWNER,
+  PORTFOLIO_DISCLAIMER,
+} from "@/lib/portfolio-data";
 
-const TABS = ["MY PORTFOLIO", "TAX CALCULATOR", "10-YEAR PROJECTION", "INVESTMENT SCHOOL"] as const;
-type Tab = typeof TABS[number];
-
-// Compact school concepts — 5 cards in accordion style
 const CONCEPTS = [
-  {
-    id: "mos",
-    label: "MARGIN OF SAFETY",
-    author: "Graham",
-    color: "var(--bull)",
-    definition: "Buy only when price is significantly below intrinsic value — your protection against being wrong.",
-    signal: "SET stocks with MOS ≥30% are in the strong buy zone. See /scan.",
-    quote: "The margin of safety is always dependent on the price paid.",
-  },
-  {
-    id: "mr-market",
-    label: "MR. MARKET",
-    author: "Graham",
-    color: "var(--caution)",
-    definition: "The market is a moody partner offering daily prices. Exploit his panic — never follow his enthusiasm.",
-    signal: "F&G below 25 = Mr. Market is panicking. Historically the best time to buy quality.",
-    quote: "Mr. Market is there to serve you, not to guide you.",
-  },
-  {
-    id: "moat",
-    label: "ECONOMIC MOAT",
-    author: "Buffett",
-    color: "var(--tech)",
-    definition: "A durable competitive advantage. 4 types: cost advantage, switching costs, network effect, intangible assets.",
-    signal: "ADVANC (switching), AOT (scale), CPALL (network) — these are wide moat Thai stocks.",
-    quote: "The key is determining the competitive advantage and the durability of that advantage.",
-  },
-  {
-    id: "1pct",
-    label: "THE 1% RULE",
-    author: "Risk Management",
-    color: "var(--bear)",
-    definition: "Never risk more than 1% of account per trade. 10 losses in a row still leaves 90% of capital.",
-    signal: "Position size = (Account × 1%) ÷ (Entry − Stop). The simulator enforces this.",
-    quote: "Survival is the first law of trading. You can't make money if you're out of the game.",
-  },
-  {
-    id: "regime",
-    label: "MARKET REGIME",
-    author: "Technical",
-    color: "var(--caution)",
-    definition: "Trending markets reward trend-following. Ranging markets punish it. Know which you're in.",
-    signal: "Trade desk shows current regime. Trending = full size. Ranging = half size or stay out.",
-    quote: "The trend is your friend — until it ends.",
-  },
+  { id: "ssf",  label: "SSF",  full: "Super Savings Fund",       cap: "฿200k or 30% income · whichever lower", lock: "10 years · withdrawable after 10y from purchase",  who: "Anyone with taxable income", color: "var(--tech)" },
+  { id: "rmf",  label: "RMF",  full: "Retirement Mutual Fund",   cap: "฿500k or 30% income · whichever lower", lock: "Until age 55 · 5y minimum holding",                who: "Long horizon · retirement",   color: "var(--bear)" },
+  { id: "tesg", label: "TESG", full: "Thai ESG Fund",            cap: "฿300k or 30% income · whichever lower", lock: "8 years from purchase",                            who: "Domestic ESG mandate",        color: "var(--caution)" },
+  { id: "ltf",  label: "LTF",  full: "Long-Term Equity (legacy)", cap: "Discontinued for new buys (2020)",      lock: "5–7 years depending on issue year",                who: "Existing holders only",       color: "var(--violet)" },
+  { id: "fee",  label: "FEE",  full: "What you actually pay",    cap: "Front-end 0–1.5% on purchase",          lock: "Yearly TER 0.5–2.0% — quiet drag",                 who: "Always check the fact-sheet", color: "var(--muted)" },
 ];
 
+const fmtTHB = (n: number) => `฿${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+
+function Scroller({ children }: { children: React.ReactNode }) {
+  return <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: 16 }}>{children}</div>;
+}
+
 export default function MoneyPage() {
-  const [tab, setTab] = useState<Tab>("TAX CALCULATOR");
-  const [openConcept, setOpenConcept] = useState<string | null>(null);
+  const summary = useMemo(() => computeSummary(HOLDINGS), []);
+  const gainColor = summary.totalGain >= 0 ? "var(--bull)" : "var(--bear)";
 
   return (
-    <div className="page page-enter" style={{ paddingTop: 16 }}>
-      <div className="t-display" style={{ marginBottom: 4 }}>Money</div>
-      <div className="t-body" style={{ color: "var(--muted)", marginBottom: 16 }}>
-        Tax, projection, and the frameworks that made Buffett a billionaire.
-      </div>
-
-      {/* Tab strip */}
-      <div style={{ display: "flex", borderBottom: "1px solid var(--line)", marginBottom: 16, overflowX: "auto", scrollbarWidth: "none" }}>
-        {TABS.map(t => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            style={{
-              padding: "10px 14px",
-              minHeight: 44,
-              background: "transparent",
-              border: "none",
-              borderBottom: tab === t ? "2px solid var(--bull)" : "2px solid transparent",
-              color: tab === t ? "var(--bull)" : "var(--muted)",
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-micro)",
-              letterSpacing: "0.08em",
-              fontWeight: tab === t ? 700 : 400,
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      {tab === "MY PORTFOLIO" && <PortfolioTracker />}
-      {tab === "TAX CALCULATOR" && <TaxCalc />}
-
-      {tab === "10-YEAR PROJECTION" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <ProjectionChart initialAmount={500_000} monthlyContribution={10_000} />
-          <div className="card" style={{ padding: 16 }}>
-            <div className="t-body" style={{ fontWeight: 600, marginBottom: 6 }}>Patience is the edge.</div>
-            <div className="t-body" style={{ color: "var(--muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
-              Starting with ฿500K + ฿10K/month. The gap between 6% and 10% over 10 years is the difference between discipline and drift. The money you save on taxes via RMF/Thai ESG can be reinvested — move that savings directly into the monthly contribution slider.
+    <div className="dashboard-page">
+      {/* Header */}
+      <div className="dashboard-page__header">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+              <h1 className="t-display" style={{ fontSize: "1.25rem", lineHeight: 1.1 }}>Dream Portfolio</h1>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.55rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.18em",
+                  color: "var(--braun-yellow, #ffd000)",
+                  border: "1px solid var(--braun-yellow, #ffd000)",
+                  padding: "2px 7px",
+                }}
+              >
+                EDUCATIONAL
+              </span>
             </div>
-            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
-              <div className="t-body" style={{ fontSize: "0.875rem", fontStyle: "italic", color: "var(--ink)" }}>
-                &ldquo;The stock market is a device for transferring money from the impatient to the patient.&rdquo;
-              </div>
-              <div className="t-micro" style={{ marginTop: 4 }}>Warren Buffett</div>
+            <div className="t-micro" style={{ color: "var(--muted)", marginTop: 4 }}>
+              {PORTFOLIO_OWNER} · {PORTFOLIO_ACCOUNT} · as of {PORTFOLIO_AS_OF}
+            </div>
+            <div className="t-micro" style={{ color: "var(--dim)", marginTop: 2, fontSize: "0.5625rem" }}>
+              {PORTFOLIO_DISCLAIMER}
             </div>
           </div>
+          <div style={{ display: "flex", gap: 18, alignItems: "baseline" }}>
+            <Mini label="Value"   value={fmtTHB(summary.totalValue)} />
+            <Mini label="Cost"    value={fmtTHB(summary.totalCost)} />
+            <Mini label="Gain ฿"  value={`${summary.totalGain >= 0 ? "+" : ""}${fmtTHB(summary.totalGain)}`} color={gainColor} />
+            <Mini label="Gain %"  value={`${summary.totalGain >= 0 ? "+" : ""}${summary.totalGainPct.toFixed(2)}%`} color={gainColor} bold />
+          </div>
         </div>
-      )}
+      </div>
 
-      {tab === "INVESTMENT SCHOOL" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {CONCEPTS.map(c => (
-            <details
-              key={c.id}
-              style={{ background: "var(--bg-surface)", border: "1px solid var(--line)", borderLeft: `3px solid ${c.color}` }}
-              open={openConcept === c.id}
-              onToggle={(e) => setOpenConcept((e.target as HTMLDetailsElement).open ? c.id : null)}
-            >
-              <summary style={{
-                padding: "14px 16px",
-                cursor: "pointer",
-                listStyle: "none",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                minHeight: 52,
-              }}>
-                <div>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: c.color, fontWeight: 700, letterSpacing: "0.08em", marginBottom: 2 }}>
-                    {c.label}
+      <div className="dashboard-page__body">
+        <Tabs
+          defaultId="summary"
+          tabs={[
+            {
+              id: "summary", label: "SUMMARY", badge: `${HOLDINGS.length} funds`,
+              content: <Scroller><PortfolioSummaryView /></Scroller>,
+            },
+            {
+              id: "holdings", label: "HOLDINGS", badge: "FULL TABLE",
+              content: (
+                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: 16 }}>
+                  <HoldingsTableView />
+                </div>
+              ),
+            },
+            {
+              id: "performance", label: "PERFORMANCE", badge: `${summary.totalGain >= 0 ? "+" : ""}${summary.totalGainPct.toFixed(1)}%`,
+              content: <Scroller><PerformanceView /></Scroller>,
+            },
+            {
+              id: "tax", label: "TAX", badge: "RMF/SSF/TESG",
+              content: (
+                <Scroller>
+                  <div style={{ display: "grid", gap: 14 }}>
+                    <TaxCalc />
+                    <div>
+                      <div className="t-micro" style={{ marginBottom: 8, letterSpacing: "0.14em" }}>TAX-BUCKET REFERENCE</div>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+                        {CONCEPTS.map(c => (
+                          <div key={c.id} style={{ background: "var(--bg-surface)", border: "1px solid var(--line)", borderTop: `3px solid ${c.color}`, padding: 12 }}>
+                            <div className="t-mono" style={{ fontSize: "0.875rem", fontWeight: 700, color: c.color, letterSpacing: "0.08em" }}>{c.label}</div>
+                            <div className="t-micro" style={{ color: "var(--muted)", marginTop: 2 }}>{c.full}</div>
+                            <div style={{ marginTop: 8, display: "grid", gap: 4 }}>
+                              <Bit label="Cap"  text={c.cap} />
+                              <Bit label="Lock" text={c.lock} />
+                              <Bit label="Who"  text={c.who} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div className="t-micro">{c.author}</div>
-                </div>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--dim)" }}>▾</span>
-              </summary>
-              <div style={{ padding: "0 16px 16px", borderTop: "1px solid var(--line)" }}>
-                <div className="t-body" style={{ marginTop: 12, lineHeight: 1.6 }}>{c.definition}</div>
-                <div style={{ background: "var(--bg-hover)", padding: "10px 12px", margin: "10px 0", borderLeft: `2px solid ${c.color}` }}>
-                  <div className="t-micro" style={{ color: c.color, marginBottom: 3 }}>TODAY&apos;S SIGNAL</div>
-                  <div className="t-body" style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{c.signal}</div>
-                </div>
-                <div style={{ paddingTop: 10, borderTop: "1px solid var(--line)" }}>
-                  <div className="t-body" style={{ fontSize: "0.875rem", fontStyle: "italic", color: "var(--ink)" }}>&ldquo;{c.quote}&rdquo;</div>
-                </div>
-              </div>
-            </details>
-          ))}
-        </div>
-      )}
+                </Scroller>
+              ),
+            },
+            {
+              id: "projection", label: "PROJECTION", badge: "10-YR",
+              content: (
+                <Scroller>
+                  <div className="t-micro" style={{ color: "var(--muted)", marginBottom: 10 }}>
+                    Starting from current value (฿{Math.round(summary.totalValue).toLocaleString()}) · ฿10,000/mo additional · 6 / 8 / 10% compound rates
+                  </div>
+                  <ProjectionChart initialAmount={Math.round(summary.totalValue)} monthlyContribution={10_000} />
+                </Scroller>
+              ),
+            },
+            {
+              id: "perfect", label: "PERFECT PORTFOLIO", badge: "ROCHE",
+              content: (
+                <Scroller>
+                  <PerfectPortfolio />
+                </Scroller>
+              ),
+            },
+          ]}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Mini({ label, value, color, bold }: { label: string; value: string; color?: string; bold?: boolean }) {
+  return (
+    <div>
+      <div className="t-micro">{label}</div>
+      <div className="t-mono" style={{ fontSize: bold ? "1rem" : "0.875rem", fontWeight: 700, color: color ?? "var(--ink)", marginTop: 2 }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Bit({ label, text }: { label: string; text: string }) {
+  return (
+    <div style={{ fontSize: "0.6875rem", lineHeight: 1.45 }}>
+      <span className="t-micro" style={{ color: "var(--dim)", marginRight: 6 }}>{label}</span>
+      <span style={{ color: "var(--ink)" }}>{text}</span>
     </div>
   );
 }
