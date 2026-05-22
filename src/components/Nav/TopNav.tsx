@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ProfileBadge } from "@/components/KPI/ProfileBadge";
 import { LangToggle } from "@/components/KPI/LangToggle";
 import { APP_VERSION } from "@/lib/version";
+import { StoryButton } from "@/components/Story/StoryButton";
 
 const NAV = [
   { href: "/",        label: "DESK"    },
@@ -66,6 +67,10 @@ export function TopNav() {
           v{APP_VERSION}
         </span>
       </Link>
+
+      <div style={{ marginRight: 14 }}>
+        <StoryButton variant="chip" />
+      </div>
 
       <div style={{ display: "flex", flex: 1, gap: 0 }}>
         {NAV.map(({ href, label }) => {

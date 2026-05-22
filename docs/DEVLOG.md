@@ -4,6 +4,33 @@ One entry per meaningful session. Newest at the top.
 
 ---
 
+## 2026-05-22 — STORY panel (v1.2.0)
+
+**Shipped**
+
+- `src/components/Story/StoryModal.tsx` — accessible modal (role=dialog,
+  ESC to close, backdrop click, scroll lock). Four sections: genesis, what
+  I was looking at, what we're trying to achieve, collaborate. Contacts:
+  email, LinkedIn (/in/drnon), GitHub (@Nonarkara), repo link.
+- `src/components/Story/StoryButton.tsx` — subtle `STORY` chip trigger,
+  hairline-bordered, mono, matches the version-stamp register.
+- Wired into TopNav (next to v stamp) on desktop, and into the
+  fixed mobile chip in `layout.tsx`.
+- Version 1.1.0 → **1.2.0**.
+
+**Voice** — drafted in Dr Non's register per §12: mundane → philosophy
+opening ("This started as a private dashboard. A friend wanted to
+understand his Thai mutual funds…"), no motivational fluff, no
+possessive copy, design-heritage paragraph names Rams/Bloomberg/Vignelli
+as colleagues.
+
+**Open**
+
+- Copy is a draft — Dr Non may want to edit any of the four sections.
+  All content sits in `StoryModal.tsx` as static JSX; trivial to revise.
+
+---
+
 ## 2026-05-22 — TimesFM forecast source
 
 **Shipped**
