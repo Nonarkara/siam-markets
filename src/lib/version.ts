@@ -2,4 +2,4 @@
 // on every meaningful release. Surfaced in TopNav (desktop) and below the
 // DayTraders wordmark on mobile.
 
-export const APP_VERSION = "1.2.0";
+export const APP_VERSION = "1.3.0";

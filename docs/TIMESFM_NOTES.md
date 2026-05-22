@@ -14,20 +14,26 @@ the DayTraders dashboard as **probabilistic context** — never as a trade signa
 
 ## How it's wired here
 
+Nightly local ingestion writes a static JSON. The web app serves it from
+the edge — no model inference at request time.
+
 ```
-client (MorningSignal)
-   ↓ fetch /api/forecast?symbol=^SET.BK&horizon=5
-edge route src/app/api/forecast/route.ts
-   ↓ fetchHistoricalPrices() — Yahoo, no key
-   ↓ forecast() — src/lib/api/timesfm.ts
-       └─ Forecaster interface
-              ├─ HuggingFaceForecaster  (when HUGGINGFACE_API_TOKEN set)
-              └─ StubForecaster          (naive last-value baseline, no key)
+ingestion (laptop, daily)                  serving (Cloudflare Pages edge)
+─────────────────────────                  ─────────────────────────────
+ingestion/forecast.py                      MorningSignal.tsx
+  ↓ timesfm 1.3.0 (PyTorch)                  ↓ fetch /api/forecast?symbol=^SET.BK
+  ↓ pulls SET history from yfinance        src/app/api/forecast/route.ts
+  ↓ runs TimesFM-2.0-500m locally            ↓ forecast() — src/lib/api/timesfm.ts
+  ↓ writes public/data/forecasts.json            └─ Forecaster interface
+  ↓ git add / commit / push                        ├─ StaticJsonForecaster (real TimesFM)
+                                                   └─ StubForecaster (naive baseline)
 ```
 
-The `Forecaster` interface keeps the backend swappable. Today: HF Inference
-API. Tomorrow: a self-hosted FastAPI/Cloud Run microservice running TimesFM
-locally for cost/latency control. Call sites do not change.
+The `Forecaster` interface keeps the backend swappable. `StaticJsonForecaster`
+reads the committed JSON via a Next.js static import (works on the
+Cloudflare edge runtime). If the JSON is missing or older than 48 h,
+`selectForecaster()` falls through to the stub so the dashboard never
+breaks.
 
 Returned shape:
 
@@ -35,8 +41,8 @@ Returned shape:
 {
   median: number[],
   quantiles: { p10, p25, p50, p75, p90 },
-  source: "timesfm-hf" | "stub",
-  model: string,         // HF model id, or "stub-naive"
+  source: "static-json" | "stub",
+  model: string,         // "google/timesfm-2.0-500m-pytorch" or "stub-naive"
   generatedAt: ISO8601,
 }
 ```
@@ -45,17 +51,43 @@ A helper `probabilityAtOrAbove(result, threshold)` derives `P(touch ≥ X)` at
 horizon end via piecewise linear interpolation over the five quantiles —
 adequate for UI framing, not for risk pricing.
 
-## Environment variables
+## Running the ingestion
 
-| Var | Purpose | Default |
-|---|---|---|
-| `HUGGINGFACE_API_TOKEN` | HF Inference auth. Missing → stub backend. | unset |
-| `TIMESFM_MODEL` | HF model id, lets you bump versions without code changes. | `google/timesfm-2.0-500m-pytorch` |
-| `TIMESFM_BACKEND` | `auto` \| `hf` \| `stub`. `auto` picks HF when token is present. | `auto` |
+```bash
+# First time — creates a venv, installs ~3 GB of deps (torch + timesfm + ...)
+python3.11 -m venv .venv
+.venv/bin/pip install -r ingestion/requirements.txt
 
-Without any env var the app boots and the projection block renders against
-the stub backend — naive last-value with √t-scaled band — so the end-to-end
-pipeline is exercisable in CI and on a fresh checkout.
+# Run the forecast
+.venv/bin/python ingestion/forecast.py
+# or: npm run ingest:forecast (if .venv/bin/python is on PATH)
+```
+
+First model load downloads ~2 GB from HuggingFace into the local HF cache
+(no token needed for public models). Subsequent runs reuse the cache and
+take ~10–20 s for a single ticker on Apple Silicon.
+
+After the script writes `public/data/forecasts.json`, commit and push —
+Cloudflare Pages auto-rebuilds and the live URL picks up the new bands.
+
+## Environment
+
+No env vars are required. The HuggingFace token previously documented is
+no longer used — HF's Serverless Inference API does **not** host TimesFM
+(see "Why not HF Inference API" below).
+
+## Why not HF Inference API
+
+The model card lists `library_name: "timesfm"` — it uses the custom
+`timesfm` Python package, not standard `transformers`. HF Serverless
+Inference only auto-serves models with a standard pipeline. TimesFM is
+not on that path. Even with a valid token, a POST to
+`api-inference.huggingface.co/models/google/timesfm-2.0-500m-pytorch`
+will not return a forecast.
+
+The HF Inference Endpoints product (paid) would work, with a custom
+inference handler — that's the "microservice swap path" in the section
+below. Not justified for daily-frequency data on a single index.
 
 ## Where TimesFM slots in (fit list)
 
@@ -110,46 +142,36 @@ stop — that drift is the regression.
 
 ## How to bump the model version
 
-The HF model id is environment-driven. To move to TimesFM 2.5 / 3.0 when it
-ships:
-
-```bash
-# .env.local
-TIMESFM_MODEL=google/timesfm-2.5-500m-pytorch
-```
-
-No code changes needed. The defensive normaliser in `timesfm.ts` tolerates
-the common HF response shapes (`{ quantiles: { "0.5": [...] }}`, flat array,
-keyed objects).
+Change the `MODEL_ID` constant at the top of `ingestion/forecast.py`. The
+ingestion script will pull the new weights on the next run. The
+StaticJsonForecaster just trusts the `model` field in the JSON; no code
+change in the web app.
 
 ## How to swap the backend later
 
-Today's HF Inference API is fastest to try, costs per request, and is rate-
-limited. When forecast volume grows, swap to a self-hosted microservice:
+Daily ingestion is enough for SET (one index, slow-moving). When the
+project grows — many tickers, intraday, on-demand re-runs — stand up a
+microservice:
 
-1. Run TimesFM on Cloud Run or a small Render GPU box. FastAPI server,
-   `/forecast` endpoint accepting `{ history, horizon, frequency }`,
-   returning `{ quantiles: { p10, p25, p50, p75, p90 } }`.
+1. Run `ingestion/forecast.py`'s core as a FastAPI server (Render / Cloud
+   Run). Endpoint `/forecast` accepting `{ symbol, history, horizon }`,
+   returning the same quantile shape.
 2. In `src/lib/api/timesfm.ts`, add a third class implementing `Forecaster`,
    e.g. `MicroserviceForecaster(url, token)`.
-3. Extend `selectForecaster()`:
-   ```ts
-   if (backend === "microservice") return new MicroserviceForecaster(url, token);
-   ```
-4. Add `TIMESFM_BACKEND=microservice` and `TIMESFM_SERVICE_URL=…` to env.
+3. Extend `selectForecaster()` to prefer it when a `TIMESFM_SERVICE_URL`
+   env var is present.
 
 Call sites — Morning Signal, `/api/forecast`, future Scanner column — do
 not change.
 
 ## Open questions
 
-- HF Inference API for TimesFM has historically been slow to warm up
-  (`wait_for_model: true` can take 20–60s on first hit). Acceptable for a
-  morning brief; not acceptable for the simulator's 1,000-path Monte Carlo.
-  That feature should wait for the microservice swap.
 - Quantile calibration on Thai equities is unknown. Add a calibration job
   that compares realised vs. predicted quantile coverage over a 1-year
   backtest before relying on the bands for risk sizing.
-- Decide a cache TTL policy: SET closes daily, so 1h on the client and 30m
-  on the edge route is sane. If the model is ever called on weekly closes
-  the TTL should rise to a day.
+- Ingestion is currently manual. Automate via launchd / GitHub Action on
+  a daily cron once the schema is stable.
+- TimesFM-2.0 was trained on global daily series; explicit fine-tune on
+  SET / SET50 may improve calibration. Open question whether the marginal
+  gain is worth the engineering — the zero-shot baseline is likely fine
+  for context-only use.

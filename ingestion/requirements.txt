@@ -1,0 +1,8 @@
+# The pypi `timesfm` package is on the 1.3.x line, but it serves the
+# TimesFM-2.0 model checkpoint from HuggingFace at runtime. Confusing —
+# but model version ≠ package version. Python 3.11+ is fine for 1.3.0.
+timesfm>=1.3.0
+torch>=2.0.0
+yfinance>=0.2.40
+huggingface_hub>=0.20.0
+numpy

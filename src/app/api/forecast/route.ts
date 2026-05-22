@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchHistoricalPrices } from "@/lib/api/yahoo";
-import { forecast, probabilityAtOrAbove, type ForecastResult } from "@/lib/api/timesfm";
+import { forecast, probabilityAtOrAbove, staticForecastAsOf, type ForecastResult } from "@/lib/api/timesfm";
 
 export const runtime = "edge";
 export const revalidate = 1800; // 30 min
@@ -23,17 +23,19 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const symbol  = searchParams.get("symbol")  ?? "^SET.BK";
   const horizon = clampInt(searchParams.get("horizon"), 5, 1, 30);
-  const range   = (searchParams.get("range") ?? "1y") as "3mo" | "6mo" | "1y" | "2y";
 
-  const history = await fetchHistoricalPrices(symbol, range, "1d");
+  // We still pull a short history. The StaticJsonForecaster ignores it; the
+  // stub uses it for the random-walk band; either way we need `lastClose`
+  // for probability framing and as a sanity anchor.
+  const history = await fetchHistoricalPrices(symbol, "3mo", "1d");
   const series  = history.map((p) => p.close).filter((c) => c > 0);
   const lastClose = series.length ? series[series.length - 1] : 0;
 
-  const result = await forecast({ series, horizon, frequency: "D" });
+  const result = await forecast({ symbol, series, horizon, frequency: "D" });
 
   return NextResponse.json({
     symbol,
-    asOf: new Date().toISOString(),
+    asOf: staticForecastAsOf() ?? new Date().toISOString(),
     lastClose,
     horizon: result.horizon,
     frequency: result.frequency,

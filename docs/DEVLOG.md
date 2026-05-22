@@ -4,6 +4,50 @@ One entry per meaningful session. Newest at the top.
 
 ---
 
+## 2026-05-22 — Real TimesFM via local ingestion (v1.3.0)
+
+**Why this changed**
+
+We shipped a HuggingFace Inference API backend in v1.1.0 expecting that a
+free HF token would unlock real TimesFM forecasts. It doesn't. Discovered
+after the user pasted a valid token and the dashboard still showed
+`BASELINE`. The model uses the custom `timesfm` Python package, not
+standard `transformers` — HF's Serverless Inference doesn't route it.
+
+**Shipped**
+
+- `ingestion/forecast.py` — nightly script. Loads TimesFM-2.0-500m via the
+  `timesfm` package, pulls 2y of SET closes from yfinance, generates 5-day
+  probabilistic forecast at quantiles [.1, .25, .5, .75, .9], writes to
+  `public/data/forecasts.json`.
+- `ingestion/requirements.txt` — `timesfm`, `torch`, `yfinance`,
+  `huggingface_hub`, `numpy`. Python 3.11.
+- `src/lib/api/timesfm.ts` — removed `HuggingFaceForecaster` (dead code).
+  Added `StaticJsonForecaster` that reads the committed JSON via a Next.js
+  static import (works on Cloudflare edge). `selectForecaster()` picks it
+  when the JSON is fresh (<48 h), else falls through to stub.
+- `src/app/api/forecast/route.ts` — keeps the same response shape;
+  history is still fetched for `lastClose` framing but the forecast comes
+  from the static JSON.
+- `MorningSignal.tsx` — disclaimer copy updated: stub now says
+  "RUN npm run ingest:forecast FOR TIMESFM" instead of "ADD HF TOKEN".
+- `.env.local` — stripped the now-unused `HUGGINGFACE_API_TOKEN`.
+- `docs/TIMESFM_NOTES.md` — fully rewrote the wiring and why-not-HF
+  sections. Microservice swap path preserved.
+- Version 1.2.0 → **1.3.0**.
+
+**First-run timing on M5 Max** — model download ~4 min (2 GB to HF cache),
+forecast generation ~20 s wall clock. Subsequent runs skip the download:
+~20 s end-to-end.
+
+**Open**
+
+- Move from `git push` deploy to a scheduled cron once stable.
+- Expand `SYMBOLS` from just `^SET.BK` to a SET50 subset for the planned
+  Scanner column. The JSON schema is keyed by symbol — one-line change.
+
+---
+
 ## 2026-05-22 — STORY panel (v1.2.0)
 
 **Shipped**

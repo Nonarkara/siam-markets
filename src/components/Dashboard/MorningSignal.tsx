@@ -331,7 +331,7 @@ function ForecastBlock({
       }}>
         <span>
           {stub
-            ? "STUB BACKEND · NAIVE LAST-VALUE BASELINE · ADD HUGGINGFACE_API_TOKEN FOR TIMESFM"
+            ? "BASELINE · NAIVE LAST-VALUE · RUN npm run ingest:forecast FOR TIMESFM"
             : `MODEL: ${f.model.toUpperCase()} · PROBABILISTIC CONTEXT, NOT A TRADE SIGNAL`}
         </span>
         <button
