@@ -136,8 +136,13 @@ export const MARKET_LOCATIONS: MarketLocation[] = [
   { id: "us2y",   layer: "RATES", city: "New York",   country: "US", flag: "🇺🇸", lat: 40.40, lon: -74.40, symbol: "^IRX",     indexLabel: "US 2Y",   sizeTier: 3, capBn: 28000, unit: "%" },
   { id: "dxy",    layer: "RATES", city: "Washington", country: "US", flag: "💵", lat: 38.85, lon: -77.20, symbol: "DX-Y.NYB", indexLabel: "USD Index", sizeTier: 3, capBn: 0, unit: "idx" },
 
-  // ── VOL · stress gauge ────────────────────────────────────
-  { id: "vix",    layer: "VOL", city: "Chicago", country: "US", flag: "📉", lat: 41.88, lon: -87.63, symbol: "^VIX", indexLabel: "VIX",     sizeTier: 2, capBn: 0, unit: "idx" },
+  // ── VOL · stress gauges (global) ─────────────────────────
+  { id: "vix",    layer: "VOL", city: "Chicago",   country: "US",  flag: "🇺🇸", lat: 41.88,  lon: -87.63,  symbol: "^VIX",   indexLabel: "VIX",    sizeTier: 2, capBn: 0, unit: "idx", alwaysOn: true },
+  { id: "vxn",    layer: "VOL", city: "New York",  country: "US",  flag: "🇺🇸", lat: 40.50,  lon: -74.10,  symbol: "^VXN",   indexLabel: "VXN",    sizeTier: 3, capBn: 0, unit: "idx", alwaysOn: true },
+  { id: "vstoxx", layer: "VOL", city: "Frankfurt", country: "EU",  flag: "🇪🇺", lat: 50.12,  lon:   8.68,  symbol: "^VSTOXX",indexLabel: "VSTOXX", sizeTier: 3, capBn: 0, unit: "idx", alwaysOn: true },
+  { id: "vnky",   layer: "VOL", city: "Osaka",     country: "JP",  flag: "🇯🇵", lat: 34.69,  lon: 135.50,  symbol: "^VNKY",  indexLabel: "VNKY",   sizeTier: 3, capBn: 0, unit: "idx", alwaysOn: true },
+  { id: "vhsi",   layer: "VOL", city: "Hong Kong", country: "HK",  flag: "🇭🇰", lat: 22.32,  lon: 114.16,  symbol: "^VHSI",  indexLabel: "VHSI",   sizeTier: 3, capBn: 0, unit: "idx", alwaysOn: true },
+  { id: "move",   layer: "VOL", city: "New York",  country: "US",  flag: "💵",  lat: 40.75,  lon: -74.00,  symbol: "^MOVE",  indexLabel: "MOVE",   sizeTier: 3, capBn: 0, unit: "idx", alwaysOn: true },
 ];
 
 /**

@@ -118,6 +118,12 @@ export const ASSET_CLASS_MARKETS = [
   { symbol: "AUDUSD=X", name: "AUD/USD",     unit: "rate",    category: "fx"        },
   { symbol: "USDBRL=X", name: "USD/BRL",     unit: "rate",    category: "fx"        },
   { symbol: "USDTHB=X", name: "USD/THB",     unit: "rate",    category: "fx"        },
+  // Global vol — added for the world-map VOL layer
+  { symbol: "^VXN",    name: "VXN (Nasdaq)", unit: "index",   category: "volatility"},
+  { symbol: "^VSTOXX", name: "VSTOXX (EU)",  unit: "index",   category: "volatility"},
+  { symbol: "^VNKY",   name: "VNKY (JP)",    unit: "index",   category: "volatility"},
+  { symbol: "^VHSI",   name: "VHSI (HK)",    unit: "index",   category: "volatility"},
+  { symbol: "^MOVE",   name: "MOVE (Bond)",  unit: "index",   category: "volatility"},
 ] as const;
 
 export async function fetchAssetClasses(): Promise<YahooQuote[]> {

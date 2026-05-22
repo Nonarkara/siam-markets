@@ -25,9 +25,12 @@
 export const runtime    = "edge";
 export const revalidate = 60; // refresh every minute
 
-const OPENSKY_URL = "https://opensky-network.org/api/states/all";
+// api.airplanes.live — community ADSBExchange mirror.
+// Free, no key, does not block cloud/edge environments.
+// /v2/mil returns all currently-tracked military aircraft globally.
+const AIRPLANESLIVE_MIL = "https://api.airplanes.live/v2/mil";
 
-// SE Asia + approaches: [min_lon, min_lat, max_lon, max_lat]
+// SE Asia + approaches: filter envelope after fetch
 const BBOX = { lamin: 0, lomin: 92, lamax: 28, lomax: 135 };
 
 // ─── ICAO24 hex prefix ranges for military registries ─────────
@@ -71,8 +74,6 @@ const MILITARY_CALLSIGN_PATTERNS: Array<{ pattern: RegExp; label: string; flag: 
   { pattern: /^RSAF\d/,   label: "Singapore RSAF",                 flag: "🇸🇬", significance: "Singapore Air Force operations" },
 ];
 
-// OpenSky state vector indices
-const IDX = { icao24: 0, callsign: 1, origin_country: 2, lon: 5, lat: 6, baro_alt: 7, velocity: 9, heading: 10, on_ground: 8 };
 
 export interface MilitaryFlight {
   icao24:      string;
@@ -125,64 +126,81 @@ export interface MilitaryFlightResponse {
   note:       string;
 }
 
+// api.airplanes.live aircraft shape (subset we use)
+interface AirplanesLiveAc {
+  hex:      string;       // ICAO24
+  flight?:  string;       // callsign (trimmed)
+  r?:       string;       // registration
+  t?:       string;       // type / model
+  lat?:     number;
+  lon?:     number;
+  alt_baro?: number | "ground";
+  gs?:      number;       // ground speed kt
+  track?:   number;       // heading
+  dbFlags?: number;       // bit 1 = military
+  ownOp?:   string;       // owner / operator
+}
+
 export async function GET(): Promise<Response> {
   try {
-    const url = new URL(OPENSKY_URL);
-    url.searchParams.set("lamin", BBOX.lamin.toString());
-    url.searchParams.set("lomin", BBOX.lomin.toString());
-    url.searchParams.set("lamax", BBOX.lamax.toString());
-    url.searchParams.set("lomax", BBOX.lomax.toString());
-
-    const res = await fetch(url.toString(), {
+    const res = await fetch(AIRPLANESLIVE_MIL, {
       headers: { "User-Agent": "DayTraders-Intelligence/1.0" },
-      signal:  AbortSignal.timeout(10_000),
+      signal:  AbortSignal.timeout(12_000),
     });
 
-    if (!res.ok) throw new Error(`OpenSky ${res.status}`);
+    if (!res.ok) throw new Error(`airplanes.live ${res.status}`);
 
-    const data = await res.json() as { states?: unknown[][] | null };
-    const states = data.states ?? [];
+    const data = await res.json() as { ac?: AirplanesLiveAc[]; now?: number };
+    const allAc = data.ac ?? [];
 
+    // Filter to SE Asia bbox and classify
     const flights: MilitaryFlight[] = [];
-    const total_seen = states.length;
+    let total_seen = 0;
 
-    for (const s of states) {
-      if (!Array.isArray(s)) continue;
-      const icao24  = (s[IDX.icao24]  as string) ?? "";
-      const rawCs   = (s[IDX.callsign] as string) ?? "";
-      const country = (s[IDX.origin_country] as string) ?? "";
-      const lon     = s[IDX.lon]      as number | null;
-      const lat     = s[IDX.lat]      as number | null;
+    for (const ac of allAc) {
+      const lat = ac.lat;
+      const lon = ac.lon;
+      if (lat == null || lon == null) continue;
 
-      if (!lat || !lon) continue;
+      // Bbox filter — SE Asia + approaches
+      if (lat < BBOX.lamin || lat > BBOX.lamax || lon < BBOX.lomin || lon > BBOX.lomax) continue;
+
+      total_seen++;
+
+      const icao24  = (ac.hex   ?? "").toLowerCase();
+      const rawCs   = (ac.flight ?? "").trim();
+      const country = ""; // not provided by this API, derived via classification
 
       const match = classifyFlight(icao24, rawCs, country);
       if (!match) continue;
 
+      const altRaw = ac.alt_baro;
+      const altNum = (typeof altRaw === "number") ? altRaw * 0.3048 : null; // ft → m
+
       flights.push({
-        icao24:      icao24.toLowerCase(),
-        callsign:    rawCs.trim() || "—",
-        country,
-        flag:        match.flag,
+        icao24,
+        callsign:     rawCs || "—",
+        country:      match.flag,     // use flag as identifier since country not in feed
+        flag:         match.flag,
         lat,
         lon,
-        altitude_m:  (s[IDX.baro_alt] as number | null),
-        velocity_ms: (s[IDX.velocity] as number | null),
-        heading:     (s[IDX.heading]  as number | null),
-        label:       match.label,
+        altitude_m:   altNum,
+        velocity_ms:  ac.gs != null ? ac.gs * 0.5144 : null, // kt → m/s
+        heading:      ac.track ?? null,
+        label:        match.label,
         significance: match.significance,
-        source:      match.source,
-        onGround:    !!(s[IDX.on_ground]),
+        source:       match.source,
+        onGround:     altRaw === "ground",
       });
     }
 
     const payload: MilitaryFlightResponse = {
-      flights:    flights.sort((a, b) => Number(b.onGround) - Number(a.onGround)), // airborne first
+      flights:    flights.sort((a, b) => Number(a.onGround) - Number(b.onGround)), // airborne first
       total_seen,
       flagged:    flights.length,
       as_of:      new Date().toISOString(),
       bbox:       BBOX,
-      note:       "ADS-B only. Transponder-off / stealth aircraft not visible. Correlational signal layer.",
+      note:       "ADS-B via airplanes.live. Transponder-off / stealth aircraft not visible. Correlational signal layer.",
     };
 
     return Response.json(payload, {
@@ -191,8 +209,9 @@ export async function GET(): Promise<Response> {
 
   } catch (e) {
     return Response.json(
-      { flights: [], total_seen: 0, flagged: 0, as_of: new Date().toISOString(), bbox: BBOX, note: `OpenSky unavailable: ${e}` },
-      { headers: { "Cache-Control": "public, s-maxage=60" } },
+      { flights: [], total_seen: 0, flagged: 0, as_of: new Date().toISOString(), bbox: BBOX,
+        note: `Flight data unavailable: ${e}. Try again in 60s.` },
+      { headers: { "Cache-Control": "public, s-maxage=30" } },
     );
   }
 }
