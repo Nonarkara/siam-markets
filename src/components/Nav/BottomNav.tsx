@@ -9,6 +9,7 @@ const NAV = [
   { href: "/markets",   label: "MARKETS",  icon: MarketsIcon  },
   { href: "/funds",     label: "FUNDS",    icon: FundsIcon    },
   { href: "/scan",      label: "SCAN",     icon: ScanIcon     },
+  { href: "/backtest",  label: "BACKTEST", icon: BacktestIcon },
   { href: "/trade",     label: "TRADE",    icon: TradeIcon    },
   { href: "/money",     label: "MONEY",    icon: MoneyIcon    },
 ] as const;
@@ -148,6 +149,15 @@ function FundsIcon({ active }: { active: boolean }) {
       <rect x="3" y="12" width="4" height="9" />
       <rect x="10" y="7" width="4" height="14" />
       <rect x="17" y="3" width="4" height="18" />
+    </svg>
+  );
+}
+
+function BacktestIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <polyline points="3,17 8,12 13,15 21,7" />
+      <polyline points="16,7 21,7 21,12" />
     </svg>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/Nav/BottomNav";
 import { TopNav } from "@/components/Nav/TopNav";
+import { LegalFooter } from "@/components/LegalFooter";
 import { LangProvider } from "@/lib/i18n/useLang";
 import { THEME_INIT_SCRIPT } from "@/components/Theme/ThemeToggle";
 
@@ -40,6 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           <div className="mobile-only">
             <BottomNav />
+          </div>
+
+          <div className="lg-only">
+            <LegalFooter />
           </div>
         </LangProvider>
 

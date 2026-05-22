@@ -1,245 +1,162 @@
 /**
  * Curated financial-TV channel registry.
- * Single source of truth for the TV wall (`/newsroom`) and AI context route.
- * Each channel has a YouTube channel ID — the `/live_stream?channel=` embed
- * form auto-resolves to the currently-airing live broadcast, so we never
- * have to chase rotating video IDs.
+ *
+ * YouTube live_stream embeds auto-resolve to the current broadcast.
+ * All channels tested for live availability.
  */
 
 export interface TVChannel {
   id: string;
   name: string;
   flag: string;
-  lang: "EN" | "TH" | "ZH" | "ME";
-  region: string;
+  lang: "EN" | "TH" | "ZH";
+  regionGroup: "AMERICAS" | "EUROPE" | "ASIA" | "OCEANIA" | "MIDDLE EAST" | "GLOBAL";
   focus: string;
   color: string;
-  /** YouTube channel ID — used with /embed/live_stream?channel=… */
   channelId: string;
-  /** Watch outside the embed (open in YouTube). */
   watchUrl: string;
-  /** Time zone offset for the channel's HQ — used by AI program guess. */
   tzOffset: number;
-  /** Rough weekday programming blocks at the channel's local time. */
-  programming: { start: number; end: number; show: string }[];
 }
 
 export const TV_CHANNELS: TVChannel[] = [
+  // ─── AMERICAS ─────────────────────────────────────────────────
   {
-    id: "bloomberg",
-    name: "Bloomberg TV",
-    flag: "🇺🇸",
-    lang: "EN",
-    region: "US",
-    focus: "Global markets · macro",
-    color: "#ff6900",
-    channelId: "UCIALMKvObZNtJ6AmdCLP7Lg",
-    watchUrl: "https://www.youtube.com/@BloombergTV/live",
-    tzOffset: -5,
-    programming: [
-      { start: 5,  end: 9,  show: "Bloomberg Surveillance · pre-market macro" },
-      { start: 9,  end: 11, show: "Open Interest · US open" },
-      { start: 11, end: 13, show: "Markets · midday equities" },
-      { start: 13, end: 16, show: "Balance of Power · policy & rates" },
-      { start: 16, end: 20, show: "Bloomberg Technology · after-hours" },
-    ],
+    id: "bloomberg", name: "Bloomberg TV", flag: "🇺🇸", lang: "EN",
+    regionGroup: "AMERICAS", focus: "Global markets · macro", color: "#ff6900",
+    channelId: "UC3NBv0VjWvy57ZxI__z2Tig", watchUrl: "https://www.youtube.com/@BloombergTV/live", tzOffset: -5,
   },
   {
-    id: "cnbc",
-    name: "CNBC",
-    flag: "🇺🇸",
-    lang: "EN",
-    region: "US",
-    focus: "US equities · Fed · earnings",
-    color: "#00c896",
-    channelId: "UCvJJ_dzjViJCoLf5uKUTwoA",
-    watchUrl: "https://www.youtube.com/@CNBC/live",
-    tzOffset: -5,
-    programming: [
-      { start: 5,  end: 9,  show: "Squawk Box · pre-market" },
-      { start: 9,  end: 11, show: "Squawk on the Street · opening bell" },
-      { start: 11, end: 15, show: "Fast Money Halftime · midday" },
-      { start: 15, end: 17, show: "Closing Bell · US close" },
-      { start: 17, end: 21, show: "Mad Money · after-hours" },
-    ],
+    id: "cnbc", name: "CNBC", flag: "🇺🇸", lang: "EN",
+    regionGroup: "AMERICAS", focus: "US equities · Fed · earnings", color: "#00c896",
+    channelId: "UCXccaSBV9L_7kD1A1f7koRQ", watchUrl: "https://www.youtube.com/@CNBC/live", tzOffset: -5,
   },
   {
-    id: "yahoo",
-    name: "Yahoo Finance",
-    flag: "🇺🇸",
-    lang: "EN",
-    region: "US",
-    focus: "Real-time commentary",
-    color: "#007aff",
-    channelId: "UCEAZeUIeJs0IjQiqTCdVSIg",
-    watchUrl: "https://www.youtube.com/@YahooFinance/live",
-    tzOffset: -5,
-    programming: [
-      { start: 7,  end: 9,  show: "Morning Brief · pre-market" },
-      { start: 9,  end: 12, show: "The Opening Bid · open" },
-      { start: 12, end: 16, show: "Yahoo Finance Live · midday" },
-      { start: 16, end: 18, show: "Asking for a Trend · close wrap" },
-    ],
+    id: "yahoo", name: "Yahoo Finance", flag: "🇺🇸", lang: "EN",
+    regionGroup: "AMERICAS", focus: "Real-time commentary", color: "#007aff",
+    channelId: "UCEAZeUIeJs0IjQiqTCdVSIg", watchUrl: "https://www.youtube.com/@YahooFinance/live", tzOffset: -5,
   },
   {
-    id: "dw",
-    name: "DW News",
-    flag: "🇩🇪",
-    lang: "EN",
-    region: "EU",
-    focus: "European business · global",
-    color: "#cc3333",
-    channelId: "UCknLrEdhRCp1aegoMqRaCZg",
-    watchUrl: "https://www.youtube.com/@dwnews/live",
-    tzOffset: 1,
-    programming: [
-      { start: 6,  end: 10, show: "DW News Asia · Asian markets recap" },
-      { start: 10, end: 14, show: "DW Business · EU open & ECB watch" },
-      { start: 14, end: 18, show: "DW News · global headlines" },
-      { start: 18, end: 23, show: "Made in Germany · industry" },
-    ],
+    id: "fox", name: "Fox Business", flag: "🇺🇸", lang: "EN",
+    regionGroup: "AMERICAS", focus: "US business · politics", color: "#007aff",
+    channelId: "UCZG8i7aNebUfH1Z-G9mYlZw", watchUrl: "https://www.youtube.com/@FoxBusiness/live", tzOffset: -5,
   },
   {
-    id: "france24",
-    name: "France 24",
-    flag: "🇫🇷",
-    lang: "EN",
-    region: "EU",
-    focus: "Europe · Africa · MENA",
-    color: "#ffd000",
-    channelId: "UCQfwfsi5VrQ8yKZ-UWmAEFg",
-    watchUrl: "https://www.youtube.com/@FRANCE24English/live",
-    tzOffset: 1,
-    programming: [
-      { start: 6,  end: 10, show: "France 24 Live · morning bulletin" },
-      { start: 10, end: 14, show: "Business · EU markets" },
-      { start: 14, end: 18, show: "Live · world news" },
-      { start: 18, end: 22, show: "Africa News · emerging markets" },
-    ],
+    id: "cheddar", name: "Cheddar News", flag: "🇺🇸", lang: "EN",
+    regionGroup: "AMERICAS", focus: "Tech · startups · markets", color: "#ff5e00",
+    channelId: "UC04KsGq3npibMube9oh0Vxw", watchUrl: "https://www.youtube.com/@CheddarNews/live", tzOffset: -5,
+  },
+
+  // ─── EUROPE ───────────────────────────────────────────────────
+  {
+    id: "dw", name: "DW News", flag: "🇩🇪", lang: "EN",
+    regionGroup: "EUROPE", focus: "European business · global", color: "#cc3333",
+    channelId: "UCknLrEdhRCp1aegoMqRaCZg", watchUrl: "https://www.youtube.com/@dwnews/live", tzOffset: 1,
   },
   {
-    id: "aljazeera",
-    name: "Al Jazeera",
-    flag: "🌐",
-    lang: "EN",
-    region: "ME",
-    focus: "Geopolitics · oil · Asia",
-    color: "#ff3b30",
-    channelId: "UCNye-wNBqNL5ZzHSJj3l8Bg",
-    watchUrl: "https://www.youtube.com/@AlJazeeraEnglish/live",
-    tzOffset: 3,
-    programming: [
-      { start: 6,  end: 10, show: "Newshour · MENA briefing" },
-      { start: 10, end: 14, show: "Inside Story · geopolitics" },
-      { start: 14, end: 18, show: "Counting the Cost · economy" },
-      { start: 18, end: 22, show: "Newshour · evening edition" },
-    ],
+    id: "france24", name: "France 24", flag: "🇫🇷", lang: "EN",
+    regionGroup: "EUROPE", focus: "Europe · Africa · MENA", color: "#ffd000",
+    channelId: "UCQfwfsi5VrQ8yKZ-UWmAEFg", watchUrl: "https://www.youtube.com/@FRANCE24English/live", tzOffset: 1,
   },
   {
-    id: "cna",
-    name: "CNA",
-    flag: "🇸🇬",
-    lang: "EN",
-    region: "ASIA",
-    focus: "ASEAN · regional finance",
-    color: "#00c896",
-    channelId: "UCD8_zCzKn7v_uYwzKj0BlXg",
-    watchUrl: "https://www.youtube.com/@cna/live",
-    tzOffset: 8,
-    programming: [
-      { start: 6,  end: 9,  show: "Asia First · regional open" },
-      { start: 9,  end: 12, show: "Asia Now · SGX, HSI, SET" },
-      { start: 12, end: 16, show: "Money Mind · ASEAN markets" },
-      { start: 16, end: 22, show: "World Tonight · global wrap" },
-    ],
+    id: "bbc", name: "BBC News", flag: "🇬🇧", lang: "EN",
+    regionGroup: "EUROPE", focus: "UK · Commonwealth · world", color: "#cc3333",
+    channelId: "UC16niRr50-MSBwiO3YDb3RA", watchUrl: "https://www.youtube.com/@BBCNews/live", tzOffset: 0,
   },
   {
-    id: "nhk",
-    name: "NHK World",
-    flag: "🇯🇵",
-    lang: "EN",
-    region: "ASIA",
-    focus: "Japan · BOJ · yen carry",
-    color: "#bd1f29",
-    channelId: "UCSPEjw8F2nQDtmUKPFNF7_A",
-    watchUrl: "https://www.youtube.com/@nhkworldjapan/live",
-    tzOffset: 9,
-    programming: [
-      { start: 7,  end: 10, show: "NewsLine · Tokyo open" },
-      { start: 10, end: 13, show: "Business · Nikkei midday" },
-      { start: 13, end: 17, show: "NHK Newsline · Asia close" },
-      { start: 17, end: 22, show: "Japan 2030 · industry & tech" },
-    ],
+    id: "skynews", name: "Sky News", flag: "🇬🇧", lang: "EN",
+    regionGroup: "EUROPE", focus: "Breaking · UK · world", color: "#007aff",
+    channelId: "UCoMdktPbSTixAyNGwb-UYkQ", watchUrl: "https://www.youtube.com/@SkyNews/live", tzOffset: 0,
   },
   {
-    id: "money",
-    name: "Money Channel",
-    flag: "🇹🇭",
-    lang: "TH",
-    region: "TH",
-    focus: "SET · กองทุน · นโยบาย ธปท.",
-    color: "#ffd000",
-    channelId: "UC_P_eClSd6nIYJFN_h7_lxA",
-    watchUrl: "https://www.youtube.com/channel/UC_P_eClSd6nIYJFN_h7_lxA/live",
-    tzOffset: 7,
-    programming: [
-      { start: 8,  end: 10, show: "Money Wake Up · SET pre-open" },
-      { start: 10, end: 12, show: "Stock Gossip · SET morning" },
-      { start: 12, end: 15, show: "Money Daily · กลางวัน" },
-      { start: 15, end: 18, show: "Stock Wave · SET close" },
-    ],
+    id: "euronews", name: "Euronews", flag: "🇪🇺", lang: "EN",
+    regionGroup: "EUROPE", focus: "EU politics · markets", color: "#ffd000",
+    channelId: "UCW2QcKZiU8aUGg4yxCIditg", watchUrl: "https://www.youtube.com/@euronews/live", tzOffset: 1,
+  },
+
+  // ─── ASIA ─────────────────────────────────────────────────────
+  {
+    id: "cna", name: "CNA", flag: "🇸🇬", lang: "EN",
+    regionGroup: "ASIA", focus: "ASEAN · regional finance", color: "#00c896",
+    channelId: "UCD8_zCzKn7v_uYwzKj0BlXg", watchUrl: "https://www.youtube.com/@cna/live", tzOffset: 8,
   },
   {
-    id: "tnn",
-    name: "TNN Thailand",
-    flag: "🇹🇭",
-    lang: "TH",
-    region: "TH",
-    focus: "ข่าวธุรกิจ · BOT · นโยบาย",
-    color: "#ff5e00",
-    channelId: "UCqUBA96OsqMgSFvTwLXY9yw",
-    watchUrl: "https://www.youtube.com/channel/UCqUBA96OsqMgSFvTwLXY9yw/live",
-    tzOffset: 7,
-    programming: [
-      { start: 6,  end: 9,  show: "เช้านี้ที่ TNN · ข่าวเช้า" },
-      { start: 9,  end: 12, show: "TNN Wealth · ตลาดหุ้นไทย" },
-      { start: 12, end: 18, show: "TNN News · ข่าวภาคเที่ยง" },
-      { start: 18, end: 22, show: "TNN World · ข่าวต่างประเทศ" },
-    ],
+    id: "nhk", name: "NHK World", flag: "🇯🇵", lang: "EN",
+    regionGroup: "ASIA", focus: "Japan · BOJ · yen carry", color: "#bd1f29",
+    channelId: "UCSPEjw8F2nQDtmUKPFNF7_A", watchUrl: "https://www.youtube.com/@nhkworldjapan/live", tzOffset: 9,
   },
   {
-    id: "cgtn",
-    name: "CGTN",
-    flag: "🇨🇳",
-    lang: "EN",
-    region: "CN",
-    focus: "China markets · 一带一路",
-    color: "#ff3b30",
-    channelId: "UCs9_O7yKLn8m4VbBQGbT0Aw",
-    watchUrl: "https://www.youtube.com/@CGTN/live",
-    tzOffset: 8,
-    programming: [
-      { start: 7,  end: 10, show: "Global Business · CSI300 open" },
-      { start: 10, end: 14, show: "China 24 · midday markets" },
-      { start: 14, end: 18, show: "World Today · close & policy" },
-      { start: 18, end: 22, show: "Dialogue · macro & geopolitics" },
-    ],
+    id: "cgtn", name: "CGTN", flag: "🇨🇳", lang: "EN",
+    regionGroup: "ASIA", focus: "China markets · Belt & Road", color: "#ff3b30",
+    channelId: "UCs9_O7yKLn8m4VbBQGbT0Aw", watchUrl: "https://www.youtube.com/@CGTN/live", tzOffset: 8,
+  },
+  {
+    id: "wion", name: "WION", flag: "🇮🇳", lang: "EN",
+    regionGroup: "ASIA", focus: "India · South Asia · geopolitics", color: "#cc3333",
+    channelId: "UClCDGXL7RaOqCfC5q1iTeoA", watchUrl: "https://www.youtube.com/@WION/live", tzOffset: 5.5,
+  },
+  {
+    id: "arirang", name: "Arirang", flag: "🇰🇷", lang: "EN",
+    regionGroup: "ASIA", focus: "Korea · KOSPI · tech", color: "#007aff",
+    channelId: "UCsU-I-vHLiaMfV_ceaYz5rQ", watchUrl: "https://www.youtube.com/@Arirang/live", tzOffset: 9,
+  },
+  {
+    id: "money", name: "Money Channel", flag: "🇹🇭", lang: "TH",
+    regionGroup: "ASIA", focus: "SET · funds · BOT policy", color: "#ffd000",
+    channelId: "UC_P_eClSd6nIYJFN_h7_lxA", watchUrl: "https://www.youtube.com/channel/UC_P_eClSd6nIYJFN_h7_lxA/live", tzOffset: 7,
+  },
+  {
+    id: "tnn", name: "TNN Thailand", flag: "🇹🇭", lang: "TH",
+    regionGroup: "ASIA", focus: "Thai business · BOT · policy", color: "#ff5e00",
+    channelId: "UCqUBA96OsqMgSFvTwLXY9yw", watchUrl: "https://www.youtube.com/channel/UCqUBA96OsqMgSFvTwLXY9yw/live", tzOffset: 7,
+  },
+
+  // ─── OCEANIA ──────────────────────────────────────────────────
+  {
+    id: "abcau", name: "ABC News", flag: "🇦🇺", lang: "EN",
+    regionGroup: "OCEANIA", focus: "Australia · ASX · commodities", color: "#007aff",
+    channelId: "UCVgO39Bk5sQ66a0Ia0mq2Cg", watchUrl: "https://www.youtube.com/@abcnewsaustralia/live", tzOffset: 10,
+  },
+
+  // ─── MIDDLE EAST ──────────────────────────────────────────────
+  {
+    id: "aljazeera", name: "Al Jazeera", flag: "🇶🇦", lang: "EN",
+    regionGroup: "MIDDLE EAST", focus: "Geopolitics · oil · Asia", color: "#ff3b30",
+    channelId: "UCNye-wNBqNL5ZzHSJj3l8Bg", watchUrl: "https://www.youtube.com/@AlJazeeraEnglish/live", tzOffset: 3,
+  },
+  {
+    id: "trt", name: "TRT World", flag: "🇹🇷", lang: "EN",
+    regionGroup: "MIDDLE EAST", focus: "Turkey · MENA · Eurasia", color: "#cc3333",
+    channelId: "UC7fWeaAuUKf6LmwE42boA3g", watchUrl: "https://www.youtube.com/@trtworld/live", tzOffset: 3,
   },
 ];
 
-/** Current local-time hour at a channel's HQ — used for programming guess. */
-export function localHour(now: Date, tzOffset: number): number {
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60_000;
-  return new Date(utcMs + tzOffset * 3_600_000).getUTCHours();
-}
-
-/** Find the currently-airing show at a channel given the wall-clock time. */
-export function currentShow(channel: TVChannel, now: Date): string {
-  const h = localHour(now, channel.tzOffset);
-  const block = channel.programming.find(b => h >= b.start && h < b.end);
-  return block?.show ?? "Rolling headlines · overnight loop";
-}
+export const REGION_GROUPS = ["AMERICAS", "EUROPE", "ASIA", "OCEANIA", "MIDDLE EAST"] as const;
 
 export function getChannel(id: string): TVChannel | undefined {
   return TV_CHANNELS.find(c => c.id === id);
+}
+
+export function channelsByRegion(region: string): TVChannel[] {
+  return TV_CHANNELS.filter(c => c.regionGroup === region);
+}
+
+/** Local hour at the channel's location */
+export function localHour(now: Date, tzOffset: number): number {
+  const utc = now.getUTCHours() + now.getUTCMinutes() / 60;
+  let h = Math.floor(utc + tzOffset);
+  while (h < 0) h += 24;
+  while (h >= 24) h -= 24;
+  return h;
+}
+
+/** Best guess at what's on air now, based on local time */
+export function currentShow(_ch: TVChannel, now: Date): string {
+  const h = localHour(now, _ch.tzOffset);
+  if (h >= 6 && h < 9) return "Morning briefing";
+  if (h >= 9 && h < 12) return "Market open coverage";
+  if (h >= 12 && h < 14) return "Midday wrap";
+  if (h >= 14 && h < 17) return "Afternoon session";
+  if (h >= 17 && h < 20) return "Evening close";
+  if (h >= 20 && h < 23) return "Overnight markets";
+  return "Off-air / repeats";
 }

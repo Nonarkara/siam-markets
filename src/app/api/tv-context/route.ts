@@ -57,7 +57,7 @@ export async function GET() {
 
   const lines = TV_CHANNELS.map(ch => {
     const lh = String(localHour(now, ch.tzOffset)).padStart(2, "0");
-    return `- ${ch.id} | ${ch.name} (${ch.region}, local ${lh}:00) | focus: ${ch.focus} | schedule guess: ${currentShow(ch, now)}`;
+    return `- ${ch.id} | ${ch.name} (${ch.regionGroup}, local ${lh}:00) | focus: ${ch.focus} | schedule guess: ${currentShow(ch, now)}`;
   }).join("\n");
 
   const system = `You are a financial-TV producer briefing a Thai retail investor.
@@ -115,7 +115,7 @@ Rules:
         id: ch.id,
         show: currentShow(ch, now),
         topic: ch.focus,
-        takeaway: `${ch.region} channel · ${ch.focus}`,
+        takeaway: `${ch.regionGroup} channel · ${ch.focus}`,
         source: "schedule",
       };
     });

@@ -435,7 +435,7 @@ export function TVWall() {
                   >
                     <div>
                       <div className="t-micro" style={{ color: "var(--braun-yellow, #ffd000)", letterSpacing: "0.14em", marginBottom: 4 }}>
-                        {ctx?.source === "ai" ? "AI READ" : "SCHEDULE"} · {ch.region}
+                        {ctx?.source === "ai" ? "AI READ" : "SCHEDULE"} · {ch.regionGroup}
                       </div>
                       <div className="t-body" style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--ink)", lineHeight: 1.3 }}>
                         {ctx?.show ?? ch.focus}

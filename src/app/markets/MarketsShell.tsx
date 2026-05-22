@@ -17,6 +17,7 @@ import { WorldNewsHub } from "@/components/Intelligence/WorldNewsHub";
 import { EconCalendar } from "@/components/Intelligence/EconCalendar";
 import { VIXCurve } from "@/components/Market/VIXCurve";
 import { ThaiCommodities } from "@/components/Market/ThaiCommodities";
+import { MarketColumns } from "@/components/Market/MarketColumns";
 import type { WorldEvent } from "@/lib/types";
 import type { YahooQuote, HistoryPoint } from "@/lib/api/yahoo";
 import type { MacroData } from "@/lib/api/fred";
@@ -72,18 +73,31 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
               label: "MAP",
               badge: "WORLD",
               content: (
-                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: 12 }}>
-                  <WorldMarketsMap
-                    quotes={[
+                <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                  {/* Top: split-panel world map */}
+                  <div style={{ flex: 1.1, minHeight: 0, display: "flex", flexDirection: "column", padding: "6px 10px 0", overflow: "hidden" }}>
+                    <WorldMarketsMap
+                      quotes={[
+                        ...regional.thai,
+                        ...regional.asean,
+                        ...regional.china,
+                        ...regional.global,
+                        ...assets,
+                      ]}
+                      histories={histories}
+                      foreignFlow={foreignFlow}
+                    />
+                  </div>
+                  {/* Bottom: major market columns */}
+                  <div style={{ flex: 0.9, minHeight: 0, borderTop: "1px solid var(--line)", overflow: "hidden" }}>
+                    <MarketColumns quotes={[
                       ...regional.thai,
                       ...regional.asean,
                       ...regional.china,
                       ...regional.global,
                       ...assets,
-                    ]}
-                    histories={histories}
-                    foreignFlow={foreignFlow}
-                  />
+                    ]} />
+                  </div>
                 </div>
               ),
             },

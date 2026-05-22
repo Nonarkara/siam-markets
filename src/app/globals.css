@@ -501,12 +501,13 @@ a:focus-visible,
   scrollbar-color: var(--dim) transparent;
 }
 
-/* Desktop: 2×2 quadrants — viewport minus top nav minus 56px world clock banner */
+/* Desktop: 2×2 quadrants — fills remaining space in flex parent */
 @media (min-width: 1024px) {
   .quadrant-grid {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    height: calc(100dvh - var(--top-h) - 56px);
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -517,7 +518,7 @@ a:focus-visible,
   }
 
   .quadrant-content {
-    padding: 14px;
+    padding: 8px;
   }
 }
 

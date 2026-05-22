@@ -21,8 +21,10 @@ export function GrahamOverlayChart({ data, height = 240 }: Props) {
     const el = containerRef.current;
     if (!el || data.length === 0) return;
 
+    const h = el.clientHeight > 0 ? el.clientHeight : height;
+
     const chart = createChart(el, {
-      height,
+      height: h,
       layout: {
         background: { color: "transparent" },
         textColor: "var(--muted)",
@@ -73,7 +75,7 @@ export function GrahamOverlayChart({ data, height = 240 }: Props) {
 
     const resize = () => {
       if (containerRef.current) {
-        chart.applyOptions({ width: containerRef.current.clientWidth });
+        chart.applyOptions({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight });
       }
     };
     window.addEventListener("resize", resize);
@@ -84,5 +86,5 @@ export function GrahamOverlayChart({ data, height = 240 }: Props) {
     };
   }, [data, height]);
 
-  return <div ref={containerRef} style={{ width: "100%" }} />;
+  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }

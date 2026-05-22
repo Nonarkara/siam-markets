@@ -1,0 +1,43 @@
+# ─── Causal Intelligence Ingestion — Python dependencies ──────────────
+# Install: pip install -r ingestion/requirements_causal.txt
+#
+# Core (already in most scientific Python envs):
+numpy>=1.26
+pandas>=2.2
+scipy>=1.13
+scikit-learn>=1.5
+statsmodels>=0.14.4
+yfinance>=0.2.40
+requests>=2.32
+python-dotenv>=1.0
+supabase>=2.10
+
+# ─── Causal inference ─────────────────────────────────────────────────
+ruptures>=1.1.10          # change-point / structural break detection
+tigramite>=5.2.4          # PCMCI causal discovery (offline quarterly runs)
+                          # NOTE: GPL-3.0 — keep in offline scripts only
+
+# ─── Forecasting ──────────────────────────────────────────────────────
+darts>=0.32               # unified forecasting: LightGBM, TFT, N-BEATS
+                          # pulls PyTorch — use `pip install darts[torch]` for full suite
+                          # use `pip install u8darts` for lightweight (no torch)
+lightgbm>=4.5             # fast tree models (used by darts LightGBM)
+prophet>=1.1.6            # seasonality + holiday decomposition
+fredapi>=0.5.2            # FRED API client
+
+# ─── NLP / Sentiment ──────────────────────────────────────────────────
+transformers>=4.44        # Hugging Face (FinBERT, WangchanBERTa)
+torch>=2.4                # PyTorch (MPS-accelerated on M5 Max)
+pythainlp>=5.3.4          # Thai NLP — tokenisation + POS tagging
+feedparser>=6.0           # RSS feed parsing (Thai + English news)
+
+# ─── Data aggregation ─────────────────────────────────────────────────
+wbgapi>=1.0.12            # World Bank API (GDP, CPI, indicators)
+dbnomics>=0.8             # DBnomics: FRED + OECD + IMF + BIS in one call
+comtradeapicall>=0.2      # UN Comtrade (trade flow data)
+
+# ─── Visualization (offline Jupyter / report generation) ──────────────
+plotly>=5.24              # interactive charts
+networkx>=3.3             # minimum spanning tree of asset correlations
+matplotlib>=3.9           # static charts for reports
+seaborn>=0.13             # statistical visualisation
