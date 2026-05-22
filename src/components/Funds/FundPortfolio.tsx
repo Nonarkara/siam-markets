@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import type { MutualFund } from "@/lib/api/mock-funds";
+import { FundComparisonChart } from "./FundComparisonChart";
 
 interface Props {
   funds: MutualFund[];
@@ -50,29 +51,32 @@ export function FundPortfolio({ funds, onRemove }: Props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {/* Comparison / single-fund chart */}
+      <FundComparisonChart funds={funds} />
+
       {/* Summary stats */}
       <div className="portfolio-stats" style={{
         background: "var(--bg-raised)", border: "1px solid var(--line)",
       }}>
         <div style={{ padding: "10px 14px", borderRight: "1px solid var(--line-dim)" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>FUNDS</div>
-          <div className="mono-display" style={{ color: "var(--ink)" }}>{funds.length}</div>
+          <div className="t-mono-display" style={{ color: "var(--ink)" }}>{funds.length}</div>
         </div>
         <div style={{ padding: "10px 14px", borderRight: "1px solid var(--line-dim)" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>AVG EXPENSE</div>
-          <div className="mono-display" style={{ color: analysis!.avgExpense < 1.0 ? "var(--bull)" : "var(--caution)" }}>
+          <div className="t-mono-display" style={{ color: analysis!.avgExpense < 1.0 ? "var(--bull)" : "var(--caution)" }}>
             {analysis!.avgExpense.toFixed(2)}%
           </div>
         </div>
         <div style={{ padding: "10px 14px", borderRight: "1px solid var(--line-dim)" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>1Y RETURN</div>
-          <div className="mono-display" style={{ color: analysis!.weightedReturn1y > 0 ? "var(--bull)" : "var(--bear)" }}>
+          <div className="t-mono-display" style={{ color: analysis!.weightedReturn1y > 0 ? "var(--bull)" : "var(--bear)" }}>
             {analysis!.weightedReturn1y > 0 ? "+" : ""}{analysis!.weightedReturn1y.toFixed(1)}%
           </div>
         </div>
         <div style={{ padding: "10px 14px" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>5Y RETURN</div>
-          <div className="mono-display" style={{ color: analysis!.weightedReturn5y > 0 ? "var(--bull)" : "var(--bear)" }}>
+          <div className="t-mono-display" style={{ color: analysis!.weightedReturn5y > 0 ? "var(--bull)" : "var(--bear)" }}>
             {analysis!.weightedReturn5y > 0 ? "+" : ""}{analysis!.weightedReturn5y.toFixed(1)}%
           </div>
         </div>
@@ -92,7 +96,7 @@ export function FundPortfolio({ funds, onRemove }: Props) {
                   width: `${Math.min(100, count * 20)}px`,
                   background: count >= 3 ? "var(--bear)" : "var(--caution)",
                 }} />
-                <span className="mono-body" style={{ color: "var(--ink)" }}>{stock}</span>
+                <span className="t-mono" style={{ color: "var(--ink)" }}>{stock}</span>
                 <span className="t-micro" style={{ color: "var(--dim)" }}>in {count} funds</span>
               </div>
             ))}
@@ -110,21 +114,21 @@ export function FundPortfolio({ funds, onRemove }: Props) {
       }}>
         <div style={{ padding: "10px 14px", borderRight: "1px solid var(--line-dim)", textAlign: "center" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>RMF</div>
-          <div className="mono-display" style={{ color: analysis!.rmfTotal > 0 ? "var(--bull)" : "var(--dim)" }}>
+          <div className="t-mono-display" style={{ color: analysis!.rmfTotal > 0 ? "var(--bull)" : "var(--dim)" }}>
             {analysis!.rmfTotal}
           </div>
           <div className="t-micro" style={{ color: "var(--dim)" }}>funds</div>
         </div>
         <div style={{ padding: "10px 14px", borderRight: "1px solid var(--line-dim)", textAlign: "center" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>SSF</div>
-          <div className="mono-display" style={{ color: analysis!.ssfTotal > 0 ? "var(--caution)" : "var(--dim)" }}>
+          <div className="t-mono-display" style={{ color: analysis!.ssfTotal > 0 ? "var(--caution)" : "var(--dim)" }}>
             {analysis!.ssfTotal}
           </div>
           <div className="t-micro" style={{ color: "var(--dim)" }}>funds</div>
         </div>
         <div style={{ padding: "10px 14px", textAlign: "center" }}>
           <div className="t-micro" style={{ color: "var(--dim)" }}>THAI ESG</div>
-          <div className="mono-display" style={{ color: analysis!.esgTotal > 0 ? "var(--braun-yellow)" : "var(--dim)" }}>
+          <div className="t-mono-display" style={{ color: analysis!.esgTotal > 0 ? "var(--braun-yellow)" : "var(--dim)" }}>
             {analysis!.esgTotal}
           </div>
           <div className="t-micro" style={{ color: "var(--dim)" }}>funds</div>
@@ -140,13 +144,13 @@ export function FundPortfolio({ funds, onRemove }: Props) {
             display: "flex", alignItems: "center", gap: 10,
           }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="mono-body" style={{ fontWeight: 700 }}>{fund.code}</div>
+              <div className="t-mono" style={{ fontWeight: 700 }}>{fund.code}</div>
               <div className="t-body" style={{ color: "var(--muted)" }}>{fund.name}</div>
             </div>
-            <div className="mono-body" style={{ color: "var(--dim)" }}>
+            <div className="t-mono" style={{ color: "var(--dim)" }}>
               ฿{fund.nav.toFixed(2)}
             </div>
-            <div className="mono-body" style={{ color: fund.expenseRatio < 1.0 ? "var(--bull)" : "var(--caution)" }}>
+            <div className="t-mono" style={{ color: fund.expenseRatio < 1.0 ? "var(--bull)" : "var(--caution)" }}>
               {fund.expenseRatio.toFixed(2)}%
             </div>
             <button

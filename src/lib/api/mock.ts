@@ -182,6 +182,11 @@ export const MOCK_OHLCV_PTT: OHLCV[] = generateMockOHLCV(35.5, 60, 0.018);
 export const MOCK_OHLCV_ADVANC: OHLCV[] = generateMockOHLCV(232.0, 60, 0.015);
 export const MOCK_OHLCV_KBANK: OHLCV[] = generateMockOHLCV(141.0, 60, 0.016);
 
+// Placeholder until the global scanner is wired to a real feed — keep
+// the same shape as MOCK_STOCKS so callers (e.g. ScanShell) can swap
+// markets without conditional typing.
+export const MOCK_GLOBAL_STOCKS: StockFundamentals[] = MOCK_STOCKS;
+
 // ─── Smart Money Flow Mock (14-day foreign/institutional flow) ───
 
 export const MOCK_SMART_MONEY_FLOWS = [

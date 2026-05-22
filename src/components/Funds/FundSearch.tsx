@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { MOCK_FUNDS, type MutualFund } from "@/lib/api/mock-funds";
+import { FundDetailModal } from "./FundDetailModal";
 
 const CATEGORIES = ["ALL", "EQUITY", "FIXED_INCOME", "MIXED", "RMF", "SSF", "THAI_ESG", "GLOBAL"] as const;
 const AMCS = ["ALL", ...Array.from(new Set(MOCK_FUNDS.map(f => f.amc)))];
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function FundSearch({ onSelect, selectedCodes }: Props) {
+  const [detail, setDetail] = useState<MutualFund | null>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("ALL");
   const [amc, setAmc] = useState<string>("ALL");
@@ -76,26 +78,27 @@ export function FundSearch({ onSelect, selectedCodes }: Props) {
         {filtered.map(fund => {
           const isSelected = selectedCodes.includes(fund.code);
           return (
-            <button
+            <div
               key={fund.code}
-              type="button"
-              role="checkbox"
-              aria-checked={isSelected}
-              aria-label={`${isSelected ? "Remove" : "Add"} ${fund.code} ${isSelected ? "from" : "to"} portfolio`}
-              onClick={() => onSelect(fund)}
               className="fund-row"
               style={{
                 background: isSelected ? "var(--bull-10)" : "var(--bg-raised)",
                 border: `1px solid ${isSelected ? "var(--bull)" : "var(--line)"}`,
                 padding: "10px 14px",
-                cursor: "pointer",
-                textAlign: "left",
-                font: "inherit",
-                color: "inherit",
               }}
             >
-              <div className="fund-row__info">
-                <div className="mono-body" style={{ fontWeight: 700, color: "var(--ink)" }}>
+              <button
+                type="button"
+                onClick={() => setDetail(fund)}
+                aria-label={`View ${fund.code} chart and details`}
+                className="fund-row__info"
+                style={{
+                  background: "transparent", border: "none", padding: 0,
+                  cursor: "pointer", textAlign: "left", color: "inherit", font: "inherit",
+                  minWidth: 0,
+                }}
+              >
+                <div className="t-mono" style={{ fontWeight: 700, color: "var(--ink)", textDecoration: "underline", textDecorationColor: "var(--line)", textUnderlineOffset: 3 }}>
                   {fund.code}
                 </div>
                 <div className="t-body" style={{ color: "var(--muted)" }}>{fund.name}</div>
@@ -114,43 +117,59 @@ export function FundSearch({ onSelect, selectedCodes }: Props) {
                     <span className="t-micro chip-tag" style={{ color: "var(--braun-yellow)", borderColor: "var(--braun-yellow)" }}>ESG</span>
                   )}
                 </div>
-              </div>
+              </button>
               <div className="fund-row__metric">
                 <div className="t-micro" style={{ color: "var(--dim)" }}>NAV</div>
-                <div className="mono-body" style={{ fontWeight: 700 }}>฿{fund.nav.toFixed(2)}</div>
+                <div className="t-mono" style={{ fontWeight: 700 }}>฿{fund.nav.toFixed(2)}</div>
               </div>
               <div className="fund-row__metric">
                 <div className="t-micro" style={{ color: "var(--dim)" }}>EXPENSE</div>
-                <div className="mono-body" style={{ color: fund.expenseRatio < 0.7 ? "var(--bull)" : fund.expenseRatio < 1.2 ? "var(--caution)" : "var(--bear)" }}>
+                <div className="t-mono" style={{ color: fund.expenseRatio < 0.7 ? "var(--bull)" : fund.expenseRatio < 1.2 ? "var(--caution)" : "var(--bear)" }}>
                   {fund.expenseRatio.toFixed(2)}%
                 </div>
               </div>
               <div className="fund-row__metric">
                 <div className="t-micro" style={{ color: "var(--dim)" }}>1Y</div>
-                <div className="mono-body" style={{ color: fund.return1y > 0 ? "var(--bull)" : "var(--bear)" }}>
+                <div className="t-mono" style={{ color: fund.return1y > 0 ? "var(--bull)" : "var(--bear)" }}>
                   {fund.return1y > 0 ? "+" : ""}{fund.return1y.toFixed(1)}%
                 </div>
               </div>
               <div className="fund-row__metric">
                 <div className="t-micro" style={{ color: "var(--dim)" }}>5Y</div>
-                <div className="mono-body" style={{ color: fund.return5y > 0 ? "var(--bull)" : "var(--bear)" }}>
+                <div className="t-mono" style={{ color: fund.return5y > 0 ? "var(--bull)" : "var(--bear)" }}>
                   {fund.return5y > 0 ? "+" : ""}{fund.return5y.toFixed(1)}%
                 </div>
               </div>
-              <div className="fund-row__check" aria-hidden>
-                <div style={{
-                  width: 20, height: 20,
-                  border: `1px solid ${isSelected ? "var(--bull)" : "var(--line-dim)"}`,
-                  background: isSelected ? "var(--bull)" : "transparent",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {isSelected && <span className="t-micro" style={{ color: "var(--bg)" }}>✓</span>}
-                </div>
+              <div className="fund-row__check">
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={isSelected}
+                  aria-label={`${isSelected ? "Remove" : "Add"} ${fund.code} ${isSelected ? "from" : "to"} portfolio`}
+                  onClick={() => onSelect(fund)}
+                  style={{
+                    width: 32, height: 32,
+                    border: `1px solid ${isSelected ? "var(--bull)" : "var(--line-dim)"}`,
+                    background: isSelected ? "var(--bull)" : "transparent",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {isSelected ? <span className="t-micro" style={{ color: "var(--bg)" }}>✓</span> : <span className="t-micro" style={{ color: "var(--muted)" }}>+</span>}
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
+
+      <FundDetailModal
+        fund={detail}
+        isSelected={detail ? selectedCodes.includes(detail.code) : false}
+        onToggle={(f) => { onSelect(f); }}
+        onClose={() => setDetail(null)}
+      />
     </div>
   );
 }
