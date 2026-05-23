@@ -13,6 +13,7 @@
  */
 
 import { useState, type ReactNode } from "react";
+import { PanelBoundary } from "@/components/ErrorBoundary/PanelBoundary";
 
 export interface Tab {
   id: string;
@@ -95,7 +96,14 @@ export function Tabs({ tabs, defaultId, trailing }: Props) {
         id={`tabpanel-${current?.id}`}
         aria-labelledby={`tab-${current?.id}`}
       >
-        {current?.content}
+        {/* Per-tab error isolation — boundary resets when user switches tabs */}
+        <PanelBoundary
+          key={current?.id}
+          resetKey={current?.id}
+          label={current?.label}
+        >
+          {current?.content}
+        </PanelBoundary>
       </div>
     </>
   );

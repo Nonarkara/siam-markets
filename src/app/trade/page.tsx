@@ -14,7 +14,7 @@
  *   • Macro sensitivity (Brent / yields / USD/THB) with rationale
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Tabs } from "@/components/Tabs/Tabs";
 import { RegimeGauge } from "@/components/Causal/RegimeGauge";
 import {
@@ -32,12 +32,16 @@ import { getReference, peersOf } from "@/lib/trade-reference";
 import { calculatePositionSize } from "@/lib/trading";
 import { MOCK_OHLCV_PTT, MOCK_OHLCV_ADVANC, MOCK_OHLCV_KBANK, MOCK_TRADING_NEWS } from "@/lib/api/mock";
 import { fmtNum, pctColor } from "@/lib/format";
+import { DataFreshness } from "@/components/DataFreshness/DataFreshness";
 import type { OHLCV } from "@/lib/types";
+import type { OhlcvResponse } from "@/app/api/ohlcv/route";
 
-const STOCKS: { symbol: string; name: string; data: OHLCV[] }[] = [
-  { symbol: "PTT.BK",    name: "PTT",            data: MOCK_OHLCV_PTT    },
-  { symbol: "ADVANC.BK", name: "Advanced Info",  data: MOCK_OHLCV_ADVANC },
-  { symbol: "KBANK.BK",  name: "Kasikorn Bank",  data: MOCK_OHLCV_KBANK  },
+// Canonical 3 SET tickers wired to live OHLCV via /api/ohlcv.
+// `data` starts as the mock fallback; useEffect swaps it to live data on mount.
+const STOCKS: { symbol: string; name: string; mock: OHLCV[] }[] = [
+  { symbol: "PTT.BK",    name: "PTT",            mock: MOCK_OHLCV_PTT    },
+  { symbol: "ADVANC.BK", name: "Advanced Info",  mock: MOCK_OHLCV_ADVANC },
+  { symbol: "KBANK.BK",  name: "Kasikorn Bank",  mock: MOCK_OHLCV_KBANK  },
 ];
 
 // ─── Page ───────────────────────────────────────────────────────
@@ -48,7 +52,48 @@ export default function TradePage() {
   const [riskPct, setRiskPct] = useState(1);
 
   const stock = STOCKS[selectedIdx];
-  const data = stock.data;
+
+  // Live OHLCV fetch with mock fallback. State lives per-symbol via key in
+  // a Map so switching tabs doesn't re-fetch what we already have.
+  const [ohlcvBySymbol, setOhlcvBySymbol] = useState<Record<string, { data: OHLCV[]; source: "live"|"mock"; lastUpdated: string; note: string }>>({});
+
+  useEffect(() => {
+    if (ohlcvBySymbol[stock.symbol]) return;     // already loaded
+    let cancelled = false;
+    fetch(`/api/ohlcv?symbol=${encodeURIComponent(stock.symbol)}&range=3mo&interval=1d`)
+      .then(r => r.json() as Promise<OhlcvResponse>)
+      .then(payload => {
+        if (cancelled) return;
+        setOhlcvBySymbol(prev => ({
+          ...prev,
+          [stock.symbol]: {
+            data:        payload.points,
+            source:      payload.source,
+            lastUpdated: payload.lastUpdated,
+            note:        payload.note,
+          },
+        }));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        // Network-level failure — fall back to mock
+        setOhlcvBySymbol(prev => ({
+          ...prev,
+          [stock.symbol]: {
+            data:        stock.mock,
+            source:      "mock",
+            lastUpdated: stock.mock[stock.mock.length - 1]?.date ?? new Date().toISOString(),
+            note:        "Network error — using synthetic OHLCV. Do not trade on this data.",
+          },
+        }));
+      });
+    return () => { cancelled = true; };
+  }, [stock.symbol]);
+
+  const live = ohlcvBySymbol[stock.symbol];
+  const data = live?.data ?? stock.mock;     // graceful fallback while loading
+  const dataSource: "live" | "mock" = live?.source ?? "mock";
+  const lastUpdated = live?.lastUpdated ?? null;
   const current = data[data.length - 1];
   const ref = getReference(stock.symbol);
   const peers = peersOf(stock.symbol);
@@ -107,6 +152,15 @@ export default function TradePage() {
             <h1 className="t-display" style={{ fontSize: "1.25rem", lineHeight: 1.1, marginTop: 2 }}>
               Trade Desk
             </h1>
+            <div style={{ marginTop: 6 }}>
+              <DataFreshness
+                timestamp={lastUpdated}
+                source={dataSource}
+                label="Yahoo Finance · OHLCV"
+                warnAfterMinutes={1440}   // EOD data — 1d before "stale"
+                staleAfterMinutes={4320}  // 3d before "offline"
+              />
+            </div>
           </div>
 
           {/* Symbol + price hero — compact row */}

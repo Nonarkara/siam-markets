@@ -2,7 +2,18 @@
 .env
 .env*.local
 node_modules/
+
+# Build artifacts (auto-generated, never commit)
 .next/
 out/
+.vercel/
+
+# Python ingestion temp outputs
 *.pyc
 __pycache__/
+ingestion/*_latest.json
+ingestion/*.pkl
+
+# TypeScript incremental compile state
+*.tsbuildinfo
+

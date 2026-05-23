@@ -87,18 +87,38 @@ export function macd(
   slow = 26,
   signalPeriod = 9,
 ): MacdResult {
-  const emaFast = ema(closes, fast);
-  const emaSlow = ema(closes, slow);
-  // Align lengths: emaSlow starts same index as emaFast
+  // Length guard — need at least slow + signalPeriod bars to produce a useful signal line
+  if (!closes || closes.length < slow + signalPeriod) {
+    return { macd: [], signal: [], histogram: [] };
+  }
+
+  // Filter NaN from inputs to prevent silent error propagation
+  const clean = closes.map(v => Number.isFinite(v) ? v : 0);
+
+  const emaFast = ema(clean, fast);
+  const emaSlow = ema(clean, slow);
+
+  // Align lengths: both ema arrays seed from data[0], so emaSlow needs
+  // `slow - fast` more bars of warmup before its values are meaningful.
   const startOffset = slow - fast;
+  if (emaSlow.length <= startOffset) {
+    return { macd: [], signal: [], histogram: [] };
+  }
+
   const macdLine: number[] = [];
   for (let i = startOffset; i < emaSlow.length; i++) {
     macdLine.push(emaFast[i] - emaSlow[i - startOffset]);
   }
+  // Invariant: macdLine.length === emaSlow.length - startOffset
+  if (macdLine.length < signalPeriod) {
+    return { macd: macdLine, signal: [], histogram: [] };
+  }
+
   const signalLine = ema(macdLine, signalPeriod);
   const histogram: number[] = [];
+  const offset = macdLine.length - signalLine.length;
   for (let i = 0; i < signalLine.length; i++) {
-    histogram.push(macdLine[i + (macdLine.length - signalLine.length)] - signalLine[i]);
+    histogram.push(macdLine[i + offset] - signalLine[i]);
   }
   return { macd: macdLine, signal: signalLine, histogram };
 }
@@ -454,20 +474,41 @@ export function generateSignal(data: OHLCV[], sr?: { support: SRLevel[]; resista
     }
   }
 
-  // Determine signal
+  // ─── Determine signal ─────────────────────────────────────
+  //
+  // Maximum positive contribution from any single direction:
+  //   EMA align        20
+  //   RSI extreme      25
+  //   RSI moderate     10  (mutually exclusive with above — counted as 25 max)
+  //   VWAP             15
+  //   Bollinger        20
+  //   Regime trend     10
+  //   Candle pattern   20  (engulfing) or 15 (hammer/shooting-star)
+  //   S/R proximity    15
+  //
+  // Realistic ceiling (RSI extreme + engulfing): 20 + 25 + 15 + 20 + 10 + 20 + 15 = 125
+  //
+  // Previous code clamped confidence at `Math.min(100, score)` — which
+  // ignored 25 points of headroom AND made every score ≥ 100 appear
+  // identical at "100%". Now we normalise to MAX_SCORE so confidence
+  // genuinely spans 0-100%.
+  const MAX_SCORE = 125;
+
   let type: TradeSignal["type"] = "neutral";
   let confidence = 0;
 
   if (buyScore > sellScore + 15) {
     type = "buy";
-    confidence = Math.min(100, buyScore);
+    confidence = Math.round((buyScore / MAX_SCORE) * 100);
   } else if (sellScore > buyScore + 15) {
     type = "sell";
-    confidence = Math.min(100, sellScore);
+    confidence = Math.round((sellScore / MAX_SCORE) * 100);
   } else {
-    confidence = Math.abs(buyScore - sellScore);
+    // Neutral — confidence reflects how much the signals disagree
+    confidence = Math.round((Math.abs(buyScore - sellScore) / MAX_SCORE) * 100);
     reasons.push("Mixed signals — wait for clarity");
   }
+  confidence = Math.max(0, Math.min(100, confidence));
 
   // Calculate levels
   const atrValues = atr(data, 14);

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { GrahamOverlayChart } from "@/components/Charts/GrahamOverlayChart";
 import { generateFundamentalHistory } from "@/lib/api/mock-history";
 import { MOCK_STOCKS, MOCK_GLOBAL_STOCKS } from "@/lib/api/mock";
+import { DataFreshness } from "@/components/DataFreshness/DataFreshness";
 import type { StockFundamentals } from "@/lib/types";
+import type { ScannerData } from "@/app/api/scanner/route";
 
 const SECTORS = ["all", "Energy", "Financials", "Technology", "Consumer", "Healthcare", "Industrials", "Materials", "Real Estate", "Communication", "Utilities"];
 
@@ -70,7 +72,25 @@ export function ScanShell() {
   const [sector, setSector] = useState("all");
   const [selected, setSelected] = useState<StockFundamentals | null>(null);
 
-  const stocks = market === "thai" ? MOCK_STOCKS : MOCK_GLOBAL_STOCKS;
+  // Live Thai stocks come from /api/scanner (Supabase fundamentals → mock fallback).
+  // Global stocks remain MOCK_GLOBAL_STOCKS — those aren't ingested yet.
+  const [thaiStocks, setThaiStocks] = useState<StockFundamentals[]>(MOCK_STOCKS);
+  const [thaiSource, setThaiSource] = useState<"supabase" | "mock">("mock");
+  const [thaiUpdated, setThaiUpdated] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/scanner")
+      .then(r => r.json() as Promise<{ success: boolean; data: ScannerData }>)
+      .then(j => {
+        if (!j.success || !j.data) return;
+        setThaiStocks(j.data.stocks);
+        setThaiSource(j.data.source);
+        setThaiUpdated(j.data.oldestUpdate ?? j.data.lastUpdated);
+      })
+      .catch(() => { /* keep mock fallback */ });
+  }, []);
+
+  const stocks = market === "thai" ? thaiStocks : MOCK_GLOBAL_STOCKS;
   const filtered = sector === "all" ? stocks : stocks.filter(s => s.sector.toLowerCase() === sector.toLowerCase());
   const sorted = [...filtered].sort((a, b) => b.marginOfSafety - a.marginOfSafety);
 
@@ -98,6 +118,19 @@ export function ScanShell() {
         borderBottom: "1px solid var(--line)", flexShrink: 0, flexWrap: "wrap",
       }}>
         <span className="t-mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--ink)", marginRight: 8 }}>VALUE SCANNER</span>
+        {market === "thai" && (
+          <DataFreshness
+            timestamp={thaiUpdated}
+            source={thaiSource}
+            label="Supabase fundamentals"
+            warnAfterMinutes={1440}
+            staleAfterMinutes={4320}
+            compact
+          />
+        )}
+        {market === "global" && (
+          <DataFreshness timestamp={null} source="mock" compact />
+        )}
         <span className="t-micro" style={{ color: "var(--dim)", marginRight: 8 }}>MARKET</span>
         {(["thai", "global"] as const).map(m => (
           <button

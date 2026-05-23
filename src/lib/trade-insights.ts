@@ -12,45 +12,96 @@ import { ema, sma, rsi, atr } from "./technical";
 
 // ─── Trend strength · ADX ─────────────────────────────────────────
 
-/** ADX with +DI / −DI. Returns the last value of each. */
+/**
+ * Wilder ADX with +DI / −DI. Returns the latest smoothed values.
+ *
+ * Implementation follows Wilder, *New Concepts in Technical Trading
+ * Systems* (1978):
+ *   1. Compute TR, +DM, −DM per period
+ *   2. Wilder-smooth each (running sum: S = S − S/p + new)
+ *   3. +DI = 100 × (smPlus / smTR)  ;  −DI = 100 × (smMinus / smTR)
+ *   4. DX = 100 × |+DI − −DI| / (+DI + −DI)   — computed each period
+ *   5. ADX = Wilder-smoothed DX (RMA over `period`)
+ *
+ * Previous implementation returned a single raw DX value — that is
+ * not ADX. This version returns the proper smoothed series' latest
+ * value, plus the latest +DI / −DI.
+ *
+ * Needs `period * 2` bars minimum (period for DI smoothing + period
+ * for ADX smoothing of DX). Returns zeros if insufficient data.
+ */
 export function adx(data: OHLCV[], period = 14): { adx: number; plusDI: number; minusDI: number } {
-  if (data.length < period * 2) return { adx: 0, plusDI: 0, minusDI: 0 };
+  if (!data || data.length < period * 2) return { adx: 0, plusDI: 0, minusDI: 0 };
 
-  const trs: number[] = [];
-  const plusDMs: number[] = [];
+  // Step 1 — per-bar TR, +DM, −DM
+  const trs:      number[] = [];
+  const plusDMs:  number[] = [];
   const minusDMs: number[] = [];
-
   for (let i = 1; i < data.length; i++) {
-    const upMove = data[i].high - data[i - 1].high;
+    const upMove   = data[i].high - data[i - 1].high;
     const downMove = data[i - 1].low - data[i].low;
-    const plusDM = upMove > downMove && upMove > 0 ? upMove : 0;
-    const minusDM = downMove > upMove && downMove > 0 ? downMove : 0;
+    const plusDM   = upMove   > downMove && upMove   > 0 ? upMove   : 0;
+    const minusDM  = downMove > upMove   && downMove > 0 ? downMove : 0;
     const tr = Math.max(
       data[i].high - data[i].low,
       Math.abs(data[i].high - data[i - 1].close),
-      Math.abs(data[i].low - data[i - 1].close),
+      Math.abs(data[i].low  - data[i - 1].close),
     );
     trs.push(tr);
     plusDMs.push(plusDM);
     minusDMs.push(minusDM);
   }
+  if (trs.length < period) return { adx: 0, plusDI: 0, minusDI: 0 };
 
-  const wilder = (arr: number[], p: number): number => {
-    let sum = arr.slice(0, p).reduce((s, v) => s + v, 0);
-    for (let i = p; i < arr.length; i++) sum = sum - sum / p + arr[i];
-    return sum;
+  // Step 2 — Wilder smoothing of TR / +DM / −DM as time SERIES
+  // smTR[i] = sum of first `period` items (i == period-1), then
+  // smTR[i] = smTR[i-1] − smTR[i-1]/period + value[i]
+  const wilderSeries = (arr: number[], p: number): number[] => {
+    if (arr.length < p) return [];
+    const out: number[] = new Array(arr.length).fill(0);
+    let s = 0;
+    for (let i = 0; i < p; i++) s += arr[i];
+    out[p - 1] = s;
+    for (let i = p; i < arr.length; i++) {
+      s = s - s / p + arr[i];
+      out[i] = s;
+    }
+    return out;
   };
 
-  const smTR = wilder(trs, period);
-  const smPlus = wilder(plusDMs, period);
-  const smMinus = wilder(minusDMs, period);
+  const smTR    = wilderSeries(trs,      period);
+  const smPlus  = wilderSeries(plusDMs,  period);
+  const smMinus = wilderSeries(minusDMs, period);
 
-  const plusDI = smTR ? (smPlus / smTR) * 100 : 0;
-  const minusDI = smTR ? (smMinus / smTR) * 100 : 0;
-  const denom = plusDI + minusDI;
-  const dx = denom ? (Math.abs(plusDI - minusDI) / denom) * 100 : 0;
+  // Step 3-4 — Build DX series. Each DX needs the smoothed values at index i ≥ period-1.
+  const dxSeries: number[] = [];
+  for (let i = period - 1; i < smTR.length; i++) {
+    const tr = smTR[i];
+    if (!tr) { dxSeries.push(0); continue; }
+    const plusDI  = (smPlus[i]  / tr) * 100;
+    const minusDI = (smMinus[i] / tr) * 100;
+    const denom = plusDI + minusDI;
+    const dx = denom ? (Math.abs(plusDI - minusDI) / denom) * 100 : 0;
+    dxSeries.push(dx);
+  }
 
-  return { adx: dx, plusDI, minusDI };
+  if (dxSeries.length < period) return { adx: 0, plusDI: 0, minusDI: 0 };
+
+  // Step 5 — Wilder-smooth the DX series → ADX
+  // First ADX is simple average of first `period` DX values.
+  // After that: ADX[i] = (ADX[i-1] * (period-1) + DX[i]) / period
+  let adxVal = dxSeries.slice(0, period).reduce((s, v) => s + v, 0) / period;
+  for (let i = period; i < dxSeries.length; i++) {
+    adxVal = (adxVal * (period - 1) + dxSeries[i]) / period;
+  }
+
+  // Latest +DI / −DI from the last smoothed bar
+  const last = smTR.length - 1;
+  const tr  = smTR[last];
+  const plusDI  = tr ? (smPlus[last]  / tr) * 100 : 0;
+  const minusDI = tr ? (smMinus[last] / tr) * 100 : 0;
+
+  return { adx: adxVal, plusDI, minusDI };
 }
 
 // ─── Stochastic oscillator ────────────────────────────────────────

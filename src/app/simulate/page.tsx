@@ -5,6 +5,7 @@ import type { SimulatedTrade, SimPortfolio, PerformanceMetrics } from "@/lib/typ
 import { enterTrade, closeTrade, checkOpenTrades, calculateMetrics, calculatePositionSize } from "@/lib/trading";
 import { MOCK_OHLCV_PTT, MOCK_OHLCV_ADVANC, MOCK_OHLCV_KBANK } from "@/lib/api/mock";
 import { fmtNum, pctColor } from "@/lib/format";
+import { DataFreshness } from "@/components/DataFreshness/DataFreshness";
 
 const STOCKS = [
   { symbol: "PTT.BK", name: "PTT", price: MOCK_OHLCV_PTT[MOCK_OHLCV_PTT.length - 1].close },
@@ -45,6 +46,67 @@ export default function SimulatePage() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(portfolio));
   }, [portfolio]);
+
+  // ─── Auto-close hook ──────────────────────────────────────────
+  // Fetches the latest close for every unique open-trade symbol and
+  // runs checkOpenTrades() against it. Wired to mount + manual button.
+  // Polls every 5 min when there are open positions.
+  const [marketUpdate, setMarketUpdate] = useState<{ ts: string | null; source: "live" | "mock"; checking: boolean }>({ ts: null, source: "mock", checking: false });
+
+  const runAutoClose = async () => {
+    const openSymbols = Array.from(new Set(
+      portfolio.trades.filter(t => t.status === "open").map(t => t.symbol),
+    ));
+    if (openSymbols.length === 0) {
+      setMarketUpdate({ ts: new Date().toISOString(), source: "live", checking: false });
+      return;
+    }
+    setMarketUpdate(s => ({ ...s, checking: true }));
+    const today = new Date().toISOString().slice(0, 10);
+    let anyLive = false;
+
+    try {
+      // Fetch in parallel
+      const results = await Promise.all(openSymbols.map(async sym => {
+        try {
+          const r = await fetch(`/api/ohlcv?symbol=${encodeURIComponent(sym)}&range=1mo&interval=1d`);
+          const j = await r.json();
+          if (j.source === "live") anyLive = true;
+          const last = j.points?.[j.points.length - 1];
+          return { sym, price: last?.close as number | undefined };
+        } catch { return { sym, price: undefined }; }
+      }));
+
+      // Apply checkOpenTrades sequentially so each result feeds the next portfolio snapshot
+      setPortfolio(prev => {
+        let next = prev;
+        for (const { sym, price } of results) {
+          if (price === undefined) continue;
+          // Only this symbol's open trades will be evaluated
+          const hasOpen = next.trades.some(t => t.symbol === sym && t.status === "open");
+          if (!hasOpen) continue;
+          next = checkOpenTrades(next, price, today);
+        }
+        return next;
+      });
+
+      setMarketUpdate({ ts: new Date().toISOString(), source: anyLive ? "live" : "mock", checking: false });
+    } catch {
+      setMarketUpdate(s => ({ ...s, checking: false }));
+    }
+  };
+
+  // Run on mount and whenever the set of open symbols changes
+  // (intentionally not depending on portfolio object — that would loop)
+  const openSymbolsKey = portfolio.trades.filter(t => t.status === "open").map(t => t.symbol).sort().join(",");
+  useEffect(() => {
+    void runAutoClose();
+    if (!openSymbolsKey) return;
+    const id = setInterval(() => void runAutoClose(), 5 * 60_000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openSymbolsKey]);
+
   const [tab, setTab] = useState<Tab>("Open Trades");
   const [symbol, setSymbol] = useState("PTT.BK");
   const [direction, setDirection] = useState<"long" | "short">("long");
@@ -389,6 +451,47 @@ export default function SimulatePage() {
       {/* Tab content */}
       {tab === "Open Trades" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--gap)" }}>
+          {/* Market auto-close bar */}
+          {openTrades.length > 0 && (
+            <div style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              padding: "8px 12px", background: "var(--bg-surface)",
+              border: "1px solid var(--line)", gap: 10, flexWrap: "wrap",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <span className="t-micro" style={{ color: "var(--muted)" }}>AUTO-CLOSE ON STOP / TARGET</span>
+                <DataFreshness
+                  timestamp={marketUpdate.ts}
+                  source={marketUpdate.source}
+                  label="Market price"
+                  warnAfterMinutes={10}
+                  staleAfterMinutes={60}
+                  compact
+                />
+                {marketUpdate.checking && (
+                  <span className="t-micro" style={{ color: "var(--caution)" }}>checking…</span>
+                )}
+              </div>
+              <button
+                onClick={() => void runAutoClose()}
+                disabled={marketUpdate.checking}
+                style={{
+                  background: "transparent",
+                  border: "1px solid var(--tech)",
+                  color: "var(--tech)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.625rem",
+                  letterSpacing: "0.1em",
+                  padding: "4px 10px",
+                  cursor: marketUpdate.checking ? "wait" : "pointer",
+                  minHeight: 28,
+                }}
+              >
+                UPDATE MARKET
+              </button>
+            </div>
+          )}
+
           {openTrades.length === 0 ? (
             <div className="card" style={{ textAlign: "center", padding: 24 }}>
               <div className="t-body" style={{ color: "var(--muted)" }}>No open positions</div>

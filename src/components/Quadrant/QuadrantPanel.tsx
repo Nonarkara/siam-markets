@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ReactNode } from "react";
+import { PanelBoundary } from "@/components/ErrorBoundary/PanelBoundary";
 
 interface Props {
   title: string;
@@ -35,7 +36,9 @@ export function QuadrantPanel({
         )}
       </div>
       <div className="quadrant-content">
-        {children}
+        <PanelBoundary label={`DESK · ${title}`}>
+          {children}
+        </PanelBoundary>
       </div>
     </div>
   );
