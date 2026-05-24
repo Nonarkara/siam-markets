@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV = [
   { href: "/",          label: "DESK",      icon: DeskIcon     },
   { href: "/markets",   label: "MARKETS",   icon: MarketsIcon  },
+  { href: "/signals",   label: "WEB",       icon: WebIcon      },
   { href: "/scan",      label: "BUYS",      icon: ScanIcon     },
   { href: "/funds",     label: "FUNDS",     icon: FundsIcon    },
   { href: "/newsroom",  label: "LIVE",      icon: NewsroomIcon },
@@ -158,6 +159,19 @@ function BacktestIcon({ active }: { active: boolean }) {
     <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
       <polyline points="3,17 8,12 13,15 21,7" />
       <polyline points="16,7 21,7 21,12" />
+    </svg>
+  );
+}
+
+function WebIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <circle cx="12" cy="5"  r="2" />
+      <circle cx="5"  cy="19" r="2" />
+      <circle cx="19" cy="19" r="2" />
+      <line x1="12" y1="7"  x2="5"  y2="17" />
+      <line x1="12" y1="7"  x2="19" y2="17" />
+      <line x1="5"  y1="19" x2="19" y2="19" />
     </svg>
   );
 }
