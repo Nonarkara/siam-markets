@@ -26,29 +26,32 @@ export function LightweightChart({ data, height = 280 }: Props) {
     const el = containerRef.current;
     if (!el || data.length === 0) return;
 
+    const style = getComputedStyle(document.documentElement);
+    const getVar = (name: string) => style.getPropertyValue(name).trim() || name;
+
     const chart = createChart(el, {
       height,
       layout: {
         background: { color: "transparent" },
-        textColor: "var(--muted)",
-        fontFamily: "var(--font-mono)",
+        textColor: getVar("--muted"),
+        fontFamily: getVar("--font-mono"),
         fontSize: 10,
       },
       grid: {
-        vertLines: { color: "var(--line-dim)", style: 2 },
-        horzLines: { color: "var(--line-dim)", style: 2 },
+        vertLines: { color: getVar("--line-dim"), style: 2 },
+        horzLines: { color: getVar("--line-dim"), style: 2 },
       },
       crosshair: {
         mode: 1,
-        vertLine: { color: "var(--tech)", width: 1, style: 3, labelBackgroundColor: "var(--tech)" },
-        horzLine: { color: "var(--tech)", width: 1, style: 3, labelBackgroundColor: "var(--tech)" },
+        vertLine: { color: getVar("--tech"), width: 1, style: 3, labelBackgroundColor: getVar("--tech") },
+        horzLine: { color: getVar("--tech"), width: 1, style: 3, labelBackgroundColor: getVar("--tech") },
       },
       rightPriceScale: {
-        borderColor: "var(--line-dim)",
+        borderColor: getVar("--line-dim"),
         scaleMargins: { top: 0.1, bottom: 0.1 },
       },
       timeScale: {
-        borderColor: "var(--line-dim)",
+        borderColor: getVar("--line-dim"),
         timeVisible: false,
         secondsVisible: false,
       },
@@ -56,12 +59,12 @@ export function LightweightChart({ data, height = 280 }: Props) {
     });
 
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: "var(--bull)",
-      downColor: "var(--bear)",
-      borderUpColor: "var(--bull)",
-      borderDownColor: "var(--bear)",
-      wickUpColor: "var(--bull)",
-      wickDownColor: "var(--bear)",
+      upColor: getVar("--bull"),
+      downColor: getVar("--bear"),
+      borderUpColor: getVar("--bull"),
+      borderDownColor: getVar("--bear"),
+      wickUpColor: getVar("--bull"),
+      wickDownColor: getVar("--bear"),
     });
 
     const formatted: CandlestickData<Time>[] = data.map(d => ({

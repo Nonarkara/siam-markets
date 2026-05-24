@@ -23,43 +23,46 @@ export function GrahamOverlayChart({ data, height = 240 }: Props) {
 
     const h = el.clientHeight > 0 ? el.clientHeight : height;
 
+    const style = getComputedStyle(document.documentElement);
+    const getVar = (name: string) => style.getPropertyValue(name).trim() || name;
+
     const chart = createChart(el, {
       height: h,
       layout: {
         background: { color: "transparent" },
-        textColor: "var(--muted)",
-        fontFamily: "var(--font-mono)",
+        textColor: getVar("--muted"),
+        fontFamily: getVar("--font-mono"),
         fontSize: 10,
       },
       grid: {
-        vertLines: { color: "var(--line-dim)", style: 2 },
-        horzLines: { color: "var(--line-dim)", style: 2 },
+        vertLines: { color: getVar("--line-dim"), style: 2 },
+        horzLines: { color: getVar("--line-dim"), style: 2 },
       },
       crosshair: {
         mode: 1,
-        vertLine: { color: "var(--tech)", width: 1, style: 3 },
-        horzLine: { color: "var(--tech)", width: 1, style: 3 },
+        vertLine: { color: getVar("--tech"), width: 1, style: 3 },
+        horzLine: { color: getVar("--tech"), width: 1, style: 3 },
       },
       rightPriceScale: {
-        borderColor: "var(--line-dim)",
+        borderColor: getVar("--line-dim"),
         scaleMargins: { top: 0.15, bottom: 0.15 },
       },
       timeScale: {
-        borderColor: "var(--line-dim)",
+        borderColor: getVar("--line-dim"),
         timeVisible: false,
       },
       handleScroll: { vertTouchDrag: false },
     });
 
     const priceSeries = chart.addSeries(LineSeries, {
-      color: "var(--ink)",
+      color: getVar("--ink"),
       lineWidth: 2,
       title: "PRICE",
       lastValueVisible: false,
     });
 
     const grahamSeries = chart.addSeries(LineSeries, {
-      color: "var(--bull)",
+      color: getVar("--bull"),
       lineWidth: 2,
       lineStyle: 2,
       title: "GRAHAM №",
