@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
 /* ─── Design Tokens · Braun / Rams Financial Dark ────────────────────
@@ -59,6 +59,16 @@
   --font-future:  "Josefin Sans", system-ui, sans-serif;   /* alias to display — no Orbitron */
   --font-body:    "Source Sans 3", system-ui, sans-serif;
   --font-mono:    "IBM Plex Mono", "Courier New", monospace;
+  --font-serif:   "EB Garamond", Georgia, serif;           /* editorial counterpart — regime copy, quotes */
+
+  /* Wayfinding accent — amber as primary nav indicator (Braun = key principle).
+     Distinct from --caution (warning signal) and --braun-yellow (sparing accent). */
+  --amber-nav:    #ffd000;
+  /* Atmospheric surface — Wong Kar-wai night register. Deeper than --bg. */
+  --night:        #0a0c12;
+  /* Brand identity anchor — Leica red dot / hinomaru. NOT a signal color.
+     Use only for wordmark identity. Never for bull/bear state. */
+  --red-anchor:   #e8002d;
 
   /* Motion */
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
@@ -201,6 +211,13 @@ body {
   line-height: 1.5;
 }
 
+.t-serif {
+  font-family: var(--font-serif);
+  font-size: var(--text-body);
+  font-style: italic;
+  line-height: 1.7;
+}
+
 .t-micro {
   font-family: var(--font-body);
   font-size: var(--text-micro);
@@ -221,6 +238,18 @@ body {
   font-size: var(--text-display);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* ─── Heartbeat line — Dr Non permanent signature ────────────────── */
+.heartbeat-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--amber-nav);
+  z-index: 200;
+  pointer-events: none;
 }
 
 /* ─── Legacy glow selectors — neutralised, kept callable ─────────── */

@@ -50,11 +50,11 @@ export function BottomNav() {
               alignItems: "center",
               justifyContent: "center",
               gap: 3,
-              color: active ? "var(--bull)" : "var(--dim)",
+              color: active ? "var(--amber-nav)" : "var(--dim)",
               textDecoration: "none",
               minHeight: "var(--nav-h)",
               transition: "color 180ms var(--ease)",
-              borderTop: active ? "2px solid var(--bull)" : "2px solid transparent",
+              borderTop: active ? "2px solid var(--amber-nav)" : "2px solid transparent",
             }}
           >
             <Icon active={active} />

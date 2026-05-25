@@ -27,37 +27,50 @@ export function TopNav() {
   const pathname = usePathname();
 
   return (
-    <nav
-      role="navigation"
-      aria-label="Main navigation"
-      style={{
-        position: "fixed",
-        top: 0, left: 0, right: 0,
-        height: "var(--top-h)",
-        background: "var(--bg-raised)",
-        borderBottom: "1px solid var(--line)",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 24px",
-        zIndex: 100,
-        gap: 0,
-      }}
-    >
-      <Link
-        href="/"
+    <>
+      <div className="heartbeat-line" />
+      <nav
+        role="navigation"
+        aria-label="Main navigation"
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "0.9375rem",
-          fontWeight: 700,
-          letterSpacing: "0.1em",
-          color: "var(--ink)",
-          textDecoration: "none",
-          marginRight: 24,
-          whiteSpace: "nowrap",
+          position: "fixed",
+          top: 0, left: 0, right: 0,
+          height: "var(--top-h)",
+          background: "var(--bg-raised)",
+          borderBottom: "1px solid var(--line)",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 24px",
+          zIndex: 100,
+          gap: 0,
         }}
       >
-        DAYTRADERS
-      </Link>
+        <Link
+          href="/"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "0.9375rem",
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            color: "var(--ink)",
+            textDecoration: "none",
+            marginRight: 8,
+            whiteSpace: "nowrap",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          DAYTRADERS
+          <span style={{
+            display: "inline-block",
+            width: 5,
+            height: 5,
+            background: "var(--red-anchor)",
+            flexShrink: 0,
+          }} />
+        </Link>
+        <div style={{ marginRight: 16 }} />
 
       <div style={{ display: "flex", flex: 1, gap: 0 }}>
         {NAV.map(({ href, label }) => {
@@ -71,13 +84,13 @@ export function TopNav() {
                 fontSize: "var(--text-micro)",
                 letterSpacing: "0.08em",
                 fontWeight: active ? 700 : 400,
-                color: active ? "var(--bull)" : "var(--muted)",
+                color: active ? "var(--amber-nav)" : "var(--muted)",
                 textDecoration: "none",
                 padding: "0 14px",
                 height: "var(--top-h)",
                 display: "inline-flex",
                 alignItems: "center",
-                borderBottom: active ? "2px solid var(--bull)" : "2px solid transparent",
+                borderBottom: active ? "2px solid var(--amber-nav)" : "2px solid transparent",
                 transition: "all 180ms var(--ease)",
               }}
             >
@@ -93,5 +106,6 @@ export function TopNav() {
         <ProfileBadge />
       </div>
     </nav>
+    </>
   );
 }

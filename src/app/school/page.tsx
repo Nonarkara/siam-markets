@@ -277,8 +277,8 @@ function ConceptCard({ concept, index }: { concept: Concept; index: number }) {
         {/* Quote */}
         <div style={{ borderTop: "1px solid var(--line)", paddingTop: 12 }}>
           <div
-            className="t-body"
-            style={{ fontSize: "0.875rem", fontStyle: "italic", color: "var(--ink)", lineHeight: 1.6, marginBottom: 6 }}
+            className="t-serif"
+            style={{ color: "var(--ink)", marginBottom: 6 }}
           >
             &ldquo;{concept.quote}&rdquo;
           </div>

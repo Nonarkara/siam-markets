@@ -272,7 +272,7 @@ export function SignalWeb() {
             <div style={{
               padding: '16px 20px',
               borderBottom: '1px solid var(--line)',
-              background: 'var(--bg-raised)',
+              background: 'var(--night)',
             }}>
               <div style={{
                 fontFamily: 'var(--font-mono)',
@@ -282,10 +282,11 @@ export function SignalWeb() {
                 marginBottom: 8,
               }}>REGIME INTERPRETATION — {profile.label.toUpperCase()}</div>
               <p style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 12,
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                fontSize: 'var(--text-body)',
                 color: 'var(--muted)',
-                lineHeight: 1.65,
+                lineHeight: 1.7,
                 margin: '0 0 12px',
               }}>{profile.summary}</p>
               <div style={{

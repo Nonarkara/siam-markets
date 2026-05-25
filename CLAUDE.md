@@ -185,10 +185,41 @@ See `/Users/nonarkara/Projects/CLAUDE.md` §11 for workspace-wide rules. Project
 
 1. **Zero border-radius — enforced in globals.css**. Do not remove the `border-radius: 0 !important` reset. It is load-bearing.
 2. **Three font sizes only** — Display/Body/Micro. Do not introduce `1.1rem`, `0.82rem`, or any fourth size.
-3. **Font stack** — Josefin Sans + Source Sans 3 + IBM Plex Mono. Never substitute Roboto, Inter, Poppins, or any banned font (§11.10).
+3. **Font stack** — Josefin Sans + Source Sans 3 + IBM Plex Mono + EB Garamond (serif). Never substitute Roboto, Inter, Poppins, or any banned font (§11.10).
 4. **Palette** — `--bull: #00c896`, `--bear: #ff3b30`, `--caution: #ff9500`. Do not change accent colors without explicit approval.
 5. **Mock data in `src/lib/api/mock.ts`** — the app must render fully with no API keys. Never remove mock fallbacks.
 6. **Correlation disclaimer** — the `EventTimeline` component carries a note that events correlate but do not cause market moves. Do not remove this disclaimer.
+
+## Design DNA — Hardcoded Rules (2026-05-25)
+
+*Derived from Design_DNA_Aesthetic_Profile.md. Permanent operating rules for every surface in this project.*
+
+### Token Semantics — Never Confuse These
+
+| Token | Value | Role |
+|---|---|---|
+| `--amber-nav` | `#ffd000` | **Wayfinding only** — nav active state, tab underline. The Braun equals-key principle: one amber button in a grid of grey. |
+| `--braun-yellow` | `#ffd000` | Sparing callout accent — "second hand" use only. Not for wayfinding. |
+| `--bull` | `#00c896` | **Signal only** — gain, buy, positive state. Never use for navigation active state. |
+| `--red-anchor` | `#e8002d` | **Brand identity only** — the Leica red dot / hinomaru wordmark marker. Never use for bull/bear state, never for alerts. |
+| `--night` | `#0a0c12` | **Atmospheric surface** — Wong Kar-wai register. Use on interpretive/editorial panels (Signal Web regime, philosophy copy). Deeper than `--bg`. |
+
+### Typography Register
+
+- **`--font-serif` (`EB Garamond`)** — editorial counterpart to the Swiss grid. Use for: regime interpretation copy, trading philosophy quotes, any paragraph that *interprets* rather than *reports*. Always italic at body size.
+- **`.t-serif`** class = `font-family: var(--font-serif); font-style: italic; line-height: 1.7`. Use instead of inline fontStyle/fontSize.
+- The serif and sans never compete on the same surface. Serif = mood/interpretation. Sans = data/labels.
+
+### Permanent UI Elements
+
+- **Heartbeat line** — 1px amber (`--amber-nav`) fixed stripe at `top: 0`, `z-index: 200`. Added via `.heartbeat-line` class in TopNav. Never remove. Never recolor. It is the project's permanent signature.
+- **Red dot wordmark** — 5×5px `--red-anchor` square inline after DAYTRADERS in TopNav. Brand identity, not decoration. Never remove.
+
+### The Braun Principle Applied
+
+- Amber = wayfinding. Green = signal (gain). Red = signal (loss) or brand identity. These three channels must never bleed into each other.
+- If you see `color: active ? "var(--bull)"` on a nav element: that is a regression. Replace with `var(--amber-nav)`.
+- If you see the red anchor (`--red-anchor`) on a P&L row or market signal: that is a regression. The red anchor is for the wordmark only.
 
 ## Pages & Routes
 
