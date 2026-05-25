@@ -1,123 +1,368 @@
 "use client";
 
-import { useMemo } from "react";
-import { generateOHLC } from "@/lib/api/mock-history";
+import { useEffect, useState, useMemo } from "react";
+import { fetchYahooQuote } from "@/lib/api/yahoo";
+import type { YahooQuote, HistoryPoint } from "@/lib/api/yahoo";
 
-interface Market {
+// ─── Market definitions + hardcoded constituents ──────────────────
+
+interface Constituent { symbol: string; label: string }
+
+interface MarketDef {
   symbol: string;
   name: string;
   flag: string;
-  timezone: string;
+  exchange: string;
+  constituents: Constituent[];
 }
 
-const MAJOR_MARKETS: Market[] = [
-  { symbol: "^GSPC", name: "S&P 500", flag: "🇺🇸", timezone: "EST" },
-  { symbol: "^IXIC", name: "NASDAQ", flag: "🇺🇸", timezone: "EST" },
-  { symbol: "^DJI", name: "DOW", flag: "🇺🇸", timezone: "EST" },
-  { symbol: "^FTSE", name: "FTSE 100", flag: "🇬🇧", timezone: "GMT" },
-  { symbol: "^GDAXI", name: "DAX", flag: "🇩🇪", timezone: "CET" },
-  { symbol: "^N225", name: "NIKKEI 225", flag: "🇯🇵", timezone: "JST" },
-  { symbol: "^HSI", name: "HANG SENG", flag: "🇭🇰", timezone: "HKT" },
-  { symbol: "^SSEC", name: "SHANGHAI", flag: "🇨🇳", timezone: "CST" },
-  { symbol: "^AXJO", name: "ASX 200", flag: "🇦🇺", timezone: "AEDT" },
-  { symbol: "SET.BK", name: "SET", flag: "🇹🇭", timezone: "ICT" },
+const MARKETS: MarketDef[] = [
+  {
+    symbol: "^GSPC", name: "S&P 500", flag: "🇺🇸", exchange: "NYSE",
+    constituents: [
+      { symbol: "AAPL",  label: "AAPL"  },
+      { symbol: "MSFT",  label: "MSFT"  },
+      { symbol: "NVDA",  label: "NVDA"  },
+    ],
+  },
+  {
+    symbol: "^IXIC", name: "Nasdaq", flag: "🇺🇸", exchange: "NASDAQ",
+    constituents: [
+      { symbol: "GOOGL", label: "GOOGL" },
+      { symbol: "AMZN",  label: "AMZN"  },
+      { symbol: "META",  label: "META"  },
+    ],
+  },
+  {
+    symbol: "^FTSE", name: "FTSE 100", flag: "🇬🇧", exchange: "LSE",
+    constituents: [
+      { symbol: "SHEL.L", label: "SHEL" },
+      { symbol: "HSBA.L", label: "HSBA" },
+      { symbol: "BP.L",   label: "BP"   },
+    ],
+  },
+  {
+    symbol: "^GDAXI", name: "DAX", flag: "🇩🇪", exchange: "XETRA",
+    constituents: [
+      { symbol: "SAP.DE",  label: "SAP"  },
+      { symbol: "SIE.DE",  label: "SIE"  },
+      { symbol: "BAYN.DE", label: "BAYN" },
+    ],
+  },
+  {
+    symbol: "^N225", name: "Nikkei", flag: "🇯🇵", exchange: "TSE",
+    constituents: [
+      { symbol: "7203.T", label: "TOYOTA" },
+      { symbol: "9984.T", label: "SOFTBK" },
+      { symbol: "6861.T", label: "KEYENC" },
+    ],
+  },
+  {
+    symbol: "^HSI", name: "Hang Seng", flag: "🇭🇰", exchange: "HKEX",
+    constituents: [
+      { symbol: "0700.HK", label: "TENCENT" },
+      { symbol: "9988.HK", label: "ALIBABA" },
+      { symbol: "0941.HK", label: "CML"     },
+    ],
+  },
+  {
+    symbol: "000001.SS", name: "Shanghai", flag: "🇨🇳", exchange: "SSE",
+    constituents: [
+      { symbol: "600519.SS", label: "KWEICHOW" },
+      { symbol: "601318.SS", label: "PINGAN"   },
+      { symbol: "600036.SS", label: "CMB"      },
+    ],
+  },
+  {
+    symbol: "^AXJO", name: "ASX 200", flag: "🇦🇺", exchange: "ASX",
+    constituents: [
+      { symbol: "BHP.AX", label: "BHP" },
+      { symbol: "CBA.AX", label: "CBA" },
+      { symbol: "CSL.AX", label: "CSL" },
+    ],
+  },
+  {
+    symbol: "^SET.BK", name: "SET", flag: "🇹🇭", exchange: "SET",
+    constituents: [
+      { symbol: "PTT.BK",    label: "PTT"    },
+      { symbol: "KBANK.BK",  label: "KBANK"  },
+      { symbol: "ADVANC.BK", label: "ADVANC" },
+    ],
+  },
+  {
+    symbol: "^BVSP", name: "Bovespa", flag: "🇧🇷", exchange: "B3",
+    constituents: [
+      { symbol: "VALE3.SA",  label: "VALE"  },
+      { symbol: "PETR4.SA",  label: "PETR4" },
+      { symbol: "ITUB4.SA",  label: "ITUB4" },
+    ],
+  },
 ];
 
-function MiniSparkline({ data, color }: { data: number[]; color: string }) {
-  if (data.length < 2) return <div style={{ height: 24, background: "var(--bg-raised)" }} />;
-  const w = 80;
-  const h = 24;
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const points = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
-    const y = h - ((v - min) / range) * h;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
+// ─── YTD sparkline (SVG) ──────────────────────────────────────────
+
+function YtdSparkline({ points, color }: { points: HistoryPoint[]; color: string }) {
+  if (points.length < 2) {
+    return (
+      <div
+        style={{
+          height: 40,
+          background: "var(--bg-raised)",
+          border: "1px solid var(--line-dim)",
+        }}
+      />
+    );
+  }
+  const W = 160;
+  const H = 40;
+  const vals = points.map(p => p.c);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const span = max - min || 1;
+  const pts = vals
+    .map((v, i) => {
+      const x = (i / (vals.length - 1)) * W;
+      const y = H - ((v - min) / span) * (H - 4) - 2;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
   return (
-    <svg width={w} height={h} style={{ display: "block" }}>
-      <polyline points={points} fill="none" stroke={color} strokeWidth={1.2} />
+    <svg
+      width="100%"
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      style={{ display: "block", height: 40 }}
+      aria-hidden="true"
+    >
+      <polyline points={pts} fill="none" stroke={color} strokeWidth={1.5} />
     </svg>
   );
 }
 
-interface Props {
-  quotes?: Array<{ symbol: string; price?: number; changePct?: number }>;
+// ─── Single constituent stock row ─────────────────────────────────
+
+function ConstituentRow({ symbol, label }: { symbol: string; label: string }) {
+  const [quote, setQuote] = useState<YahooQuote | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchYahooQuote(symbol, label).then(q => {
+      if (!cancelled && q) setQuote(q);
+    });
+    return () => { cancelled = true; };
+  }, [symbol, label]);
+
+  const color = quote
+    ? quote.changePct >= 0 ? "var(--bull)" : "var(--bear)"
+    : "var(--muted)";
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 4,
+        minHeight: 18,
+      }}
+    >
+      <span
+        className="t-mono"
+        style={{ fontSize: "var(--text-micro)", color: "var(--ink)", letterSpacing: "0.03em" }}
+      >
+        {label}
+      </span>
+      <span
+        className="t-mono"
+        style={{ fontSize: "var(--text-micro)", color }}
+      >
+        {quote
+          ? `${quote.changePct >= 0 ? "+" : ""}${quote.changePct.toFixed(1)}%`
+          : "—"}
+      </span>
+    </div>
+  );
 }
 
-export function MarketColumns({ quotes = [] }: Props) {
-  const enriched = useMemo(() => {
-    return MAJOR_MARKETS.map(m => {
-      const q = quotes.find(q => q.symbol === m.symbol);
-      const price = q?.price ?? 0;
-      const change = q?.changePct ?? (Math.random() * 3 - 1.5);
-      const history = generateOHLC(m.symbol, 65, price || 4000).map(d => d.close);
-      const sessionSlice = history.slice(-10);
-      const dayHigh = Math.max(...sessionSlice);
-      const dayLow = Math.min(...sessionSlice);
-      const pts = price * change / 100;
-      return { ...m, price, change, history, dayHigh, dayLow, pts };
-    });
-  }, [quotes]);
+// ─── Single market card ───────────────────────────────────────────
 
-  const topPerformer = enriched.reduce((best, m) => m.change > best.change ? m : best, enriched[0]);
+function MarketCard({
+  market,
+  quote,
+  ytdPoints,
+}: {
+  market: MarketDef;
+  quote: YahooQuote | undefined;
+  ytdPoints: HistoryPoint[];
+}) {
+  const todayColor = quote
+    ? quote.changePct >= 0 ? "var(--bull)" : "var(--bear)"
+    : "var(--muted)";
+
+  const ytdColor = useMemo(() => {
+    if (ytdPoints.length < 2) return "var(--muted)";
+    return ytdPoints[ytdPoints.length - 1].c >= ytdPoints[0].c
+      ? "var(--bull)"
+      : "var(--bear)";
+  }, [ytdPoints]);
+
+  const ytdPct = useMemo(() => {
+    if (ytdPoints.length < 2) return null;
+    const first = ytdPoints[0].c;
+    const last  = ytdPoints[ytdPoints.length - 1].c;
+    return (last / first - 1) * 100;
+  }, [ytdPoints]);
+
+  return (
+    <div
+      style={{
+        width: 180,
+        flexShrink: 0,
+        borderRight: "1px solid var(--line-dim)",
+        padding: "8px 10px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        background: "var(--bg)",
+        transition: "background 0.12s",
+        minHeight: 44, // tap target floor
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "var(--bg-raised)"; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "var(--bg)"; }}
+    >
+      {/* Header: flag · name · exchange badge */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden" }}>
+          <span style={{ fontSize: "0.875rem", flexShrink: 0, lineHeight: 1 }}>{market.flag}</span>
+          <span
+            className="t-micro"
+            style={{ color: "var(--ink)", fontWeight: 700, letterSpacing: "0.06em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+          >
+            {market.name.toUpperCase()}
+          </span>
+        </div>
+        <span
+          className="t-micro"
+          style={{
+            color: "var(--muted)",
+            border: "1px solid var(--line-dim)",
+            padding: "0 3px",
+            letterSpacing: "0.04em",
+            flexShrink: 0,
+            lineHeight: "1.6",
+          }}
+        >
+          {market.exchange}
+        </span>
+      </div>
+
+      {/* Index price — large mono */}
+      <div
+        className="t-mono"
+        style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--ink)", lineHeight: 1.1, marginTop: 2 }}
+      >
+        {quote
+          ? quote.price.toLocaleString(undefined, { maximumFractionDigits: 2 })
+          : "—"}
+      </div>
+
+      {/* Today % change */}
+      <div
+        className="t-mono"
+        style={{ fontSize: "var(--text-body)", color: todayColor, lineHeight: 1 }}
+      >
+        {quote
+          ? `${quote.changePct >= 0 ? "+" : ""}${quote.changePct.toFixed(2)}%`
+          : "—"}
+      </div>
+
+      {/* Hairline divider */}
+      <div style={{ borderTop: "1px solid var(--line-dim)", margin: "3px 0" }} />
+
+      {/* YTD sparkline */}
+      <YtdSparkline points={ytdPoints} color={ytdColor} />
+
+      {/* YTD % */}
+      <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 1 }}>
+        <span className="t-micro" style={{ color: "var(--muted)", letterSpacing: "0.08em" }}>YTD</span>
+        <span
+          className="t-mono"
+          style={{ fontSize: "var(--text-micro)", color: ytdColor, fontWeight: 600 }}
+        >
+          {ytdPct != null
+            ? `${ytdPct >= 0 ? "+" : ""}${ytdPct.toFixed(1)}%`
+            : "—"}
+        </span>
+      </div>
+
+      {/* Hairline divider */}
+      <div style={{ borderTop: "1px solid var(--line-dim)", margin: "3px 0" }} />
+
+      {/* Constituent stocks — lazy-fetched */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        {market.constituents.map(c => (
+          <ConstituentRow key={c.symbol} symbol={c.symbol} label={c.label} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Public component ─────────────────────────────────────────────
+
+interface Props {
+  quotes?: YahooQuote[];
+  histories?: Record<string, HistoryPoint[]>;
+}
+
+export function MarketColumns({ quotes = [], histories = {} }: Props) {
+  // Jan 1 of current year in milliseconds (HistoryPoint.t is ms)
+  const JAN1_MS = useMemo(
+    () => new Date(`${new Date().getFullYear()}-01-01T00:00:00Z`).getTime(),
+    [],
+  );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-      <div style={{
-        display: "flex", alignItems: "center", gap: 8,
-        padding: "4px 10px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0,
-      }}>
-        <span className="t-micro" style={{ color: "var(--dim)", letterSpacing: "0.14em" }}>MAJOR MARKETS</span>
-        <span className="t-mono" style={{ fontSize: "0.5rem", color: "var(--bull)" }}>
-          TOP {topPerformer.flag} {topPerformer.name} {topPerformer.change >= 0 ? "+" : ""}{topPerformer.change.toFixed(2)}%
+      {/* Strip header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "4px 10px",
+          borderBottom: "1px solid var(--line-dim)",
+          flexShrink: 0,
+        }}
+      >
+        <span className="t-micro" style={{ color: "var(--muted)", letterSpacing: "0.14em" }}>
+          MAJOR MARKETS · YTD
         </span>
       </div>
-      <div style={{
-        flex: 1, minHeight: 0, overflow: "hidden",
-        display: "grid", gridTemplateColumns: "repeat(10, 1fr)", gap: 1,
-      }}>
-        {enriched.map(m => {
-          const color = m.change >= 0 ? "var(--bull)" : "var(--bear)";
+
+      {/* Horizontal scroll strip */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowX: "auto",
+          overflowY: "hidden",
+          display: "flex",
+          alignItems: "stretch",
+          WebkitOverflowScrolling: "touch" as React.CSSProperties["WebkitOverflowScrolling"],
+        }}
+      >
+        {MARKETS.map(m => {
+          const quote      = quotes.find(q => q.symbol === m.symbol);
+          const allPoints  = histories[m.symbol] ?? [];
+          const ytdPoints  = allPoints.filter(p => p.t >= JAN1_MS);
           return (
-            <div key={m.symbol} style={{
-              borderRight: "1px solid var(--line-dim)",
-              padding: "4px 6px", display: "flex", flexDirection: "column", gap: 2,
-              minWidth: 0,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                <span style={{ fontSize: "0.7rem" }}>{m.flag}</span>
-                <span className="t-mono" style={{ fontSize: "0.5625rem", fontWeight: 700, color: "var(--ink)", letterSpacing: "0.04em" }}>
-                  {m.name}
-                </span>
-              </div>
-              <span className="t-mono" style={{ fontSize: "0.75rem", fontWeight: 700, color }}>
-                {m.price ? m.price.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—"}
-              </span>
-              <span className="t-mono" style={{ fontSize: "0.5625rem", color }}>
-                {m.change >= 0 ? "+" : ""}{m.change.toFixed(2)}%
-              </span>
-              <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 4 }}>
-                <span className="t-mono" style={{ fontSize: "0.5rem", color }}>
-                  {m.pts >= 0 ? "+" : ""}{m.pts.toLocaleString(undefined, { maximumFractionDigits: 1 })} pts
-                </span>
-                <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <span className="t-mono" style={{ fontSize: "0.4375rem", color: "var(--dim)" }}>
-                    H&nbsp;{m.dayHigh.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </span>
-                  <span className="t-mono" style={{ fontSize: "0.4375rem", color: "var(--dim)" }}>
-                    L&nbsp;{m.dayLow.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </span>
-                </div>
-              </div>
-              <div style={{ marginTop: "auto" }}>
-                <MiniSparkline data={m.history} color={color} />
-              </div>
-              <span className="t-micro" style={{ fontSize: "0.4375rem", color: "var(--dim)", marginTop: 2 }}>
-                {m.timezone}
-              </span>
-            </div>
+            <MarketCard
+              key={m.symbol}
+              market={m}
+              quote={quote}
+              ytdPoints={ytdPoints}
+            />
           );
         })}
       </div>

@@ -90,13 +90,16 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
                   </div>
                   {/* Bottom: major market columns */}
                   <div style={{ flex: 0.9, minHeight: 0, borderTop: "1px solid var(--line)", overflow: "hidden" }}>
-                    <MarketColumns quotes={[
-                      ...regional.thai,
-                      ...regional.asean,
-                      ...regional.china,
-                      ...regional.global,
-                      ...assets,
-                    ]} />
+                    <MarketColumns
+                      quotes={[
+                        ...regional.thai,
+                        ...regional.asean,
+                        ...regional.china,
+                        ...regional.global,
+                        ...assets,
+                      ]}
+                      histories={histories}
+                    />
                   </div>
                 </div>
               ),
