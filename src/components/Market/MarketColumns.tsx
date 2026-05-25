@@ -266,15 +266,58 @@ function MarketCard({
           : "—"}
       </div>
 
-      {/* Today % change */}
-      <div
-        className="t-mono"
-        style={{ fontSize: "var(--text-body)", color: todayColor, lineHeight: 1 }}
-      >
-        {quote
-          ? `${quote.changePct >= 0 ? "+" : ""}${quote.changePct.toFixed(2)}%`
-          : "—"}
+      {/* Today % change + absolute pts */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+        <div
+          className="t-mono"
+          style={{ fontSize: "var(--text-body)", color: todayColor, lineHeight: 1 }}
+        >
+          {quote
+            ? `${quote.changePct >= 0 ? "+" : ""}${quote.changePct.toFixed(2)}%`
+            : "—"}
+        </div>
+        {quote?.change != null && (
+          <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: todayColor, opacity: 0.75 }}>
+            {quote.change >= 0 ? "+" : ""}{Math.abs(quote.change) >= 1000
+              ? (quote.change / 1000).toFixed(1) + "k"
+              : quote.change.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+          </span>
+        )}
       </div>
+
+      {/* 52-week range bar */}
+      {quote && quote.high52w > 0 && quote.low52w > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 3 }}>
+          {/* Bar track */}
+          <div style={{ position: "relative", height: 3, background: "var(--line-dim)" }}>
+            {(() => {
+              const span = quote.high52w - quote.low52w;
+              const pct  = span > 0 ? Math.min(100, Math.max(0, ((quote.price - quote.low52w) / span) * 100)) : 50;
+              return (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    width: `${pct}%`,
+                    height: "100%",
+                    background: todayColor,
+                  }}
+                />
+              );
+            })()}
+          </div>
+          {/* H / L labels */}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span className="t-mono" style={{ fontSize: "0.6rem", color: "var(--muted)" }}>
+              {quote.low52w.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+            <span className="t-micro" style={{ color: "var(--muted)", letterSpacing: "0.05em" }}>52W</span>
+            <span className="t-mono" style={{ fontSize: "0.6rem", color: "var(--muted)" }}>
+              {quote.high52w.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Hairline divider */}
       <div style={{ borderTop: "1px solid var(--line-dim)", margin: "3px 0" }} />
