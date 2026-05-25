@@ -1,53 +1,52 @@
 @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
-/* ─── Design Tokens · Braun / Rams Financial Dark ────────────────────
-   Hardcoded heritage: Dieter Rams' "as little design as possible."
-   Calm, hairline-bordered, single accent. No neon, no glow, no glass.
+/* ─── Design Tokens · Pitch Black · Terminal Intelligence ─────────────
+   Pure void background. Electric signal palette. Cool blue-gray type.
+   AKIRA / Ghost in the Shell register — density is clarity, not noise.
 ─────────────────────────────────────────────────────────────────── */
 :root {
-  /* Surfaces — near-black, Braun matte */
-  --bg:          #0d0d0d;
-  --bg-raised:   #161616;
-  --bg-surface:  #1e1e1e;
-  --bg-hover:    #242424;
-  --bg-glass:    #1e1e1e;          /* alias for legacy class names; no transparency */
+  /* Surfaces — pitch black with barely-there depth layers */
+  --bg:          #000000;
+  --bg-raised:   #090909;
+  --bg-surface:  #0f0f0f;
+  --bg-hover:    #161616;
+  --bg-glass:    #0f0f0f;
 
-  /* Type */
-  --ink:    #e8e8e8;
-  --muted:  #888884;
-  --dim:    #4a4a46;
+  /* Type — cool white, not warm ivory */
+  --ink:    #e6edf3;
+  --muted:  #8892a4;
+  --dim:    #4a5568;
 
-  /* Borders — hairline only */
-  --line:     #2a2a2a;
-  --line-dim: #1f1f1f;
+  /* Borders — dark navy hairline (adds depth without warming the surface) */
+  --line:     #1e2430;
+  --line-dim: #0f1420;
 
-  /* Signal palette — Braun functional (calm, never neon) */
-  --bull:    #00c896;              /* gain — emerald */
-  --bear:    #ff3b30;              /* loss — Apple alert red */
-  --caution: #ff9500;              /* watch — Apple warning amber */
-  --tech:    #007aff;              /* UI chrome — precision blue */
-  --violet:  #6e6e8a;              /* legacy alias — muted, not neon */
+  /* Signal palette — electric, never muddy */
+  --bull:    #00e676;              /* gain — electric green */
+  --bear:    #ff1744;              /* loss — electric red */
+  --caution: #ffab00;              /* watch — electric amber */
+  --tech:    #00b0ff;              /* UI chrome — electric sky */
+  --violet:  #7c84ff;              /* secondary accent */
 
   /* Heritage accent — Braun travel-clock yellow.
      Use SPARINGLY: noon line, single emphasis dot. Never as a fill. */
-  --braun-yellow: #ffd000;
+  --braun-yellow: #ffe000;
   --braun-orange: #ff6900;
 
-  /* Glow tokens — kept as transparent no-ops so legacy selectors don't break.
-     Per design heritage, no element should actually emit a glow. */
+  /* Glow tokens — kept as transparent no-ops so legacy selectors don't break. */
   --bull-glow:    transparent;
   --bear-glow:    transparent;
   --tech-glow:    transparent;
   --caution-glow: transparent;
 
-  /* Tinted backgrounds — used for row highlights, not glow */
-  --bull-10:    rgba(0, 200, 150, 0.10);
-  --bull-20:    rgba(0, 200, 150, 0.18);
-  --bear-10:    rgba(255, 59, 48, 0.10);
-  --bear-20:    rgba(255, 59, 48, 0.18);
-  --caution-10: rgba(255, 149, 0, 0.10);
-  --tech-10:    rgba(0, 122, 255, 0.10);
+  /* Tinted backgrounds — used for row highlights */
+  --bull-10:    rgba(0, 230, 118, 0.10);
+  --bull-20:    rgba(0, 230, 118, 0.18);
+  --bear-10:    rgba(255, 23, 68, 0.10);
+  --bear-20:    rgba(255, 23, 68, 0.18);
+  --caution-10: rgba(255, 171, 0, 0.10);
+  --tech-10:    rgba(0, 176, 255, 0.10);
 
   /* Typography scale — three sizes only (§11.7) */
   --text-display: 2rem;            /* 32px */
@@ -59,6 +58,7 @@
   --font-future:  "Josefin Sans", system-ui, sans-serif;   /* alias to display — no Orbitron */
   --font-body:    "Source Sans 3", system-ui, sans-serif;
   --font-mono:    "IBM Plex Mono", "Courier New", monospace;
+  --font-serif:   "EB Garamond", "Lora", serif;
   --font-serif:   "EB Garamond", Georgia, serif;           /* editorial counterpart — regime copy, quotes */
 
   /* Wayfinding accent — amber as primary nav indicator (Braun = key principle).
@@ -356,7 +356,10 @@ body {
 
 button:focus-visible,
 a:focus-visible,
-[tabindex]:focus-visible {
+[tabindex]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--tech);
   outline-offset: 2px;
 }
