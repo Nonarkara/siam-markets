@@ -184,16 +184,66 @@ function ConstituentRow({ symbol, label }: { symbol: string; label: string }) {
   );
 }
 
+// ─── Intelligence strip (regime + forecast) ───────────────────────
+
+function IntelligenceStrip({ setQuote }: { setQuote: YahooQuote | undefined }) {
+  const [regime, setRegime] = useState<{ regime: string; bull_prob: number; bear_prob: number; ranging_prob: number } | null>(null);
+  const [forecast, setForecast] = useState<{ rows?: Array<{ predicted: number }> } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/regime").then(r => r.json()).then((d: { today?: { regime: string; bull_prob: number; bear_prob: number; ranging_prob: number } }) => {
+      if (d.today) setRegime(d.today);
+    }).catch(() => {});
+    fetch("/api/forecast-set").then(r => r.json()).then((d: { rows?: Array<{ predicted: number }> }) => setForecast(d)).catch(() => {});
+  }, []);
+
+  const regimeColor = regime
+    ? regime.regime === "bull" ? "var(--bull)" : regime.regime === "bear" ? "var(--bear)" : "var(--caution)"
+    : "var(--dim)";
+
+  const forecastDir = useMemo(() => {
+    const lastPred = forecast?.rows?.[forecast.rows.length - 1]?.predicted;
+    const curPrice = setQuote?.price;
+    if (!lastPred || !curPrice) return null;
+    return (lastPred - curPrice) / curPrice * 100;
+  }, [forecast, setQuote]);
+
+  if (!regime && forecastDir === null) return null;
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+      {regime && (
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span style={{ width: 5, height: 5, background: regimeColor, display: "inline-block", flexShrink: 0 }} />
+          <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: regimeColor, letterSpacing: "0.06em" }}>
+            {regime.regime.toUpperCase()} {(Math.max(regime.bull_prob, regime.bear_prob, regime.ranging_prob) * 100).toFixed(0)}%
+          </span>
+        </span>
+      )}
+      {forecastDir !== null && (
+        <span className="t-mono" style={{
+          fontSize: "var(--text-micro)",
+          color: forecastDir >= 0 ? "var(--bull)" : "var(--bear)",
+        }}>
+          SET T+5 {forecastDir >= 0 ? "+" : ""}{forecastDir.toFixed(1)}%
+        </span>
+      )}
+    </div>
+  );
+}
+
 // ─── Single market card ───────────────────────────────────────────
 
 function MarketCard({
   market,
   quote,
   ytdPoints,
+  foreignFlow,
 }: {
   market: MarketDef;
   quote: YahooQuote | undefined;
   ytdPoints: HistoryPoint[];
+  foreignFlow?: { d5: number; d20: number };
 }) {
   const todayColor = quote
     ? quote.changePct >= 0 ? "var(--bull)" : "var(--bear)"
@@ -225,7 +275,8 @@ function MarketCard({
         gap: 3,
         background: "var(--bg)",
         transition: "background 0.12s",
-        minHeight: 44, // tap target floor
+        minHeight: 44,
+        scrollSnapAlign: "start",
       }}
       onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "var(--bg-raised)"; }}
       onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "var(--bg)"; }}
@@ -347,6 +398,28 @@ function MarketCard({
           <ConstituentRow key={c.symbol} symbol={c.symbol} label={c.label} />
         ))}
       </div>
+
+      {/* Foreign flow — SET only */}
+      {foreignFlow && market.symbol === "^SET.BK" && (
+        <>
+          <div style={{ borderTop: "1px solid var(--line-dim)", margin: "3px 0" }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <span className="t-micro" style={{ color: "var(--muted)", letterSpacing: "0.08em" }}>FOREIGN FLOW</span>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: "var(--dim)" }}>5D</span>
+              <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: foreignFlow.d5 >= 0 ? "var(--bull)" : "var(--bear)" }}>
+                {foreignFlow.d5 >= 0 ? "+" : ""}{foreignFlow.d5.toLocaleString()}M
+              </span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: "var(--dim)" }}>20D</span>
+              <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: foreignFlow.d20 >= 0 ? "var(--bull)" : "var(--bear)" }}>
+                {foreignFlow.d20 >= 0 ? "+" : ""}{foreignFlow.d20.toLocaleString()}M
+              </span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -356,10 +429,10 @@ function MarketCard({
 interface Props {
   quotes?: YahooQuote[];
   histories?: Record<string, HistoryPoint[]>;
+  foreignFlow?: { d5: number; d20: number };
 }
 
-export function MarketColumns({ quotes = [], histories = {} }: Props) {
-  // Jan 1 of current year in milliseconds (HistoryPoint.t is ms)
+export function MarketColumns({ quotes = [], histories = {}, foreignFlow }: Props) {
   const JAN1_MS = useMemo(
     () => new Date(`${new Date().getFullYear()}-01-01T00:00:00Z`).getTime(),
     [],
@@ -371,16 +444,22 @@ export function MarketColumns({ quotes = [], histories = {} }: Props) {
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "4px 10px",
+          flexDirection: "column",
+          gap: 3,
+          padding: "5px 10px",
           borderBottom: "1px solid var(--line-dim)",
           flexShrink: 0,
         }}
       >
-        <span className="t-micro" style={{ color: "var(--muted)", letterSpacing: "0.14em" }}>
-          MAJOR MARKETS · YTD
-        </span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span className="t-micro" style={{ color: "var(--muted)", letterSpacing: "0.14em" }}>
+            MAJOR MARKETS · YTD
+          </span>
+          <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: "var(--dim)" }}>
+            ← SWIPE →
+          </span>
+        </div>
+        <IntelligenceStrip setQuote={quotes.find(q => q.symbol === "^SET.BK")} />
       </div>
 
       {/* Horizontal scroll strip */}
@@ -392,6 +471,7 @@ export function MarketColumns({ quotes = [], histories = {} }: Props) {
           overflowY: "hidden",
           display: "flex",
           alignItems: "stretch",
+          scrollSnapType: "x mandatory",
           WebkitOverflowScrolling: "touch" as React.CSSProperties["WebkitOverflowScrolling"],
         }}
       >
@@ -405,6 +485,7 @@ export function MarketColumns({ quotes = [], histories = {} }: Props) {
               market={m}
               quote={quote}
               ytdPoints={ytdPoints}
+              foreignFlow={m.symbol === "^SET.BK" ? foreignFlow : undefined}
             />
           );
         })}

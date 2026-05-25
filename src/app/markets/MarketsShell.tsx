@@ -74,8 +74,14 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
               badge: "WORLD",
               content: (
                 <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                  <style>{`
+                    @media (max-width: 767px) {
+                      .market-map-top { flex: 0 0 0px !important; overflow: hidden !important; padding: 0 !important; }
+                      .market-map-bottom { flex: 1 !important; border-top: none !important; }
+                    }
+                  `}</style>
                   {/* Top: split-panel world map */}
-                  <div style={{ flex: 1.1, minHeight: 0, display: "flex", flexDirection: "column", padding: "6px 10px 0", overflow: "hidden" }}>
+                  <div className="market-map-top" style={{ flex: 1.1, minHeight: 0, display: "flex", flexDirection: "column", padding: "6px 10px 0", overflow: "hidden" }}>
                     <WorldMarketsMap
                       quotes={[
                         ...regional.thai,
@@ -89,7 +95,7 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
                     />
                   </div>
                   {/* Bottom: major market columns */}
-                  <div style={{ flex: 0.9, minHeight: 0, borderTop: "1px solid var(--line)", overflow: "hidden" }}>
+                  <div className="market-map-bottom" style={{ flex: 0.9, minHeight: 0, borderTop: "1px solid var(--line)", overflow: "hidden" }}>
                     <MarketColumns
                       quotes={[
                         ...regional.thai,
@@ -99,6 +105,7 @@ export function MarketsShell({ regional, assets, macro, events, us10y, us2y, his
                         ...assets,
                       ]}
                       histories={histories}
+                      foreignFlow={foreignFlow}
                     />
                   </div>
                 </div>
