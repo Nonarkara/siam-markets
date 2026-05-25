@@ -53,7 +53,11 @@ export function MarketColumns({ quotes = [] }: Props) {
       const price = q?.price ?? 0;
       const change = q?.changePct ?? (Math.random() * 3 - 1.5);
       const history = generateOHLC(m.symbol, 65, price || 4000).map(d => d.close);
-      return { ...m, price, change, history };
+      const sessionSlice = history.slice(-10);
+      const dayHigh = Math.max(...sessionSlice);
+      const dayLow = Math.min(...sessionSlice);
+      const pts = price * change / 100;
+      return { ...m, price, change, history, dayHigh, dayLow, pts };
     });
   }, [quotes]);
 
@@ -94,6 +98,19 @@ export function MarketColumns({ quotes = [] }: Props) {
               <span className="t-mono" style={{ fontSize: "0.5625rem", color }}>
                 {m.change >= 0 ? "+" : ""}{m.change.toFixed(2)}%
               </span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 4 }}>
+                <span className="t-mono" style={{ fontSize: "0.5rem", color }}>
+                  {m.pts >= 0 ? "+" : ""}{m.pts.toLocaleString(undefined, { maximumFractionDigits: 1 })} pts
+                </span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <span className="t-mono" style={{ fontSize: "0.4375rem", color: "var(--dim)" }}>
+                    H&nbsp;{m.dayHigh.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  </span>
+                  <span className="t-mono" style={{ fontSize: "0.4375rem", color: "var(--dim)" }}>
+                    L&nbsp;{m.dayLow.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+              </div>
               <div style={{ marginTop: "auto" }}>
                 <MiniSparkline data={m.history} color={color} />
               </div>
