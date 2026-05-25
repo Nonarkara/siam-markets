@@ -46,7 +46,7 @@ interface BucketAlloc {
 const GFAP_SLICES = [
   { key: "intl_bond",  label: "Intl Bonds",       pct: 33.2, color: "#4a8aff" },
   { key: "us_bond",    label: "US Bonds",          pct: 23.6, color: "#7ab0ff" },
-  { key: "intl_eq",    label: "Intl Equities",     pct: 25.6, color: "#00c896" },
+  { key: "intl_eq",    label: "Intl Equities",     pct: 25.6, color: "var(--bull)" },
   { key: "us_eq",      label: "US Equities",       pct: 17.6, color: "#00a07a" },
 ];
 
@@ -119,7 +119,7 @@ function calcBuckets(ageYears: number, goalYears: number, incomeStability: numbe
       role:  "7–15 year goals",
       horizon: "7–15 yrs",
       pct:   norm(balanced),
-      color: "#ffd000",
+      color: "var(--braun-yellow, #ffd000)",
       thaiInstruments: ["Balanced RMF", "Thai ESG balanced", "Multi-asset fund"],
       thaiFunds:       ["KFGBTHAIESG-A", "Balanced RMF from any major AMC"],
       why:   "Full market cycle exposure with bond ballast. Drawdowns are smaller — you're more likely to stay invested.",
@@ -129,7 +129,7 @@ function calcBuckets(ageYears: number, goalYears: number, incomeStability: numbe
       role:  "15+ year wealth compounding",
       horizon: "15+ yrs",
       pct:   norm(equity),
-      color: "#00c896",
+      color: "var(--bull)",
       thaiInstruments: ["SSF global equity", "RMF equity (SET50 + global)", "FIF tech/semi"],
       thaiFunds:       ["SCBSEMI(A)", "KFGTECHRMF", "K-USA-A", "SCBS&P500(A)"],
       why:   "Time absorbs volatility. 70% global / 30% Thai domestic splits corrects ThaiESG home-country bias.",
@@ -324,7 +324,7 @@ export function PerfectPortfolio() {
                       fontSize: "0.75rem",
                       fontWeight: 700,
                       cursor: "pointer",
-                      minHeight: 36,
+                      minHeight: 44,
                     }}
                   >
                     {v}

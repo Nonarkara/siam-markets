@@ -36,6 +36,12 @@ export function GDPGrowthChart({ data, height = 240 }: Props) {
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
 
+    // Resolve design tokens for Chart.js (can't use CSS vars directly)
+    const cssVars = getComputedStyle(document.documentElement);
+    const bull    = cssVars.getPropertyValue("--bull").trim()    || "#00c896";
+    const bear    = cssVars.getPropertyValue("--bear").trim()    || "#ff5c53";
+    const caution = cssVars.getPropertyValue("--caution").trim() || "#ff9500";
+
     // Build gradient fill above/below zero
     const labels = data.map(d => d.year.toString());
     const values = data.map(d => d.growthPct ?? 0);
@@ -47,8 +53,9 @@ export function GDPGrowthChart({ data, height = 240 }: Props) {
         const { ctx, chartArea, scales } = chart;
         if (!chartArea || !scales.x) return;
         ctx.save();
-        ctx.strokeStyle = "rgba(255, 149, 0, 0.35)";
-        ctx.fillStyle   = "rgba(255, 149, 0, 0.85)";
+        // 8-char hex: last 2 digits = alpha (0x59≈35%, 0xd9≈85%)
+        ctx.strokeStyle = caution + "59";
+        ctx.fillStyle   = caution + "d9";
         ctx.font        = "9px 'IBM Plex Mono', monospace";
         ctx.setLineDash([3, 3]);
 
@@ -68,10 +75,10 @@ export function GDPGrowthChart({ data, height = 240 }: Props) {
     const datasets: ChartDataset<"line">[] = [{
       label: "GDP Growth %",
       data: values,
-      borderColor: "#00c896",
+      borderColor: bull,
       backgroundColor: (ctxPoint) => {
         const v = ctxPoint.parsed?.y ?? 0;
-        return v < 0 ? "rgba(255, 59, 48, 0.18)" : "rgba(0, 200, 150, 0.14)";
+        return v < 0 ? bear + "2e" : bull + "24";
       },
       borderWidth: 1.8,
       pointRadius: (ctxPoint) => {
@@ -80,14 +87,14 @@ export function GDPGrowthChart({ data, height = 240 }: Props) {
       },
       pointBackgroundColor: (ctxPoint) => {
         const v = ctxPoint.parsed?.y ?? 0;
-        return v < 0 ? "#ff3b30" : "#00c896";
+        return v < 0 ? bear : bull;
       },
       fill: true,
       tension: 0,
       segment: {
         borderColor: ctxSeg => {
           const v = ctxSeg.p1.parsed?.y ?? 0;
-          return v < 0 ? "#ff3b30" : "#00c896";
+          return v < 0 ? bear : bull;
         },
       },
     }];

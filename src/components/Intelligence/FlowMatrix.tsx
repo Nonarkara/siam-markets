@@ -12,17 +12,17 @@ interface Props {
 }
 
 const labelColors: Record<string, string> = {
-  "INFLOW": "#00f0ff",
-  "OUTFLOW": "#ff3b6f",
+  "INFLOW": "var(--tech)",
+  "OUTFLOW": "var(--bear)",
   "NEUTRAL": "var(--dim)",
-  "ROTATION IN": "#00f0ff",
-  "ROTATION OUT": "#ff3b6f",
+  "ROTATION IN": "var(--tech)",
+  "ROTATION OUT": "var(--bear)",
   "STABLE": "var(--dim)",
-  "RISK-ON": "#00f0ff",
-  "RISK-OFF": "#f59e0b",
+  "RISK-ON": "var(--tech)",
+  "RISK-OFF": "var(--caution)",
   "BALANCED": "var(--dim)",
-  "LEADING UP": "#00f0ff",
-  "LEADING DOWN": "#ff3b6f",
+  "LEADING UP": "var(--tech)",
+  "LEADING DOWN": "var(--bear)",
   "DECOUPLED": "var(--caution)",
 };
 
@@ -90,7 +90,6 @@ export function FlowMatrix({ flows }: Props) {
                 bottom: 0,
                 background: color,
                 opacity: 0.7,
-                boxShadow: `0 0 6px ${color}40`,
               }} />
               <div style={{
                 position: "absolute",

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function PatternResonance({ bestMatch, similarity, allMatches }: Props) {
-  const barColor = similarity > 70 ? "#00f0ff" : similarity > 45 ? "#f59e0b" : "#ff3b6f";
+  const barColor = similarity > 70 ? "var(--tech)" : similarity > 45 ? "var(--caution)" : "var(--bear)";
 
   return (
     <div>
@@ -31,7 +31,6 @@ export function PatternResonance({ bestMatch, similarity, allMatches }: Props) {
             fontSize: "1.25rem",
             fontWeight: 700,
             color: barColor,
-            textShadow: `0 0 10px ${barColor}40`,
           }}>
             {similarity}%
           </span>
@@ -45,8 +44,7 @@ export function PatternResonance({ bestMatch, similarity, allMatches }: Props) {
           <div style={{
             height: "100%",
             width: `${similarity}%`,
-            background: `linear-gradient(90deg, ${barColor}80, ${barColor})`,
-            boxShadow: `0 0 8px ${barColor}60`,
+            background: barColor,
             transition: "width 1s cubic-bezier(0.23,1,0.32,1)",
           }} />
         </div>

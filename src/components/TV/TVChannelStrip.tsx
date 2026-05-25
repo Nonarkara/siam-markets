@@ -7,8 +7,8 @@ const STRIP_CHANNELS = [
   { name: "Yahoo Finance", flag: "🇺🇸", lang: "EN", color: "var(--bull)"    },
   { name: "Reuters",       flag: "🌐",  lang: "EN", color: "var(--caution)" },
   { name: "CGTN Biz",      flag: "🇨🇳", lang: "EN", color: "var(--bear)"    },
-  { name: "Money Ch.",     flag: "🇹🇭", lang: "TH", color: "#FFD700"        },
-  { name: "TNN Thai",      flag: "🇹🇭", lang: "TH", color: "#FFD700"        },
+  { name: "Money Ch.",     flag: "🇹🇭", lang: "TH", color: "var(--braun-yellow, #ffd000)"        },
+  { name: "TNN Thai",      flag: "🇹🇭", lang: "TH", color: "var(--braun-yellow, #ffd000)"        },
 ];
 
 export function TVChannelStrip() {

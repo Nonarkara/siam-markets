@@ -396,10 +396,10 @@ function ScopeChip({ scope }: { scope: FundScope }) {
 
 function RiskChip({ level }: { level: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 }) {
   const color =
-    level <= 2 ? "#1f8a3b" :
-    level <= 4 ? "#f2c200" :
-    level <= 6 ? "#ff7a30" :
-    "#c41e1e";
+    level <= 2 ? "var(--bull)" :
+    level <= 4 ? "var(--caution)" :
+    level <= 6 ? "var(--caution)" :
+    "var(--bear)";
   return (
     <span
       title={`Risk ${level} · ${RISK_LABEL[level]}`}

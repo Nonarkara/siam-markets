@@ -60,15 +60,16 @@ const STATIC_CORRELATIONS: AssetCorrelation[] = [
 
 function corrColor(corr: number): string {
   const abs = Math.abs(corr);
-  if (abs >= 0.6) return corr > 0 ? "rgba(0,200,150,0.7)" : "rgba(255,59,48,0.7)";
-  if (abs >= 0.4) return corr > 0 ? "rgba(0,200,150,0.45)" : "rgba(255,59,48,0.45)";
-  if (abs >= 0.2) return corr > 0 ? "rgba(0,200,150,0.2)" : "rgba(255,59,48,0.2)";
+  const dir = corr > 0 ? "var(--bull)" : "var(--bear)";
+  if (abs >= 0.6) return `color-mix(in srgb, ${dir} 70%, transparent)`;
+  if (abs >= 0.4) return `color-mix(in srgb, ${dir} 45%, transparent)`;
+  if (abs >= 0.2) return `color-mix(in srgb, ${dir} 20%, transparent)`;
   return "var(--bg-surface)";
 }
 
 function corrTextColor(corr: number): string {
   const abs = Math.abs(corr);
-  if (abs >= 0.4) return "#000000";
+  if (abs >= 0.4) return "var(--bg)";
   return corr > 0 ? "var(--bull)" : "var(--bear)";
 }
 

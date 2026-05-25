@@ -234,13 +234,6 @@ export function TerminalChart({ data, height = 220, showVolume = false, title, s
       position: "relative",
       overflow: "hidden",
     }}>
-      {/* Scanline overlay */}
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px)",
-        pointerEvents: "none",
-        zIndex: 3,
-      }} />
 
       {/* Terminal header */}
       <div style={{

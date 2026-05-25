@@ -869,7 +869,7 @@ function FlightOverlay({
           const isUS   = f.flag === "🇺🇸";
           const isCN   = f.flag === "🇨🇳";
           const isHome = f.flag === "🇹🇭";
-          const color  = isUS ? "#4a8aff" : isCN ? "var(--bear)" : isHome ? "var(--braun-yellow, #ffd000)" : "var(--caution)";
+          const color  = isUS ? "var(--tech)" : isCN ? "var(--bear)" : isHome ? "var(--braun-yellow, #ffd000)" : "var(--caution)";
           const isHovered = hover?.icao24 === f.icao24;
 
           // Triangle pointing in direction of travel

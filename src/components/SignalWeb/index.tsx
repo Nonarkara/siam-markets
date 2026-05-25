@@ -13,10 +13,10 @@ const TRADER_TABS: { key: Trader; label: string; sub: string }[] = [
 ]
 
 const CAT_LEGEND = [
-  { color: '#007aff', label: 'MACRO' },
-  { color: '#888884', label: 'MARKET' },
-  { color: '#ff9500', label: 'FLOW' },
-  { color: '#00c896', label: 'THAI' },
+  { color: 'var(--tech)',    label: 'MACRO' },
+  { color: 'var(--muted)',   label: 'MARKET' },
+  { color: 'var(--caution)', label: 'FLOW' },
+  { color: 'var(--bull)',    label: 'THAI' },
 ]
 
 function computeRegimeColor(trader: Trader): string {
@@ -119,7 +119,7 @@ export function SignalWeb() {
               <span style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: 10,
-                color: active ? 'var(--dim)' : '#2e2e2a',
+                color: active ? 'var(--dim)' : 'var(--dim)',
               }}>{tab.sub}</span>
             </button>
           )
@@ -150,7 +150,7 @@ export function SignalWeb() {
               </span>
             ))}
             <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}>
-              <span style={{ width: 20, height: 1, borderTop: '1px dashed #ffd000', opacity: 0.7 }} />
+              <span style={{ width: 20, height: 1, borderTop: '1px dashed var(--braun-yellow, #ffd000)', opacity: 0.7 }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--dim)' }}>ACTIVE CHAIN</span>
             </span>
           </div>

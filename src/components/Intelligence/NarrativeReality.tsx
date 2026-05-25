@@ -58,12 +58,6 @@ export function NarrativeReality({
               background: narrativeTone < -2 ? "var(--bear)" : narrativeTone > 2 ? "var(--bull)" : "var(--caution)",
               transform: "translateX(-50%)",
             }} />
-            <div style={{
-              position: "absolute",
-              left: 0, right: 0, top: 0, bottom: 0,
-              background: `linear-gradient(90deg, var(--bear) 0%, var(--caution) 50%, var(--bull) 100%)`,
-              opacity: 0.2,
-            }} />
           </div>
           <div style={{
             display: "flex",
@@ -115,7 +109,6 @@ export function NarrativeReality({
           fontWeight: 700,
           color: verdictColor,
           letterSpacing: "0.08em",
-          textShadow: `0 0 8px ${verdictColor}40`,
         }}>
           {vd.label}
         </span>

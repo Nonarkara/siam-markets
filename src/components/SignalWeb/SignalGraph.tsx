@@ -5,12 +5,12 @@ import type { Trader } from './types'
 import { SIGNALS, EDGES, ACTIVE_THRESHOLD } from './data'
 
 const CAT_COLOR: Record<string, string> = {
-  macro:  '#007aff',
-  market: '#888884',
-  flow:   '#ff9500',
-  thai:   '#00c896',
+  macro:  'var(--tech)',
+  market: 'var(--muted)',
+  flow:   'var(--caution)',
+  thai:   'var(--bull)',
 }
-const AMBER = '#ffd000'
+const AMBER = 'var(--braun-yellow, #ffd000)'
 
 function isActive(value: number) { return Math.abs(value) >= ACTIVE_THRESHOLD }
 
@@ -64,9 +64,9 @@ export function SignalGraph({ trader, selectedSignal, onSelect }: Props) {
   }
 
   function edgeStroke(edgeFrom: string, edgeTo: string, active: boolean): string {
-    if (!focus) return active ? AMBER : '#2a2a2a'
+    if (!focus) return active ? AMBER : 'var(--line)'
     const bothConnected = connectedIds?.has(edgeFrom) && connectedIds?.has(edgeTo)
-    return bothConnected ? AMBER : '#1a1a1a'
+    return bothConnected ? AMBER : 'var(--bg-raised)'
   }
 
   function edgeOpacity(edgeFrom: string, edgeTo: string): number {
@@ -98,12 +98,12 @@ export function SignalGraph({ trader, selectedSignal, onSelect }: Props) {
           <g key={layer.label}>
             <text
               x={4} y={layer.textY}
-              fill="#3a3a36"
+              fill="var(--dim)"
               fontFamily="IBM Plex Mono, monospace"
               fontSize={7.5}
               letterSpacing={1.4}
             >{layer.label}</text>
-            <line x1={0} y1={layer.lineY} x2={760} y2={layer.lineY} stroke="#1f1f1f" strokeWidth={1} />
+            <line x1={0} y1={layer.lineY} x2={760} y2={layer.lineY} stroke="var(--line-dim)" strokeWidth={1} />
           </g>
         ))}
 
@@ -136,7 +136,7 @@ export function SignalGraph({ trader, selectedSignal, onSelect }: Props) {
           const active   = isActive(sig.value)
           const bull     = sig.value > 0
           const catColor = CAT_COLOR[sig.category]
-          const sigColor = active ? (bull ? '#00c896' : '#ff3b30') : catColor
+          const sigColor = active ? (bull ? 'var(--bull)' : 'var(--bear)') : catColor
           const isFocus  = focus === sig.id
           const opacity  = nodeOpacity(sig.id, sig.traders)
           const labelBelow = sig.y > 380
@@ -174,7 +174,8 @@ export function SignalGraph({ trader, selectedSignal, onSelect }: Props) {
               {/* Node body */}
               <circle
                 r={6}
-                fill={isFocus ? `${AMBER}28` : active ? `${sigColor}20` : `${catColor}14`}
+                fill={isFocus ? AMBER : active ? sigColor : catColor}
+                fillOpacity={isFocus ? 0.16 : active ? 0.13 : 0.08}
                 stroke={isFocus ? AMBER : sigColor}
                 strokeWidth={isFocus ? 1.5 : 1}
               />
@@ -186,7 +187,7 @@ export function SignalGraph({ trader, selectedSignal, onSelect }: Props) {
               <text
                 y={labelBelow ? 20 : -13}
                 textAnchor="middle"
-                fill={isFocus ? AMBER : active ? sigColor : '#5a5a56'}
+                fill={isFocus ? AMBER : active ? sigColor : 'var(--dim)'}
                 fontFamily="IBM Plex Mono, monospace"
                 fontSize={9}
                 fontWeight={active ? 600 : 400}
@@ -198,7 +199,8 @@ export function SignalGraph({ trader, selectedSignal, onSelect }: Props) {
               <text
                 y={labelBelow ? 30 : -3}
                 textAnchor="middle"
-                fill={isFocus ? `${AMBER}bb` : active ? `${sigColor}99` : '#2e2e2a'}
+                fill={isFocus ? AMBER : active ? sigColor : 'var(--bg-hover)'}
+                fillOpacity={isFocus ? 0.73 : active ? 0.6 : 1}
                 fontFamily="IBM Plex Mono, monospace"
                 fontSize={7.5}
                 style={{ pointerEvents: 'none' }}

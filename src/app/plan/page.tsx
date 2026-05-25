@@ -376,7 +376,7 @@ export default function PlanPage() {
           <AllocRow
             label="SSF (Super Savings Fund)"
             sub="Tax deduction · More flexible · ~5% return"
-            color="#8e8e93"
+            color="var(--muted)"
             value={alloc.ssf}
             onChange={(v) => autoBalance("ssf", v)}
             tag="Low-hanging fruit"

@@ -33,16 +33,16 @@ const SECTOR_COLOR: Record<string, string> = {
   "Logistics / Shipping (WHA, WHART)":      "var(--tech)",
   "Industrial / Tech (DELTA, WHA, AMATA)":  "var(--bull)",
   "Agriculture (Thai sugar, rubber export prices)": "var(--caution)",
-  "Real Estate (CPN, LH, SPALI, MAJOR)":    "#a0a0ff",
-  "Renewable Energy (GULF, BGRIM, RATCH, GPSC)": "#ffd000",
-  "Hydropower (RATCH, EGCO, CKP)":          "#00b8ff",
+  "Real Estate (CPN, LH, SPALI, MAJOR)":    "var(--tech)",
+  "Renewable Energy (GULF, BGRIM, RATCH, GPSC)": "var(--braun-yellow, #ffd000)",
+  "Hydropower (RATCH, EGCO, CKP)":          "var(--tech)",
 };
 
 function freshnessBadge(daysOld: number | null): { label: string; color: string } {
   if (daysOld === null)  return { label: "NO DATA",    color: "var(--dim)" };
   if (daysOld <= 5)      return { label: "FRESH",      color: "var(--bull)" };
   if (daysOld <= 12)     return { label: "RECENT",     color: "var(--caution)" };
-  if (daysOld <= 20)     return { label: "AGING",      color: "#ff7a30" };
+  if (daysOld <= 20)     return { label: "AGING",      color: "var(--caution)" };
   return                        { label: "STALE",      color: "var(--bear)" };
 }
 

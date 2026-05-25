@@ -46,10 +46,10 @@ const ROLE_LABEL: Record<GlobalAIQuote["role"], string> = {
 const ROLE_COLOR: Record<GlobalAIQuote["role"], string> = {
   chips:    "var(--bear)",
   model:    "var(--tech)",
-  cloud:    "#a78bfa",
+  cloud:    "var(--tech)",
   platform: "var(--bull)",
   infra:    "var(--caution)",
-  foundry:  "#06b6d4",
+  foundry:  "var(--tech)",
 };
 
 export function DigitalEconomyPanel({ kpis, thaiStack, globalAi, markets }: Props) {
@@ -71,7 +71,7 @@ export function DigitalEconomyPanel({ kpis, thaiStack, globalAi, markets }: Prop
         alignItems: "center",
         padding: "10px 16px",
         borderBottom: "1px solid var(--line)",
-        background: "linear-gradient(90deg, rgba(167,139,250,0.06), transparent 60%, rgba(0,212,255,0.06))",
+        background: "var(--bg-raised)",
       }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
           <span style={{ fontSize: "1.1rem" }}>⚡</span>

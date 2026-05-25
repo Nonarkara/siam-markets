@@ -50,20 +50,11 @@ function NoSignalCard({ ch, reason }: { ch: TVChannel; reason: "offline" | "embe
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "#050508",
+        background: "var(--bg)",
         gap: 10,
         padding: 16,
       }}
     >
-      {/* Animated scan-line texture — pure CSS, no images */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.013) 3px, rgba(255,255,255,0.013) 4px)",
-          pointerEvents: "none",
-        }}
-      />
 
       <div
         style={{

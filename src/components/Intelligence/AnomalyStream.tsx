@@ -16,9 +16,9 @@ interface Props {
 }
 
 const severityConfig = {
-  critical: { color: "#ff3b6f", bg: "rgba(255,59,111,0.08)", label: "CRITICAL" },
-  warning: { color: "#f59e0b", bg: "rgba(245,158,11,0.08)", label: "WARNING" },
-  notice: { color: "#00f0ff", bg: "rgba(0,240,255,0.06)", label: "NOTICE" },
+  critical: { color: "var(--bear)", bg: "var(--bear-10)", label: "CRITICAL" },
+  warning: { color: "var(--caution)", bg: "var(--caution-10)", label: "WARNING" },
+  notice: { color: "var(--tech)", bg: "var(--tech-10)", label: "NOTICE" },
 };
 
 export function AnomalyStream({ anomalies }: Props) {

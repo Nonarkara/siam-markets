@@ -66,7 +66,7 @@ export function ThailandPanel({ gdpHistory, profile, sectors, rankings }: Props)
         alignItems: "center",
         padding: "10px 16px",
         borderBottom: "1px solid var(--line)",
-        background: "linear-gradient(90deg, rgba(0,200,150,0.04), transparent 50%, rgba(255,149,0,0.04))",
+        background: "var(--bg-raised)",
       }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
           <span style={{ fontSize: "1.2rem" }}>🇹🇭</span>
@@ -139,7 +139,7 @@ export function ThailandPanel({ gdpHistory, profile, sectors, rankings }: Props)
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                minHeight: 40,
+                minHeight: 44,
               }}
             >
               <span>{s.emoji}</span>

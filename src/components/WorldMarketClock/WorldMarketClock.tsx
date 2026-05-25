@@ -47,12 +47,12 @@ function vibeOf(pct: number): Vibe {
 }
 
 const VIBE_COLOR: Record<Vibe, string> = {
-  euphoria: "#00c896",
-  bullish:  "#00c896",
-  cautious: "#ffd000",
-  bearish:  "#ff7a6e",
-  panic:    "#ff3b30",
-  closed:   "rgba(255,255,255,0.35)",
+  euphoria: "var(--bull)",
+  bullish:  "var(--bull)",
+  cautious: "var(--braun-yellow, #ffd000)",
+  bearish:  "var(--bear)",
+  panic:    "var(--bear)",
+  closed:   "var(--dim)",
 };
 
 // 9 anchor centers, ordered west → east (NY → Sydney)
@@ -103,7 +103,7 @@ export function WorldMarketClock({ centers }: Props) {
       style={{
         display: "flex",
         alignItems: "stretch",
-        background: "#0a0a0a",
+        background: "var(--bg)",
         borderBottom: "1px solid rgba(255,255,255,0.08)",
         height: 56,
         overflowX: "auto",
