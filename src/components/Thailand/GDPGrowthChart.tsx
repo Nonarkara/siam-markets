@@ -38,9 +38,9 @@ export function GDPGrowthChart({ data, height = 240 }: Props) {
 
     // Resolve design tokens for Chart.js (can't use CSS vars directly)
     const cssVars = getComputedStyle(document.documentElement);
-    const bull    = cssVars.getPropertyValue("--bull").trim()    || "#00c896";
-    const bear    = cssVars.getPropertyValue("--bear").trim()    || "#ff5c53";
-    const caution = cssVars.getPropertyValue("--caution").trim() || "#ff9500";
+    const bull    = cssVars.getPropertyValue("--bull").trim()    || "#00ff88";
+    const bear    = cssVars.getPropertyValue("--bear").trim()    || "#ff2d55";
+    const caution = cssVars.getPropertyValue("--caution").trim() || "#ffd60a";
 
     // Build gradient fill above/below zero
     const labels = data.map(d => d.year.toString());

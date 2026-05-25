@@ -1,52 +1,54 @@
 @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Josefin+Sans:wght@300;400;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
-/* ─── Design Tokens · Pitch Black · Terminal Intelligence ─────────────
-   Pure void background. Electric signal palette. Cool blue-gray type.
-   AKIRA / Ghost in the Shell register — density is clarity, not noise.
+/* ─── Design Tokens · Deep Space Terminal ─────────────────────────────
+   Void black floor. Indigo-tinted panels. Cold blue-white text.
+   Electric signals. Single warm accent. AKIRA / mission-control register.
+   Surfaces carry barely-perceptible deep space undertone — not gray,
+   not colored, just the pressure of deep sky pressing up from below.
 ─────────────────────────────────────────────────────────────────── */
 :root {
-  /* Surfaces — pitch black with barely-there depth layers */
-  --bg:          #000000;
-  --bg-raised:   #090909;
-  --bg-surface:  #0f0f0f;
-  --bg-hover:    #161616;
-  --bg-glass:    #0f0f0f;
+  /* Surfaces — void floor, indigo depth stack */
+  --bg:          #000005;          /* near-pure void — 0.2% indigo to kill LCD flatness */
+  --bg-raised:   #03091a;          /* deep space panel — barely-there indigo */
+  --bg-surface:  #071428;          /* dark space — clearly a surface now */
+  --bg-hover:    #0d1e38;          /* navy on hover — strong directional cue */
+  --bg-glass:    #071428;
 
-  /* Type — cool white, not warm ivory */
-  --ink:    #e6edf3;
-  --muted:  #8892a4;
-  --dim:    #4a5568;
+  /* Type — cold blue-white. Clinical precision, not warm editorial */
+  --ink:    #f0f7ff;               /* near-white with cold blue cast */
+  --muted:  #6e82a0;               /* steel blue-gray */
+  --dim:    #3a4f6e;               /* deep navy-gray — almost invisible */
 
-  /* Borders — dark navy hairline (adds depth without warming the surface) */
-  --line:     #1e2430;
-  --line-dim: #0f1420;
+  /* Borders — navy structure lines, visible but not loud */
+  --line:     #142a4a;             /* dark navy — reads as structure, not noise */
+  --line-dim: #081828;             /* ghost line — secondary dividers only */
 
-  /* Signal palette — electric, never muddy */
-  --bull:    #00e676;              /* gain — electric green */
-  --bear:    #ff1744;              /* loss — electric red */
-  --caution: #ffab00;              /* watch — electric amber */
-  --tech:    #00b0ff;              /* UI chrome — electric sky */
-  --violet:  #7c84ff;              /* secondary accent */
+  /* Signal palette — full electric. No mud allowed. */
+  --bull:    #00ff88;              /* gain — full-saturation electric green */
+  --bear:    #ff2d55;              /* loss — iOS red, maximally legible */
+  --caution: #ffd60a;              /* watch — iOS 15 yellow, electric */
+  --tech:    #00b4ff;              /* UI chrome — electric sky blue */
+  --violet:  #7c84ff;              /* AI / intelligence accent */
 
-  /* Heritage accent — Braun travel-clock yellow.
-     Use SPARINGLY: noon line, single emphasis dot. Never as a fill. */
+  /* Heritage accent — the ONE warm note in a cold space.
+     Braun travel-clock yellow. SPARINGLY: noon line, single dot only. */
   --braun-yellow: #ffe000;
   --braun-orange: #ff6900;
 
-  /* Glow tokens — kept as transparent no-ops so legacy selectors don't break. */
+  /* Glow tokens — transparent no-ops. No element emits glow. */
   --bull-glow:    transparent;
   --bear-glow:    transparent;
   --tech-glow:    transparent;
   --caution-glow: transparent;
 
-  /* Tinted backgrounds — used for row highlights */
-  --bull-10:    rgba(0, 230, 118, 0.10);
-  --bull-20:    rgba(0, 230, 118, 0.18);
-  --bear-10:    rgba(255, 23, 68, 0.10);
-  --bear-20:    rgba(255, 23, 68, 0.18);
-  --caution-10: rgba(255, 171, 0, 0.10);
-  --tech-10:    rgba(0, 176, 255, 0.10);
+  /* Tinted backgrounds — row highlights, alert trays */
+  --bull-10:    rgba(0, 255, 136, 0.08);
+  --bull-20:    rgba(0, 255, 136, 0.16);
+  --bear-10:    rgba(255, 45, 85, 0.08);
+  --bear-20:    rgba(255, 45, 85, 0.16);
+  --caution-10: rgba(255, 214, 10, 0.08);
+  --tech-10:    rgba(0, 180, 255, 0.08);
 
   /* Typography scale — three sizes only (§11.7) */
   --text-display: 2rem;            /* 32px */
@@ -64,8 +66,8 @@
   /* Wayfinding accent — amber as primary nav indicator (Braun = key principle).
      Distinct from --caution (warning signal) and --braun-yellow (sparing accent). */
   --amber-nav:    #ffd000;
-  /* Atmospheric surface — Wong Kar-wai night register. Deeper than --bg. */
-  --night:        #0a0c12;
+  /* Atmospheric surface — deepest void, below --bg. Used for immersive panels. */
+  --night:        #00000a;
   /* Brand identity anchor — Leica red dot / hinomaru. NOT a signal color.
      Use only for wordmark identity. Never for bull/bear state. */
   --red-anchor:   #e8002d;
