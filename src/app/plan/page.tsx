@@ -1,1194 +1,1094 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { fmtThb } from "@/lib/format";
 import { DigitalBeaver } from "@/components/Mascot/DigitalBeaver";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// Plan page — narrative finance journey
+// 7 chapters · Kiyosaki tone · Dalio-driven projection · 3-bucket builder
+// All copy is honest about what this is and is not (illustrative, not advice).
+// ═══════════════════════════════════════════════════════════════════════════════
 
-const MONTHS   = 12;
-const RETIRE   = 60;
-const LIFE_EXP = 80;
+// ─── Thailand reference constants ────────────────────────────────────────────
 
-// ─── Investment styles ────────────────────────────────────────────────────────
+const TH_LIFE_EXPECTANCY              = 78;       // World Bank 2023
+const TH_RETIRE_AGE                   = 60;
+const TH_MIDDLE_CLASS_BASELINE        = 18_000;   // NESDC 2024, THB/mo
+const TH_MEDIAN_SAVINGS_AT_RETIREMENT = 350_000;  // BoT 2023 survey, THB (referenced in copy)
 
-const STYLES = {
-  safe: {
-    en: "SAFE",     th: "ปลอดภัย",  zh: "稳健",
-    descEN: "Savings + gov bonds. Zero volatility.",
-    descTH: "ออมทรัพย์ + พันธบัตร ไม่ผันผวน",
-    descZH: "储蓄+国债，零波动。",
-    riskEN: "LOW",      riskTH: "ต่ำ",       riskZH: "低",
-    ret: 0.04, color: "var(--tech)",
-  },
-  balanced: {
-    en: "BALANCED", th: "สมดุล",     zh: "均衡",
-    descEN: "Mutual funds + bonds. Rational default.",
-    descTH: "กองทุนรวม + พันธบัตร สมเหตุสมผล",
-    descZH: "公募基金+债券，理性之选。",
-    riskEN: "MEDIUM",   riskTH: "กลาง",      riskZH: "中",
-    ret: 0.07, color: "var(--bull)",
-  },
-  growth: {
-    en: "GROWTH",   th: "เติบโต",    zh: "成长",
-    descEN: "RMF / ThaiESG + equities. Long horizon.",
-    descTH: "RMF / ThaiESG + หุ้น ต้องการระยะยาว",
-    descZH: "RMF/ThaiESG+股票，需长期视野。",
-    riskEN: "HIGH",     riskTH: "สูง",        riskZH: "高",
-    ret: 0.10, color: "var(--caution)",
-  },
-  allin: {
-    en: "ALL-IN",   th: "เต็มสูบ",   zh: "全押",
-    descEN: "Derivatives + leverage. 90% lose.",
-    descTH: "อนุพันธ์ + เลเวอเรจ 90% ขาดทุน",
-    descZH: "衍生品+杠杆，90%散户亏损。",
-    riskEN: "EXTREME",  riskTH: "สูงมาก",    riskZH: "极高",
-    ret: 0.18, color: "var(--bear)",
-  },
-} as const;
+const NOW_YEAR = 2026;
 
-type StyleKey = keyof typeof STYLES;
+// ─── Dalio cycle phase mapping ───────────────────────────────────────────────
 
-// ─── World markets 2024 reference ────────────────────────────────────────────
-
-const WORLD_2024 = [
-  { label: "NASDAQ",    ytd:  29.6 },
-  { label: "S&P 500",   ytd:  23.3 },
-  { label: "Nikkei",    ytd:  19.2 },
-  { label: "DAX",       ytd:  18.9 },
-  { label: "Hang Seng", ytd:  17.7 },
-  { label: "SET",       ytd:  -4.8 },
-] as const;
-
-// ─── Forecast types ───────────────────────────────────────────────────────────
-
-interface ForecastRow {
-  target_date: string;
-  predicted:   number;
-  lower_80:    number;
-  upper_80:    number;
+interface CyclePhase {
+  stage:    number;
+  label:    string;
+  meanRate: number;   // expected equity rate for the year
 }
 
-interface ForecastData {
-  last_close: number;
-  rows:       ForecastRow[];
-  note:       string;
+function cycleStageForOffset(yearOffset: number): CyclePhase {
+  if (yearOffset <= 2)  return { stage: 5, label: "FRAG",   meanRate:  0.01 };
+  if (yearOffset <= 4)  return { stage: 6, label: "RESET",  meanRate: -0.05 };
+  if (yearOffset <= 8)  return { stage: 1, label: "RISE",   meanRate:  0.15 };
+  if (yearOffset <= 16) return { stage: 2, label: "BUBBLE", meanRate:  0.11 };
+  if (yearOffset <= 19) return { stage: 3, label: "PEAK",   meanRate:  0.10 };
+  if (yearOffset <= 24) return { stage: 4, label: "UNWIND", meanRate:  0.02 };
+  return cycleStageForOffset(yearOffset - 25);
 }
 
-// ─── Translations ─────────────────────────────────────────────────────────────
+// ─── Asset betas vs cycle ────────────────────────────────────────────────────
 
-type Lang = "en" | "th" | "zh";
+const MM_BETA = 0.3;
+const CM_BETA = 1.0;
+const DV_BETA = 2.5;
 
-interface Translations {
-  s1head: string; s1sub: string; s1left: (n: number) => string;
-  s2head: string; s2l1: string; s2l2: string; s2l3: string;
-  s2inv: string; s2warn: string;
-  s3head: string; s3risk: string; s3ret: string; s3pick: string;
-  s4head: string; s4ref: string; s4ai: string; s4note: string;
-  s4proj: string; s4age: string;
-  s5head: string; s5tgt: string; s5proj: string; s5good: string; s5gap: string;
-  s5read: string; s5act: string; s5yrs: (n: number) => string; s5rs: string;
-  // Pyramid
-  t1: string; t2: string; t3: string; t4: string; t5: string;
-  tapStart: string;
-  ikigaiTitle: string;
-  ikigaiFormula: string;
-  ikigaiReadiness: string;
+interface Allocation { mm: number; cm: number; dv: number }  // each 0–100, sum 100
+
+function portfolioRateForCycle(cycleRate: number, a: Allocation): number {
+  const mmRet = 0.04 + MM_BETA * (cycleRate - 0.07);
+  const cmRet = CM_BETA * cycleRate;
+  const dvRet = DV_BETA * cycleRate;
+  return (a.mm / 100) * mmRet + (a.cm / 100) * cmRet + (a.dv / 100) * dvRet;
 }
 
-const T: Record<Lang, Translations> = {
-  en: {
-    s1head:  "How old are you?",
-    s1sub:   "Monthly income",
-    s1left:  (n: number) => `${n} years to build wealth`,
-    s2head:  "Monthly expenses",
-    s2l1:    "LIVING — food, rent, utilities",
-    s2l2:    "TRANSPORT",
-    s2l3:    "EVERYTHING ELSE",
-    s2inv:   "INVESTABLE / MONTH",
-    s2warn:  "Nothing to invest. Cut expenses or raise income.",
-    s3head:  "Investment style",
-    s3risk:  "RISK",
-    s3ret:   "RETURN",
-    s3pick:  "PICK THE ONE YOU'LL HOLD FOR 20 YEARS WITHOUT SELLING",
-    s4head:  "Here is what the world looked like in 2024.",
-    s4ref:   "2024 FULL YEAR · MAJOR INDICES · REFERENCE ONLY",
-    s4ai:    "AI FORECAST · SET · 5-DAY · TIMESFM (GOOGLE)",
-    s4note:  "80% confidence band. Past training data. Not a trade signal.",
-    s4proj:  "TRAJECTORY IF NOTHING CHANGES",
-    s4age:   "age",
-    s5head:  "The result",
-    s5tgt:   "RETIREMENT TARGET",
-    s5proj:  "PROJECTION",
-    s5good:  "ON TRACK",
-    s5gap:   "BEHIND TARGET",
-    s5read:  "RETIREMENT READINESS",
-    s5act:   "WHAT TO DO NOW",
-    s5yrs:   (n: number) => `${n} yrs · monthly compounding · pre-tax`,
-    s5rs:    "RUN AGAIN WITH DIFFERENT NUMBERS",
-    t1: "INCOME", t2: "BUDGET", t3: "GROW", t4: "FREEDOM", t5: "IKIGAI",
-    tapStart:      "TAP A TIER TO EXPLORE",
-    ikigaiTitle:   "FINANCIAL INDEPENDENCE NUMBER",
-    ikigaiFormula: "annual expenses ÷ return rate",
-    ikigaiReadiness: "IKIGAI READINESS",
-  },
-  th: {
-    s1head:  "คุณอายุเท่าไหร่?",
-    s1sub:   "รายได้ต่อเดือน",
-    s1left:  (n: number) => `เหลือ ${n} ปีสร้างความมั่งคั่ง`,
-    s2head:  "ค่าใช้จ่ายต่อเดือน",
-    s2l1:    "ครองชีพ — อาหาร เช่า สาธารณูปโภค",
-    s2l2:    "ค่าเดินทาง",
-    s2l3:    "ค่าใช้จ่ายอื่นๆ",
-    s2inv:   "ลงทุนได้ต่อเดือน",
-    s2warn:  "ไม่มีเงินลงทุน ต้องลดรายจ่ายหรือเพิ่มรายได้",
-    s3head:  "สไตล์การลงทุน",
-    s3risk:  "ความเสี่ยง",
-    s3ret:   "ผลตอบแทน",
-    s3pick:  "เลือกตัวที่คุณยึดได้ 20 ปีโดยไม่ขายตอนตลาดร่วง",
-    s4head:  "นี่คือสิ่งที่เกิดขึ้นในโลกปี 2024",
-    s4ref:   "ผลตอบแทนทั้งปี 2024 · ดัชนีหลัก · ข้อมูลอ้างอิงเท่านั้น",
-    s4ai:    "AI คาดการณ์ · SET · 5 วัน · TIMESFM (Google)",
-    s4note:  "ช่วงความเชื่อมั่น 80% ข้อมูลในอดีต ไม่ใช่สัญญาณซื้อขาย",
-    s4proj:  "วิถีถ้าไม่มีอะไรเปลี่ยนแปลง",
-    s4age:   "อายุ",
-    s5head:  "ผลลัพธ์",
-    s5tgt:   "เป้าเกษียณ",
-    s5proj:  "การประมาณการ",
-    s5good:  "ตรงตามเป้า",
-    s5gap:   "ยังขาดอยู่",
-    s5read:  "ความพร้อมเกษียณ",
-    s5act:   "ทำอะไรตอนนี้",
-    s5yrs:   (n: number) => `${n} ปี · ทบต้นรายเดือน · ก่อนภาษี`,
-    s5rs:    "ลองใส่ตัวเลขใหม่",
-    t1: "รายได้", t2: "งบ", t3: "เติบโต", t4: "อิสรภาพ", t5: "อิคิไก",
-    tapStart:      "แตะชั้นที่ต้องการดู",
-    ikigaiTitle:   "ตัวเลขอิสรภาพทางการเงิน",
-    ikigaiFormula: "ค่าใช้จ่ายต่อปี ÷ อัตราผลตอบแทน",
-    ikigaiReadiness: "ความพร้อม IKIGAI",
-  },
-  zh: {
-    s1head:  "你几岁了？",
-    s1sub:   "每月收入",
-    s1left:  (n: number) => `还有${n}年积累财富`,
-    s2head:  "每月支出",
-    s2l1:    "生活 — 饮食、住房、水电",
-    s2l2:    "交通",
-    s2l3:    "其他一切",
-    s2inv:   "每月可投资金额",
-    s2warn:  "无可投资余额，先削减支出或增加收入。",
-    s3head:  "投资风格",
-    s3risk:  "风险",
-    s3ret:   "回报",
-    s3pick:  "选你能坚守20年不在下跌时卖出的那个",
-    s4head:  "2024年，世界发生了这些。",
-    s4ref:   "2024全年 · 主要指数 · 仅供参考",
-    s4ai:    "AI预测 · 泰股 · 5天 · TIMESFM（谷歌）",
-    s4note:  "80%置信区间。历史训练数据。不是买卖信号。",
-    s4proj:  "什么都不变的情况下的轨迹",
-    s4age:   "岁",
-    s5head:  "结果",
-    s5tgt:   "退休目标",
-    s5proj:  "预测",
-    s5good:  "达标",
-    s5gap:   "还差",
-    s5read:  "退休准备度",
-    s5act:   "现在做什么",
-    s5yrs:   (n: number) => `${n}年 · 月复利 · 税前`,
-    s5rs:    "换个数字重算",
-    t1: "收入", t2: "预算", t3: "增长", t4: "自由", t5: "生き甲斐",
-    tapStart:      "点击一个层级探索",
-    ikigaiTitle:   "财务独立数字",
-    ikigaiFormula: "年支出 ÷ 回报率",
-    ikigaiReadiness: "IKIGAI准备度",
-  },
-};
+interface YearPoint {
+  year:     number;
+  value:    number;
+  phase:    string;
+  yearRate: number;
+}
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+function projectWithCycle(
+  monthly: number,
+  alloc:   Allocation,
+  years:   number,
+): YearPoint[] {
+  if (years <= 0 || monthly <= 0) return [];
+  const out: YearPoint[] = [];
+  let value = 0;
+  for (let y = 0; y < years; y++) {
+    const stage = cycleStageForOffset(y);
+    const rate  = portfolioRateForCycle(stage.meanRate, alloc);
+    const mRate = rate / 12;
+    const yrContrib = Math.abs(mRate) < 1e-9
+      ? monthly * 12
+      : monthly * ((Math.pow(1 + mRate, 12) - 1) / mRate);
+    value = value * (1 + rate) + yrContrib;
+    out.push({ year: NOW_YEAR + y, value, phase: stage.label, yearRate: rate });
+  }
+  return out;
+}
 
-function projectAt(monthly: number, rate: number, years: number): number {
+// Simple compound (for the "just save" chapter)
+function projectAt(monthly: number, annualRate: number, years: number): number {
   if (years <= 0 || monthly <= 0) return 0;
-  const mr = rate / MONTHS;
-  const m  = years * MONTHS;
-  return monthly * ((Math.pow(1 + mr, m) - 1) / mr);
+  if (annualRate === 0) return monthly * 12 * years;
+  const mr = annualRate / 12;
+  return monthly * ((Math.pow(1 + mr, years * 12) - 1) / mr);
 }
 
-function monthlyNeeded(target: number, rate: number, years: number): number {
-  if (years <= 0 || rate <= 0 || target <= 0) return 0;
-  const mr = rate / MONTHS;
-  const m  = years * MONTHS;
-  return target / ((Math.pow(1 + mr, m) - 1) / mr);
+// Suggested allocation: scan a coarse grid, return first that meets target
+function suggestAllocation(monthly: number, target: number, years: number): Allocation | null {
+  if (monthly <= 0 || target <= 0 || years <= 0) return null;
+  const candidates: Allocation[] = [
+    { mm: 70, cm: 28, dv:  2 },
+    { mm: 50, cm: 45, dv:  5 },
+    { mm: 30, cm: 60, dv: 10 },
+    { mm: 20, cm: 70, dv: 10 },
+    { mm: 15, cm: 70, dv: 15 },
+    { mm: 10, cm: 70, dv: 20 },
+    { mm:  5, cm: 70, dv: 25 },
+  ];
+  for (const a of candidates) {
+    const series = projectWithCycle(monthly, a, years);
+    const final  = series[series.length - 1]?.value ?? 0;
+    if (final >= target) return a;
+  }
+  return null;
 }
 
-function doublesIn(rate: number): number {
-  return Math.round((72 / (rate * 100)) * 10) / 10;
-}
+// ─── Format helpers ──────────────────────────────────────────────────────────
 
 function fmtM(v: number): string {
   if (v >= 1_000_000) return `฿${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000)     return `฿${(v / 1_000).toFixed(0)}K`;
-  return fmtThb(v);
+  return fmtThb(Math.round(v));
 }
 
-function getActions(style: StyleKey, investable: number, lang: Lang): string[] {
-  const inv = fmtThb(investable);
-  if (lang === "th") {
-    const first: Record<StyleKey, string> = {
-      safe:     "เปิดบัญชีฝากประจำ สร้างกองทุนฉุกเฉิน 6 เดือนก่อน",
-      balanced: "เปิดบัญชีกองทุนรวม (กรุงศรี / กสิกร / SCB) เริ่มที่ 1,000 บาท/เดือน",
-      growth:   "เปิดบัญชีหุ้น ซื้อ SET50 ETF (TDEX) เป็นจุดเริ่มต้น",
-      allin:    "ศึกษา Options และ Futures ≥ 12 เดือนก่อนเทรดครั้งแรก",
-    };
-    return [first[style], `ตั้งระบบลงทุนอัตโนมัติ ${inv}/เดือน ห้ามแตะ`, "ทบทวนทุก 12 เดือน ปรับสมดุล แล้วลืมมันไป"];
-  }
-  if (lang === "zh") {
-    const first: Record<StyleKey, string> = {
-      safe:     "开定期存款账户，先建6个月应急储备。",
-      balanced: "开公募基金账户，从每月1,000铢起投。",
-      growth:   "开证券账户，买入SET50 ETF (TDEX)作为第一笔仓位。",
-      allin:    "在首次衍生品交易前，至少学习期权和期货12个月。",
-    };
-    return [first[style], `设置自动投资：${inv}/月，不要动它。`, "每12个月审视配置，再平衡，然后再次忘掉它。"];
-  }
-  const first: Record<StyleKey, string> = {
-    safe:     "Open a fixed deposit account. Build 6 months of emergency fund first.",
-    balanced: "Open a mutual fund account (Krungsri / Kasikorn / SCB). Start at ฿1,000/month.",
-    growth:   "Open a brokerage account. Buy the SET50 ETF (TDEX) as your first position.",
-    allin:    "Study options and futures for ≥ 12 months before your first derivatives trade.",
-  };
-  return [first[style], `Set up auto-invest: ${inv}/month. Never touch it.`, "Review allocation every 12 months. Rebalance. Then forget it again."];
+// ─── Translations ────────────────────────────────────────────────────────────
+
+type Lang = "en" | "th" | "zh";
+
+interface Translations {
+  appTag: string;
+  ch1: string; ch2: string; ch3: string; ch4: string; ch5: string; ch6: string; ch7: string;
+  hookHead: string; hookSub: string; hookFig: string; hookCite: string; hookHint: string;
+  curveHead: string; curveBody: string;
+  curveLabelPeak: string; curveLabelEnd: string; curveAge: string; curvePost: string;
+  nHead:    string;
+  nIncome:  string; nExpense: string;
+  nTarget:  (years: number, amount: string) => string;
+  nYrsLeft: (n: number) => string;
+  nYrsPost: (n: number) => string;
+  saveHead: string; saveMatt: string; saveBank: string; saveTarget: string;
+  saveResult: (shortBy: string) => string;
+  saveOnTrack: string; saveCite: string;
+  cycleHead: string; cycleBody: string; cycleNote: string;
+  cyclePhaseHere: string; cycleRetAge: string;
+  buildHead: string;
+  buildMM:  string; buildMMd: string;
+  buildCM:  string; buildCMd: string;
+  buildDV:  string; buildDVd: string;
+  buildSum: string;
+  buildProj: string; buildOK: string;
+  buildShort: (amt: string) => string;
+  buildSugg:  (mm: number, cm: number, dv: number) => string;
+  buildNoSugg: string;
+  commHead: string; commYouAre: string;
+  commIncomeLabel: string; commExpenseLabel: string;
+  commTargetLabel: string; commProjectedLabel: string; commAllocLabel: string;
+  commAct1: string;
+  commAct2: (amt: string) => string;
+  commAct3: string;
+  commShare: string; commCopy: string;
+  commNoSave: string;
+  footnote: string;
 }
 
-// ─── Pyramid SVG ──────────────────────────────────────────────────────────────
+const T: Record<Lang, Translations> = {
+  en: {
+    appTag: "SIAM · PLAN",
+    ch1: "01 · HOOK",     ch2: "02 · CURVE",   ch3: "03 · NUMBERS",
+    ch4: "04 · SAVING",   ch5: "05 · CYCLE",   ch6: "06 · BUILDER",
+    ch7: "07 · COMMIT",
+    hookHead: "Do you know your own finance?",
+    hookSub:  "No. Most don't. The ones who do retire on time.",
+    hookFig:  "฿350,000",
+    hookCite: "median Thai household savings AT retirement · BoT 2023",
+    hookHint: "scroll · find out what yours has to be",
+    curveHead: "The curve nobody draws for you.",
+    curveBody: "Federer was the best at 27. Magnus Carlsen peaked at 31. The athletes you know are retired by 35. You will hit the same curve — you just don't see your peak until you're past it. The years on the way down are paid for by the years on the way up. Did you stack enough?",
+    curveLabelPeak: "peak",
+    curveLabelEnd:  "78",
+    curveAge:       "AGE",
+    curvePost:      "you · today",
+    nHead:    "Two numbers. That's all.",
+    nIncome:  "income · per month",
+    nExpense: "expenses · per month",
+    nTarget:  (yrs: number) => `To live ${yrs} years after 60 at middle-class minimum in Thailand, you need this the day you turn 60:`,
+    nYrsLeft: (n: number) => `${n} years to build`,
+    nYrsPost: (n: number) => `${n} years after`,
+    saveHead: "What happens if you just save?",
+    saveMatt: "MATTRESS · 0%",
+    saveBank: "BANK · 1% real",
+    saveTarget: "TARGET",
+    saveResult: (s: string) => `Short by ${s}. Saving keeps the number. It loses the value.`,
+    saveOnTrack: "Saving alone gets you there. Most don't have your income.",
+    saveCite: "The Thai baht lost ~30% of purchasing power 2014–2024 · BoT CPI",
+    cycleHead: "The world isn't a smooth line.",
+    cycleBody: "Stages from Ray Dalio's Big Debt Crises (2018). Pattern match across ~16 historical cycles. No fixed duration. Not a forecast — a structure recognition.",
+    cycleNote: "rate per year if you went 100% equities. your portfolio rate depends on allocation.",
+    cyclePhaseHere: "we are here · stage 5 FRAG",
+    cycleRetAge:    "your 60",
+    buildHead: "Now allocate. Watch the number react.",
+    buildMM:  "MONEY MARKET",
+    buildMMd: "deposits · gov bonds · ~4%/yr · inflation eats some",
+    buildCM:  "CAPITAL MARKET",
+    buildCMd: "mutual funds · equities · 7–10%/yr long-term · volatile",
+    buildDV:  "DERIVATIVES",
+    buildDVd: "options · leverage · crypto · −100% to +600% · 90% lose",
+    buildSum: "SUM",
+    buildProj:  "PROJECTED AT 60",
+    buildOK:    "✓ ON TRACK",
+    buildShort: (a: string) => `✗ STILL SHORT BY ${a}`,
+    buildSugg:  (mm: number, cm: number, dv: number) => `Try ${mm} / ${cm} / ${dv} to close the gap.`,
+    buildNoSugg: "Even aggressive can't close the gap. Income or expenses must change.",
+    commHead: "Three things, and you walk away.",
+    commYouAre:        "YOUR PLAN",
+    commIncomeLabel:   "INCOME",
+    commExpenseLabel:  "EXPENSES",
+    commTargetLabel:   "TARGET · AT 60",
+    commProjectedLabel:"PROJECTED",
+    commAllocLabel:    "ALLOCATION",
+    commAct1: "Open auto-invest at a TH broker — Krungsri, Kasikorn, SCB, Bualuang.",
+    commAct2: (a: string) => `Set a monthly transfer of ${a} into the chosen mix. Don't touch it.`,
+    commAct3: "Review once every 12 months. Rebalance. Then forget it again.",
+    commShare:  "share this plan",
+    commCopy:   "link copied",
+    commNoSave: "This page does not save your numbers. Take a screenshot. Talk to a real advisor. Or send this link to a friend who needs it.",
+    footnote:   "Rates derived from Ray Dalio Big Debt Crises (2018) · illustrative only · not investment advice",
+  },
+  th: {
+    appTag: "SIAM · แผน",
+    ch1: "01 · เปิด",    ch2: "02 · เส้นโค้ง",  ch3: "03 · ตัวเลข",
+    ch4: "04 · ออม",     ch5: "05 · วัฏจักร",  ch6: "06 · จัดพอร์ต",
+    ch7: "07 · ลงมือ",
+    hookHead: "คุณรู้จักการเงินของคุณดีพอไหม?",
+    hookSub:  "ไม่หรอก คนส่วนมากไม่รู้ คนที่รู้ คือคนที่เกษียณทันเวลา",
+    hookFig:  "฿350,000",
+    hookCite: "ค่ามัธยฐานเงินออมครัวเรือนไทย ณ วันเกษียณ · ธปท. 2023",
+    hookHint: "เลื่อนลง · ดูตัวเลขของคุณ",
+    curveHead: "เส้นโค้งที่ไม่มีใครวาดให้คุณดู",
+    curveBody: "เฟเดอเรอร์ที่ดีที่สุดตอนอายุ 27 คาร์ลเซนสุดยอดตอน 31 นักกีฬาที่คุณรู้จักเลิกเล่นกันที่ 35 คุณก็จะเจอเส้นโค้งเดียวกัน — เพียงแต่จะเห็นจุดสูงสุดของตัวเองได้ตอนผ่านไปแล้ว ปีที่กำลังตกต่ำต้องอาศัยเงินที่ปีขาขึ้นเก็บไว้ คุณเก็บพอหรือยัง?",
+    curveLabelPeak: "จุดพีค",
+    curveLabelEnd:  "78",
+    curveAge:       "อายุ",
+    curvePost:      "คุณ · วันนี้",
+    nHead:    "แค่สองตัวเลข",
+    nIncome:  "รายได้ · ต่อเดือน",
+    nExpense: "ค่าใช้จ่าย · ต่อเดือน",
+    nTarget:  (yrs: number) => `เพื่อให้อยู่ได้ ${yrs} ปีหลังอายุ 60 ที่ระดับชนชั้นกลางในประเทศไทย คุณต้องมีจำนวนนี้ในวันที่อายุครบ 60:`,
+    nYrsLeft: (n: number) => `เหลือ ${n} ปีก่อนเกษียณ`,
+    nYrsPost: (n: number) => `${n} ปีหลังเกษียณ`,
+    saveHead: "ถ้าออมเงินอย่างเดียว จะเป็นยังไง?",
+    saveMatt: "ใต้หมอน · 0%",
+    saveBank: "ฝากธนาคาร · 1% จริง",
+    saveTarget: "เป้าหมาย",
+    saveResult: (s: string) => `ขาดอยู่ ${s} การออมเก็บตัวเลขไว้ได้ แต่เก็บมูลค่าไว้ไม่ได้`,
+    saveOnTrack: "ออมอย่างเดียวก็พอ แต่คนส่วนใหญ่ไม่มีรายได้เท่าคุณ",
+    saveCite: "เงินบาทเสียกำลังซื้อ ~30% ระหว่าง 2014–2024 · ธปท. CPI",
+    cycleHead: "โลกไม่ใช่เส้นตรงเรียบๆ",
+    cycleBody: "ขั้นจากหนังสือ Big Debt Crises ของ Ray Dalio (2018) จับรูปแบบจากวัฏจักรในประวัติศาสตร์ ~16 รอบ ไม่มีระยะเวลาที่แน่นอน ไม่ใช่การพยากรณ์ — เป็นการรู้จักโครงสร้าง",
+    cycleNote: "อัตราต่อปีหากลงหุ้น 100% อัตราพอร์ตจริงขึ้นกับการจัดสรรของคุณ",
+    cyclePhaseHere: "เราอยู่ตรงนี้ · ขั้น 5 FRAG",
+    cycleRetAge:    "อายุ 60 ของคุณ",
+    buildHead: "ลองจัดสรรดู ดูตัวเลขเปลี่ยน",
+    buildMM:  "ตลาดเงิน",
+    buildMMd: "เงินฝาก · พันธบัตรรัฐ · ~4%/ปี · เงินเฟ้อกินบ้าง",
+    buildCM:  "ตลาดทุน",
+    buildCMd: "กองทุนรวม · หุ้น · 7–10%/ปี ระยะยาว · ผันผวน",
+    buildDV:  "อนุพันธ์",
+    buildDVd: "ออปชั่น · เลเวอเรจ · คริปโต · −100% ถึง +600% · 90% ขาดทุน",
+    buildSum: "รวม",
+    buildProj:  "ประมาณการตอนอายุ 60",
+    buildOK:    "✓ ตรงตามเป้า",
+    buildShort: (a: string) => `✗ ขาดอยู่ ${a}`,
+    buildSugg:  (mm: number, cm: number, dv: number) => `ลอง ${mm} / ${cm} / ${dv} เพื่อปิดช่องว่าง`,
+    buildNoSugg: "ถึงจะเสี่ยงสุด ก็ยังไม่ถึงเป้า ต้องปรับรายได้หรือค่าใช้จ่าย",
+    commHead: "สามอย่าง แล้วเดินจากไปได้",
+    commYouAre:         "แผนของคุณ",
+    commIncomeLabel:    "รายได้",
+    commExpenseLabel:   "ค่าใช้จ่าย",
+    commTargetLabel:    "เป้า · 60",
+    commProjectedLabel: "ประมาณการ",
+    commAllocLabel:     "การจัดสรร",
+    commAct1: "เปิดบัญชีลงทุนอัตโนมัติกับโบรกเกอร์ไทย — กรุงศรี กสิกร SCB บัวหลวง",
+    commAct2: (a: string) => `ตั้งโอนเงินเข้าทุกเดือน ${a} ห้ามแตะ`,
+    commAct3: "ทบทวนปีละครั้ง ปรับสมดุล แล้วลืมมันไป",
+    commShare:  "ส่งแผนนี้",
+    commCopy:   "คัดลอกลิงก์แล้ว",
+    commNoSave: "หน้านี้ไม่ได้บันทึกตัวเลขของคุณ บันทึกหน้าจอไว้ คุยกับที่ปรึกษาตัวจริง หรือส่งลิงก์นี้ให้เพื่อนที่ต้องการ",
+    footnote:   "อ้างอิงอัตราจาก Ray Dalio Big Debt Crises (2018) · เพียงตัวอย่าง · ไม่ใช่คำแนะนำการลงทุน",
+  },
+  zh: {
+    appTag: "SIAM · 计划",
+    ch1: "01 · 钩子",  ch2: "02 · 曲线",  ch3: "03 · 数字",
+    ch4: "04 · 储蓄",  ch5: "05 · 周期",  ch6: "06 · 配置",
+    ch7: "07 · 行动",
+    hookHead: "你真的了解自己的财务吗？",
+    hookSub:  "不。大多数人都不。了解的人，会准时退休。",
+    hookFig:  "฿350,000",
+    hookCite: "退休时泰国家庭储蓄中位数 · 泰央行 2023",
+    hookHint: "向下滑动 · 算出你自己的数字",
+    curveHead: "没人为你画过的那条曲线。",
+    curveBody: "费德勒27岁登顶。卡尔森31岁达到巅峰。你认识的运动员35岁就退役。你也会遇到同一条曲线 — 只是过了顶点才会发现。下坡的年份要靠上坡的年份养着。你攒够了吗？",
+    curveLabelPeak: "顶点",
+    curveLabelEnd:  "78",
+    curveAge:       "年龄",
+    curvePost:      "你 · 今天",
+    nHead:    "两个数字。仅此而已。",
+    nIncome:  "月收入",
+    nExpense: "月支出",
+    nTarget:  (yrs: number) => `要在60岁后于泰国按中产基本生活水准过 ${yrs} 年，你需要在60岁那天拥有:`,
+    nYrsLeft: (n: number) => `还有 ${n} 年`,
+    nYrsPost: (n: number) => `退休后 ${n} 年`,
+    saveHead: "如果只是储蓄会怎样？",
+    saveMatt: "床垫下 · 0%",
+    saveBank: "银行存款 · 1% 实际",
+    saveTarget: "目标",
+    saveResult: (s: string) => `还差 ${s}。储蓄保住了数字，失去了价值。`,
+    saveOnTrack: "光储蓄就够了。大多数人没你这样的收入。",
+    saveCite: "泰铢2014–2024年累计贬值约30%购买力 · 泰央行 CPI",
+    cycleHead: "世界不是一条直线。",
+    cycleBody: "阶段来自瑞·达利欧《大债务危机》(2018)。模式识别基于约16个历史周期。没有固定期限。不是预测 — 是对结构的认知。",
+    cycleNote: "100%股票时的年化率。组合实际利率取决于你的配置。",
+    cyclePhaseHere: "我们在这 · 第5阶段 FRAG",
+    cycleRetAge:    "你的60岁",
+    buildHead: "现在配置。看数字反应。",
+    buildMM:  "货币市场",
+    buildMMd: "存款 · 政府债 · ~4%/年 · 通胀吃掉一些",
+    buildCM:  "资本市场",
+    buildCMd: "公募基金 · 股票 · 长期7–10%/年 · 短期波动",
+    buildDV:  "衍生品",
+    buildDVd: "期权 · 杠杆 · 加密 · −100% 到 +600% · 90%亏损",
+    buildSum: "合计",
+    buildProj:  "60岁预计",
+    buildOK:    "✓ 达标",
+    buildShort: (a: string) => `✗ 还差 ${a}`,
+    buildSugg:  (mm: number, cm: number, dv: number) => `试试 ${mm} / ${cm} / ${dv} 来补齐。`,
+    buildNoSugg: "即便激进配置也补不齐。必须调整收入或支出。",
+    commHead: "三件事，然后你可以离开。",
+    commYouAre:         "你的计划",
+    commIncomeLabel:    "收入",
+    commExpenseLabel:   "支出",
+    commTargetLabel:    "目标 · 60",
+    commProjectedLabel: "预计",
+    commAllocLabel:     "配置",
+    commAct1: "在泰国券商开自动定投账户 — 大城、开泰、SCB、Bualuang。",
+    commAct2: (a: string) => `设置每月自动转账 ${a} 进入你选的配置。别碰它。`,
+    commAct3: "每12个月回看一次。再平衡。然后再忘掉它。",
+    commShare:  "分享这份计划",
+    commCopy:   "链接已复制",
+    commNoSave: "本页不保存你的数字。截图。和真正的顾问聊聊。或把链接发给需要的朋友。",
+    footnote:   "利率参考自瑞·达利欧《大债务危机》(2018) · 仅作示例 · 不构成投资建议",
+  },
+};
 
-function PyramidSVG({ currentLevel, activeTier, onTierClick, t }: {
-  currentLevel: number;
-  activeTier:   1|2|3|4|5|null;
-  onTierClick:  (n: 1|2|3|4|5) => void;
-  t:            Translations;
+// ─── Slider primitive ────────────────────────────────────────────────────────
+
+function Slider({ value, min, max, step, onChange, accent }: {
+  value: number; min: number; max: number; step: number;
+  onChange: (v: number) => void; accent?: string;
 }) {
-  // viewBox 0 0 280 162 · Tier 5=apex(top), Tier 1=base(bottom)
-  const POLYS: Record<1|2|3|4|5, string> = {
-    5: "140,2 108,34 172,34",
-    4: "108,34 172,34 200,66 80,66",
-    3: "80,66 200,66 228,98 52,98",
-    2: "52,98 228,98 256,130 24,130",
-    1: "24,130 256,130 278,160 2,160",
-  };
-  const CENTERS: Record<1|2|3|4|5, [number, number]> = {
-    5: [140, 22], 4: [140, 52], 3: [140, 83], 2: [140, 115], 1: [140, 147],
-  };
-  const LABELS: Record<1|2|3|4|5, string> = {
-    1: t.t1, 2: t.t2, 3: t.t3, 4: t.t4, 5: t.t5,
-  };
-
-  const tiers: (1|2|3|4|5)[] = [5, 4, 3, 2, 1];
-
   return (
-    <svg
-      viewBox="0 0 280 162"
-      style={{ width: "100%", maxWidth: 300, display: "block", margin: "0 auto" }}
-      aria-label="Financial independence pyramid"
-    >
-      {tiers.map(n => {
-        const achieved = n <= currentLevel;
-        const isNext   = n === currentLevel + 1;
-        const isSel    = activeTier === n;
-        const isIkigai = n === 5;
-
-        const fill   = achieved && isIkigai ? "rgba(255,149,0,0.22)"
-                     : achieved             ? "rgba(0,200,150,0.14)"
-                     : isNext               ? "rgba(255,255,255,0.03)"
-                     : "rgba(255,255,255,0.01)";
-        const stroke = achieved && isIkigai ? "#ff9500"
-                     : achieved             ? "#00c896"
-                     : isSel || isNext      ? "#ff9500"
-                     : "#2a2a2a";
-        const sw     = isSel ? 2.5 : isNext ? 1.5 : 1;
-        const tc     = achieved && isIkigai ? "#ff9500"
-                     : achieved             ? "#00c896"
-                     : isNext               ? "#ff9500"
-                     : "#444";
-        const [cx, cy] = CENTERS[n];
-
-        return (
-          <g key={n} onClick={() => onTierClick(n)} style={{ cursor: "pointer" }}>
-            <polygon points={POLYS[n]} style={{ fill, stroke, strokeWidth: sw }} />
-            <text
-              x={cx} y={cy}
-              textAnchor="middle" dominantBaseline="middle"
-              style={{
-                fill: tc,
-                fontFamily: "var(--font-mono, monospace)",
-                fontSize: n === 5 ? "8px" : "9px",
-                fontWeight: 700,
-                letterSpacing: "0.05em",
-                pointerEvents: "none",
-                userSelect: "none",
-              }}
-            >
-              {LABELS[n]}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
+    <input
+      type="range" min={min} max={max} step={step} value={value}
+      onChange={e => onChange(Number(e.target.value))}
+      style={{
+        width: "100%", height: 3, minHeight: 44, display: "block",
+        accentColor: accent ?? "var(--caution)", cursor: "pointer",
+      }}
+    />
   );
 }
 
-// ─── Level indicator ──────────────────────────────────────────────────────────
+// ─── Chapter wrapper ─────────────────────────────────────────────────────────
 
-function LevelIndicator({ currentLevel, activeTier, t, lang, onTrack, investable, style }: {
-  currentLevel: number; activeTier: 1|2|3|4|5|null;
-  t: Translations; lang: Lang; onTrack: boolean;
-  investable: number; style: StyleKey | null;
-}) {
-  const tierNames: Record<1|2|3|4|5, string> = {
-    1: t.t1, 2: t.t2, 3: t.t3, 4: t.t4, 5: t.t5,
-  };
-  const hints: Record<0|1|2|3|4|5, string> = {
-    0: lang === "th" ? "ใส่รายได้เพื่อเริ่ม" : lang === "zh" ? "输入收入以开始" : "enter income to begin",
-    1: lang === "th" ? "ลดค่าใช้จ่ายเพื่อปลดล็อกการลงทุน" : lang === "zh" ? "减少支出以解锁投资" : "reduce expenses to unlock investing",
-    2: lang === "th" ? "เลือกสไตล์การลงทุน" : lang === "zh" ? "选择投资风格" : "select an investment style",
-    3: lang === "th" ? "เพิ่มการลงทุนเพื่อให้ถึงเป้า" : lang === "zh" ? "增加投资以达标" : "increase investment to reach target",
-    4: lang === "th" ? "เกษียณตรงเป้า — IKIGAI รออยู่" : lang === "zh" ? "退休达标 — IKIGAI等你" : "retirement on track — IKIGAI awaits",
-    5: lang === "th" ? "อิสรภาพทางการเงิน" : lang === "zh" ? "财务独立" : "financial independence",
-  };
-
-  const color = currentLevel >= 5 ? "var(--caution)"
-              : currentLevel >= 4 ? "var(--bull)"
-              : currentLevel >= 2 ? "var(--caution)"
-              : "var(--dim)";
-
-  const levelName = currentLevel >= 1 && currentLevel <= 5
-    ? tierNames[currentLevel as 1|2|3|4|5] : "";
-  const hint = hints[currentLevel as 0|1|2|3|4|5] ?? "";
-
+function Chapter({ tag, children }: { tag: string; children: React.ReactNode }) {
   return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: 8,
-      padding: "7px 0 10px",
-      borderBottom: "1px solid var(--line)",
+    <section style={{
+      padding: "36px 0 44px",
+      borderTop: "1px solid var(--line)",
+      display: "flex", flexDirection: "column",
+      gap: 16,
     }}>
       <div style={{
         fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-        fontWeight: 700, color,
-        letterSpacing: "0.1em", flexShrink: 0,
+        color: "var(--dim)", letterSpacing: "0.16em",
       }}>
-        {currentLevel > 0 ? `LEVEL ${currentLevel}` : "LEVEL 0"}
-        {levelName ? ` · ${levelName}` : ""}
+        {tag}
       </div>
-      <div style={{
-        fontFamily: "var(--font-mono)", fontSize: "0.62rem",
-        color: "var(--dim)", letterSpacing: "0.04em",
-        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-      }}>
-        {hint}
-      </div>
-    </div>
+      {children}
+    </section>
   );
 }
 
-// ─── Tier Panel ───────────────────────────────────────────────────────────────
+function ChapterHead({ text }: { text: string }) {
+  return (
+    <h2 style={{
+      fontFamily: "var(--font-display, 'Josefin Sans'), sans-serif",
+      fontSize: "var(--text-display)",
+      fontWeight: 700, color: "var(--ink)", lineHeight: 1.1, margin: 0,
+      letterSpacing: "-0.01em",
+    }}>
+      {text}
+    </h2>
+  );
+}
 
-type TierPanelProps = {
-  tier:             1|2|3|4|5;
-  lang:             Lang;
-  t:                Translations;
-  age:              number; setAge:       (v: number)   => void;
-  salary:           number; setSalary:    (v: number)   => void;
-  living:           number; setLiving:    (v: number)   => void;
-  transport:        number; setTransport: (v: number)   => void;
-  other:            number; setOther:     (v: number)   => void;
-  style:            StyleKey | null; setStyle: (v: StyleKey) => void;
-  investable:       number;
-  monthlyExpenses:  number;
-  yearsToRetire:    number;
-  retirementTarget: number;
-  projectedValue:   number;
-  onTrack:          boolean;
-  readiness:        number;
-  ikigaiTarget:     number;
-  ikigaiReadiness:  number;
-  forecast:         ForecastData | null;
-  onRestart:        () => void;
-};
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 1 — HOOK
+// ═══════════════════════════════════════════════════════════════════════════════
 
-function TierPanel(p: TierPanelProps) {
-  const { tier, t, lang } = p;
+function HookChapter({ t }: { t: Translations }) {
+  return (
+    <Chapter tag={t.ch1}>
+      <ChapterHead text={t.hookHead} />
+      <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
+        {t.hookSub}
+      </p>
+      <div style={{
+        marginTop: 12, padding: "16px 0",
+        borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
+      }}>
+        <div style={{
+          fontFamily: "var(--font-mono)", fontSize: "var(--text-display)",
+          fontWeight: 700, color: "var(--caution)", lineHeight: 1,
+        }}>
+          {t.hookFig}
+        </div>
+        <div className="t-micro" style={{
+          color: "var(--dim)", marginTop: 6, textTransform: "none", letterSpacing: 0,
+        }}>
+          {t.hookCite}
+        </div>
+      </div>
+      <div className="t-micro" style={{ color: "var(--muted)", marginTop: 4 }}>
+        ↓ {t.hookHint}
+      </div>
+    </Chapter>
+  );
+}
 
-  const header = (
-    <div className="t-micro" style={{ color: "var(--caution)", padding: "10px 0 8px", letterSpacing: "0.12em" }}>
-      {tier === 1 ? t.t1 : tier === 2 ? t.t2 : tier === 3 ? t.t3 : tier === 4 ? t.t4 : t.t5}
-    </div>
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 2 — BELL CURVE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function BellCurveChapter({ t, age, setAge }: {
+  t: Translations; age: number; setAge: (v: number) => void;
+}) {
+  const W = 600, H = 200;
+  const PEAK_AGE = 42;
+  function ageToX(a: number) { return ((a - 18) / (78 - 18)) * W; }
+  function capability(a: number) {
+    const d = (a - PEAK_AGE) / 24;
+    return Math.max(0, 1 - d * d);
+  }
+  function capToY(c: number) { return H - 30 - c * (H - 60); }
+
+  const points: string[] = [];
+  for (let a = 18; a <= 78; a++) {
+    points.push(`${ageToX(a).toFixed(1)},${capToY(capability(a)).toFixed(1)}`);
+  }
+  const dotX = ageToX(age);
+  const dotY = capToY(capability(age));
+
+  return (
+    <Chapter tag={t.ch2}>
+      <ChapterHead text={t.curveHead} />
+      <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.7, margin: 0 }}>
+        {t.curveBody}
+      </p>
+
+      <div style={{ marginTop: 12, padding: "12px 0", borderTop: "1px solid var(--line)" }}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}
+          aria-label="Capability vs age curve"
+        >
+          <line x1={0} y1={H - 30} x2={W} y2={H - 30} stroke="var(--line)" strokeWidth={1} />
+          <polyline points={points.join(" ")} fill="none" stroke="var(--ink)" strokeWidth={1.5} opacity={0.7} />
+          <line x1={ageToX(PEAK_AGE)} y1={H - 30} x2={ageToX(PEAK_AGE)} y2={capToY(1)} stroke="var(--dim)" strokeDasharray="3 3" strokeWidth={1} />
+          <circle cx={dotX} cy={dotY} r={6} fill="var(--caution)" />
+          <line x1={dotX} y1={dotY} x2={dotX} y2={H - 30} stroke="var(--caution)" strokeWidth={1.5} />
+          <text x={dotX} y={H - 12} fill="var(--caution)" fontSize="13" fontFamily="var(--font-mono)" fontWeight={700}
+            textAnchor={age < 28 ? "start" : age > 68 ? "end" : "middle"}>
+            {age}
+          </text>
+          <text x={W - 4} y={H - 12} fill="var(--dim)" fontSize="11" fontFamily="var(--font-mono)" textAnchor="end">
+            {t.curveLabelEnd}
+          </text>
+          <text x={ageToX(PEAK_AGE)} y={capToY(1) - 8} fill="var(--dim)" fontSize="11" fontFamily="var(--font-mono)" textAnchor="middle">
+            {t.curveLabelPeak} · {PEAK_AGE}
+          </text>
+        </svg>
+      </div>
+
+      <div style={{ paddingTop: 4 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.curveAge}</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--caution)" }}>
+            {age}
+          </span>
+        </div>
+        <Slider value={age} min={18} max={65} step={1} onChange={setAge} />
+        <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 8 }}>
+          {t.curvePost}
+        </div>
+      </div>
+    </Chapter>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 3 — NUMBERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function NumbersChapter({ t, income, setIncome, expenses, setExpenses, target, yearsToRetire, yearsPostRetire }: {
+  t: Translations;
+  income: number;   setIncome:   (v: number) => void;
+  expenses: number; setExpenses: (v: number) => void;
+  target: number; yearsToRetire: number; yearsPostRetire: number;
+}) {
+  return (
+    <Chapter tag={t.ch3}>
+      <ChapterHead text={t.nHead} />
+
+      <div style={{ padding: "12px 0", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.nIncome.toUpperCase()}</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
+            {fmtThb(income)}
+          </span>
+        </div>
+        <Slider value={income} min={5_000} max={300_000} step={1_000} onChange={setIncome} />
+      </div>
+
+      <div style={{ padding: "12px 0", borderBottom: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.nExpense.toUpperCase()}</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
+            {fmtThb(expenses)}
+          </span>
+        </div>
+        <Slider value={expenses} min={8_000} max={100_000} step={500} onChange={setExpenses} />
+      </div>
+
+      <div style={{ display: "flex", gap: 32, paddingTop: 8 }}>
+        <div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--caution)" }}>
+            {yearsToRetire}
+          </div>
+          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
+            {t.nYrsLeft(yearsToRetire)}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--muted)" }}>
+            {yearsPostRetire}
+          </div>
+          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
+            {t.nYrsPost(yearsPostRetire)}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 8, padding: "16px 0 0", borderTop: "1px solid var(--line)" }}>
+        <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
+          {t.nTarget(yearsPostRetire, "")}
+        </p>
+        <div style={{
+          marginTop: 12,
+          fontFamily: "var(--font-mono)", fontSize: "var(--text-display)",
+          fontWeight: 700, color: "var(--caution)", lineHeight: 1,
+        }}>
+          {fmtM(target)}
+        </div>
+      </div>
+    </Chapter>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 4 — JUST SAVING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function JustSavingChapter({ t, income, expenses, target, yearsToRetire }: {
+  t: Translations;
+  income: number; expenses: number; target: number; yearsToRetire: number;
+}) {
+  const investable = Math.max(0, income - expenses);
+  const mattress   = investable * 12 * yearsToRetire;
+  const bank       = projectAt(investable, 0.01, yearsToRetire);
+  const best       = Math.max(mattress, bank);
+  const shortBy    = Math.max(0, target - best);
+  const maxBar     = Math.max(target, best) || 1;
+  const wMatt      = (mattress / maxBar) * 100;
+  const wBank      = (bank / maxBar)     * 100;
+
+  return (
+    <Chapter tag={t.ch4}>
+      <ChapterHead text={t.saveHead} />
+
+      <div style={{ marginTop: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 124, flexShrink: 0 }}>
+            {t.saveMatt}
+          </div>
+          <div style={{ flex: 1, height: 18, background: "var(--bg-raised)", position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${wMatt}%`, background: "var(--muted)", opacity: 0.6 }} />
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--ink)", width: 78, textAlign: "right", flexShrink: 0 }}>
+            {fmtM(mattress)}
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 124, flexShrink: 0 }}>
+            {t.saveBank}
+          </div>
+          <div style={{ flex: 1, height: 18, background: "var(--bg-raised)", position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${wBank}%`, background: "var(--ink)", opacity: 0.7 }} />
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--ink)", width: 78, textAlign: "right", flexShrink: 0 }}>
+            {fmtM(bank)}
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--caution)", width: 124, flexShrink: 0 }}>
+            {t.saveTarget}
+          </div>
+          <div style={{ flex: 1, height: 18, background: "var(--bg-raised)", position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: "100%", background: "var(--caution)", opacity: 0.85 }} />
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--caution)", width: 78, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>
+            {fmtM(target)}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 18, padding: "16px 0 0", borderTop: "1px solid var(--line)" }}>
+        <p className="t-body" style={{
+          color: shortBy > 0 ? "var(--bear)" : "var(--bull)",
+          lineHeight: 1.6, margin: 0, fontWeight: 700,
+        }}>
+          {shortBy > 0 ? t.saveResult(fmtM(shortBy)) : t.saveOnTrack}
+        </p>
+        <div className="t-micro" style={{ color: "var(--dim)", marginTop: 10, textTransform: "none", letterSpacing: 0 }}>
+          {t.saveCite}
+        </div>
+      </div>
+    </Chapter>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 5 — CYCLE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function CycleChapter({ t, yearsToRetire }: { t: Translations; yearsToRetire: number }) {
+  const ILLU_MONTHLY = 10_000;
+  const ILLU_ALLOC: Allocation = { mm: 0, cm: 100, dv: 0 };
+  const series = useMemo(
+    () => projectWithCycle(ILLU_MONTHLY, ILLU_ALLOC, Math.max(yearsToRetire, 20)),
+    [yearsToRetire],
   );
 
-  // ── Tier 1: INCOME ──────────────────────────────────────────────────────────
-  if (tier === 1) return (
-    <div>
-      {header}
-      <div style={{ borderBottom: "1px solid var(--line)", padding: "12px 0 10px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.s1head.toUpperCase()}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.8rem", fontWeight: 700, color: "var(--caution)", lineHeight: 1 }}>{p.age}</span>
-        </div>
-        <input type="range" min={18} max={55} step={1} value={p.age}
-          onChange={e => p.setAge(Number(e.target.value))}
-          style={{ width: "100%", accentColor: "var(--caution)", cursor: "pointer", height: 3, minHeight: 44, display: "block" }} />
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>18</span>
-          <span className="t-micro" style={{ color: "var(--caution)" }}>{t.s1left(p.yearsToRetire)}</span>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>55</span>
-        </div>
+  if (series.length === 0) return (
+    <Chapter tag={t.ch5}><ChapterHead text={t.cycleHead} /></Chapter>
+  );
+
+  const W = 600, H = 200;
+  const vals = series.map(p => p.value);
+  const maxV = Math.max(...vals);
+  const minV = Math.min(...vals, 0);
+  const rng  = (maxV - minV) || 1;
+  function xAt(i: number) { return (i / (series.length - 1)) * W; }
+  function yAt(v: number) { return H - 38 - ((v - minV) / rng) * (H - 60); }
+  const path = series.map((p, i) => `${i === 0 ? "M" : "L"} ${xAt(i).toFixed(1)} ${yAt(p.value).toFixed(1)}`).join(" ");
+
+  const retX = yearsToRetire <= series.length ? xAt(yearsToRetire - 1) : null;
+
+  const phaseColors: Record<string, string> = {
+    FRAG:   "var(--bear)",
+    RESET:  "var(--bear)",
+    RISE:   "var(--bull)",
+    BUBBLE: "var(--bull)",
+    PEAK:   "var(--caution)",
+    UNWIND: "var(--muted)",
+  };
+
+  return (
+    <Chapter tag={t.ch5}>
+      <ChapterHead text={t.cycleHead} />
+      <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
+        {t.cycleBody}
+      </p>
+
+      <div style={{ marginTop: 12 }}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}
+          aria-label="Year-by-year equity projection with cycle phases"
+        >
+          <line x1={0} y1={yAt(0)} x2={W} y2={yAt(0)} stroke="var(--line)" strokeDasharray="3 3" />
+
+          {series.map((p, i) => {
+            const x  = xAt(i);
+            const x2 = i < series.length - 1 ? xAt(i + 1) : W;
+            return (
+              <rect key={i} x={x} y={H - 28} width={x2 - x} height={7}
+                fill={phaseColors[p.phase] ?? "var(--muted)"} opacity={0.55} />
+            );
+          })}
+
+          <path d={path} fill="none" stroke="var(--caution)" strokeWidth={2} />
+          {series.map((p, i) => (
+            <circle key={i} cx={xAt(i)} cy={yAt(p.value)} r={2.5}
+              fill={p.yearRate < 0 ? "var(--bear)" : "var(--bull)"} />
+          ))}
+
+          {retX !== null && (
+            <>
+              <line x1={retX} y1={20} x2={retX} y2={H - 28} stroke="var(--caution)" strokeWidth={1.5} />
+              <text x={retX} y={16} fill="var(--caution)" fontSize="11" fontFamily="var(--font-mono)" textAnchor="middle">
+                {t.cycleRetAge}
+              </text>
+            </>
+          )}
+
+          {(["FRAG", "RESET", "RISE", "BUBBLE", "PEAK", "UNWIND"] as const).map(label => {
+            const firstIdx = series.findIndex(p => p.phase === label);
+            if (firstIdx < 0) return null;
+            return (
+              <text key={label} x={xAt(firstIdx) + 2} y={H - 12} fill={phaseColors[label]}
+                fontSize="9" fontFamily="var(--font-mono)" textAnchor="start" opacity={0.9}>
+                {label}
+              </text>
+            );
+          })}
+        </svg>
       </div>
-      <div style={{ borderBottom: "1px solid var(--line)", padding: "12px 0 10px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.s1sub.toUpperCase()}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.8rem", fontWeight: 700, color: "var(--ink)", lineHeight: 1 }}>{fmtThb(p.salary)}</span>
-        </div>
-        <input type="range" min={5_000} max={150_000} step={1_000} value={p.salary}
-          onChange={e => p.setSalary(Number(e.target.value))}
-          style={{ width: "100%", accentColor: "var(--caution)", cursor: "pointer", height: 3, minHeight: 44, display: "block" }} />
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>฿5k</span>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>฿150k</span>
-        </div>
+
+      <div className="t-micro" style={{
+        color: "var(--dim)", marginTop: 8, textTransform: "none", letterSpacing: 0, lineHeight: 1.5,
+      }}>
+        {t.cycleNote} · {t.cyclePhaseHere}
       </div>
+    </Chapter>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 6 — BUILDER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function BuilderChapter({ t, alloc, setAlloc, projected, target, suggestion }: {
+  t: Translations;
+  alloc: Allocation; setAlloc: (a: Allocation) => void;
+  projected: number; target: number;
+  suggestion: Allocation | null;
+}) {
+  function updateBucket(key: keyof Allocation, newVal: number) {
+    const v   = Math.max(0, Math.min(100, Math.round(newVal)));
+    const old = alloc[key];
+    const delta = v - old;
+    const others = (["mm", "cm", "dv"] as (keyof Allocation)[]).filter(k => k !== key);
+    const otherSum = others.reduce((s, k) => s + alloc[k], 0);
+    let n: Allocation = { ...alloc, [key]: v };
+    if (otherSum === 0) {
+      const split = (100 - v) / 2;
+      n = { ...n, [others[0]]: split, [others[1]]: split };
+    } else {
+      n = {
+        ...n,
+        [others[0]]: Math.max(0, alloc[others[0]] - (delta * alloc[others[0]]) / otherSum),
+        [others[1]]: Math.max(0, alloc[others[1]] - (delta * alloc[others[1]]) / otherSum),
+      };
+    }
+    const r: Allocation = {
+      mm: Math.round(n.mm),
+      cm: Math.round(n.cm),
+      dv: Math.round(n.dv),
+    };
+    const total = r.mm + r.cm + r.dv;
+    if (total !== 100) {
+      const adj = 100 - total;
+      const tgt = others.reduce((a, b) => r[a] > r[b] ? a : b);
+      r[tgt] = Math.max(0, r[tgt] + adj);
+    }
+    setAlloc(r);
+  }
+
+  const shortBy = Math.max(0, target - projected);
+  const onTrack = projected >= target;
+
+  const buckets: { key: keyof Allocation; label: string; desc: string; col: string }[] = [
+    { key: "mm", label: t.buildMM, desc: t.buildMMd, col: "var(--tech)" },
+    { key: "cm", label: t.buildCM, desc: t.buildCMd, col: "var(--bull)" },
+    { key: "dv", label: t.buildDV, desc: t.buildDVd, col: "var(--bear)" },
+  ];
+
+  return (
+    <Chapter tag={t.ch6}>
+      <ChapterHead text={t.buildHead} />
+
+      <div style={{ marginTop: 12 }}>
+        {buckets.map(b => (
+          <div key={b.key} style={{
+            padding: "14px 0",
+            borderTop: "1px solid var(--line)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+              <span style={{
+                fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
+                color: b.col, letterSpacing: "0.08em", fontWeight: 700,
+              }}>
+                {b.label}
+              </span>
+              <span style={{
+                fontFamily: "var(--font-mono)", fontSize: "var(--text-body)",
+                fontWeight: 700, color: b.col,
+              }}>
+                {alloc[b.key]}%
+              </span>
+            </div>
+            <Slider value={alloc[b.key]} min={0} max={100} step={1}
+              onChange={v => updateBucket(b.key, v)} accent={b.col} />
+            <div className="t-micro" style={{
+              color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 4,
+            }}>
+              {b.desc}
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
         padding: "10px 0",
+        borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
       }}>
-        <span className="t-micro" style={{ color: "var(--dim)" }}>
-          {lang === "th" ? "เป้าเกษียณ" : lang === "zh" ? "退休目标" : "RETIREMENT TARGET"}
-        </span>
+        <span className="t-micro" style={{ color: "var(--dim)" }}>{t.buildSum}</span>
         <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--muted)" }}>
-          {fmtM(p.retirementTarget)}
+          {alloc.mm + alloc.cm + alloc.dv}%
         </span>
       </div>
-    </div>
-  );
 
-  // ── Tier 2: BUDGET ──────────────────────────────────────────────────────────
-  if (tier === 2) {
-    const total    = p.living + p.transport + p.other;
-    const pct      = p.salary > 0 ? Math.min(100, Math.round((total / p.salary) * 100)) : 0;
-    const barColor = pct > 90 ? "var(--bear)" : pct > 70 ? "var(--caution)" : "var(--bull)";
-    const rows: { label: string; value: number; set: (v: number) => void; max: number }[] = [
-      { label: t.s2l1, value: p.living,    set: p.setLiving,    max: 50_000 },
-      { label: t.s2l2, value: p.transport, set: p.setTransport, max: 20_000 },
-      { label: t.s2l3, value: p.other,     set: p.setOther,     max: 30_000 },
-    ];
-    return (
-      <div>
-        {header}
-        <div style={{ padding: "8px 0", borderBottom: "1px solid var(--line)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span className="t-micro" style={{ color: "var(--dim)" }}>{fmtThb(total)} / {fmtThb(p.salary)}</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: barColor }}>{pct}% spent</span>
-          </div>
-          <div style={{ height: 4, background: "var(--line)" }}>
-            <div style={{ height: "100%", width: `${pct}%`, background: barColor, transition: "width 200ms ease" }} />
-          </div>
+      <div style={{ paddingTop: 14 }}>
+        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>
+          {t.buildProj}
         </div>
-        {rows.map(row => (
-          <div key={row.label} style={{ borderBottom: "1px solid var(--line)", padding: "10px 0 8px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-              <span className="t-micro" style={{ color: "var(--dim)" }}>{row.label}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>{fmtThb(row.value)}</span>
-            </div>
-            <input type="range" min={0} max={row.max} step={500} value={row.value}
-              onChange={e => row.set(Number(e.target.value))}
-              style={{ width: "100%", accentColor: "var(--caution)", cursor: "pointer", height: 3, minHeight: 40, display: "block" }} />
-          </div>
-        ))}
         <div style={{
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          padding: "12px 0", paddingLeft: 12,
-          borderLeft: `3px solid ${p.investable > 0 ? "var(--bull)" : "var(--bear)"}`,
-          marginTop: 4,
+          fontFamily: "var(--font-mono)", fontSize: "var(--text-display)",
+          fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)", lineHeight: 1,
         }}>
-          <span className="t-micro" style={{ color: p.investable > 0 ? "var(--bull)" : "var(--bear)" }}>{t.s2inv}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.5rem", fontWeight: 700, color: p.investable > 0 ? "var(--bull)" : "var(--bear)", lineHeight: 1 }}>
-            {fmtThb(p.investable)}
-          </span>
+          {fmtM(projected)}
         </div>
-        {p.investable <= 0 && (
-          <div className="t-micro" style={{ color: "var(--bear)", textTransform: "none", letterSpacing: 0, paddingTop: 4 }}>{t.s2warn}</div>
-        )}
-      </div>
-    );
-  }
-
-  // ── Tier 3: GROW ────────────────────────────────────────────────────────────
-  if (tier === 3) {
-    const actions = p.style ? getActions(p.style, p.investable, lang) : [];
-    return (
-      <div>
-        {header}
-        <div className="t-micro" style={{ color: "var(--dim)", padding: "0 0 8px" }}>
-          {t.s3head.toUpperCase()} — {t.s3risk.toUpperCase()} vs {t.s3ret.toUpperCase()}
+        <div style={{
+          fontFamily: "var(--font-mono)", fontSize: "var(--text-body)",
+          fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)", marginTop: 8,
+        }}>
+          {onTrack ? t.buildOK : t.buildShort(fmtM(shortBy))}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, marginBottom: 10 }}>
-          {(Object.entries(STYLES) as [StyleKey, typeof STYLES[StyleKey]][]).map(([key, s]) => {
-            const selected = p.style === key;
-            const label = lang === "zh" ? s.zh : lang === "th" ? s.th : s.en;
-            const desc  = lang === "zh" ? s.descZH : lang === "th" ? s.descTH : s.descEN;
-            const risk  = lang === "zh" ? s.riskZH : lang === "th" ? s.riskTH : s.riskEN;
-            const est   = projectAt(p.investable, s.ret, p.yearsToRetire);
-            const dbl   = doublesIn(s.ret);
-            return (
-              <button key={key} onClick={() => p.setStyle(key)} style={{
-                padding: "14px 12px",
-                background: selected ? s.color : "var(--bg-raised)",
-                border: `1px solid ${selected ? s.color : "var(--line)"}`,
-                borderBottom: selected ? `4px solid rgba(0,0,0,0.25)` : `1px solid var(--line)`,
-                cursor: "pointer", textAlign: "left", minHeight: 110,
-                display: "flex", flexDirection: "column", gap: 3,
-              }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: selected ? "#000" : s.color, letterSpacing: "0.08em" }}>
-                  {label}
-                </div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.4rem", fontWeight: 700, color: selected ? "#000" : s.color, lineHeight: 1 }}>
-                  +{(s.ret * 100).toFixed(0)}%
-                </div>
-                <div className="t-micro" style={{ color: selected ? "rgba(0,0,0,0.6)" : "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
-                  {t.s3risk}: {risk} · {lang === "th" ? "สองเท่าใน" : lang === "zh" ? "翻倍" : "×2 in"} {dbl}y
-                </div>
-                <div className="t-micro" style={{ color: selected ? "rgba(0,0,0,0.55)" : "var(--dim)", textTransform: "none", letterSpacing: 0, lineHeight: 1.3 }}>
-                  {desc}
-                </div>
-                {p.investable > 0 && (
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: selected ? "#000" : s.color, marginTop: 4, paddingTop: 4, borderTop: `1px solid ${selected ? "rgba(0,0,0,0.2)" : "var(--line)"}` }}>
-                    → {fmtM(est)}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-        {!p.style && (
-          <div className="t-micro" style={{ color: "var(--dim)", textAlign: "center", padding: "4px 0 8px" }}>{t.s3pick}</div>
-        )}
-        {actions.length > 0 && (
-          <div style={{ paddingTop: 4 }}>
-            <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 6 }}>{t.s5act}</div>
-            {actions.map((action, i) => (
-              <div key={i} style={{
-                display: "flex", gap: 12, padding: "10px 12px", marginBottom: 2,
-                background: "var(--bg-raised)", border: "1px solid var(--line)", alignItems: "flex-start",
-              }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: p.style ? STYLES[p.style].color : "var(--caution)", flexShrink: 0, paddingTop: 1 }}>
-                  0{i + 1}
-                </div>
-                <div className="t-body" style={{ color: "var(--muted)", lineHeight: 1.5 }}>{action}</div>
-              </div>
-            ))}
+        {!onTrack && (
+          <div className="t-micro" style={{
+            color: "var(--caution)", marginTop: 6, textTransform: "none", letterSpacing: 0,
+          }}>
+            {suggestion
+              ? t.buildSugg(suggestion.mm, suggestion.cm, suggestion.dv)
+              : t.buildNoSugg}
           </div>
         )}
       </div>
-    );
-  }
-
-  // ── Tier 4: FREEDOM ─────────────────────────────────────────────────────────
-  if (tier === 4) {
-    const sel      = p.style ? STYLES[p.style] : null;
-    const maxAbs   = Math.max(...WORLD_2024.map(m => Math.abs(m.ytd)));
-    const color    = p.onTrack ? "var(--bull)" : p.readiness >= 70 ? "var(--caution)" : "var(--bear)";
-    const barW     = Math.min(100, p.readiness);
-    const milestones = [10, 20, p.yearsToRetire].filter((y, i, a) => a.indexOf(y) === i && y > 0);
-    return (
-      <div>
-        {header}
-        {/* Readiness */}
-        <div style={{ borderBottom: "1px solid var(--line)", padding: "10px 0 10px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span className="t-micro" style={{ color: "var(--dim)" }}>{t.s5read}</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color }}>{p.readiness}%</span>
-          </div>
-          <div style={{ height: 5, background: "var(--line)" }}>
-            <div style={{ height: "100%", width: `${barW}%`, background: color, transition: "width 800ms ease" }} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-            <div>
-              <div className="t-micro" style={{ color: "var(--dim)" }}>{t.s5tgt}</div>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", fontWeight: 700, color: "var(--muted)" }}>{fmtM(Math.round(p.retirementTarget / 1000) * 1000)}</div>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <div className="t-micro" style={{ color }}>{p.onTrack ? t.s5good : t.s5gap}</div>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", fontWeight: 700, color }}>{fmtM(Math.round(p.projectedValue / 1000) * 1000)}</div>
-            </div>
-          </div>
-        </div>
-        {/* World markets */}
-        <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "10px 12px", marginTop: 8, marginBottom: 3 }}>
-          <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 10 }}>{t.s4ref}</div>
-          {[...WORLD_2024].sort((a, b) => b.ytd - a.ytd).map(m => {
-            const pos    = m.ytd >= 0;
-            const barPct = (Math.abs(m.ytd) / maxAbs) * 100;
-            const col    = pos ? "var(--bull)" : "var(--bear)";
-            return (
-              <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: m.label === "SET" ? "var(--caution)" : "var(--muted)", width: 68, flexShrink: 0 }}>{m.label}</div>
-                <div style={{ flex: 1, height: 12, background: "var(--bg-raised)", position: "relative" }}>
-                  <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${barPct}%`, background: col, opacity: 0.75 }} />
-                </div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: col, width: 48, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>
-                  {pos ? "+" : ""}{m.ytd}%
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {/* SET forecast */}
-        <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "10px 12px", marginBottom: 3 }}>
-          <div className="t-micro" style={{ color: "var(--caution)", marginBottom: 8 }}>{t.s4ai}</div>
-          {p.forecast
-            ? <ForecastChart data={p.forecast} note={t.s4note} />
-            : <div className="t-micro" style={{ color: "var(--dim)", padding: "8px 0", textTransform: "none", letterSpacing: 0 }}>
-                {lang === "th" ? "กำลังโหลด…" : lang === "zh" ? "加载中…" : "Loading forecast…"}
-              </div>
-          }
-        </div>
-        {/* Trajectory */}
-        {sel && (
-          <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "10px 12px" }}>
-            <div className="t-micro" style={{ color: sel.color, marginBottom: 10 }}>{t.s4proj}</div>
-            {milestones.map(yrs => {
-              const val   = projectAt(p.investable, sel.ret, yrs);
-              const ageAt = p.age + yrs;
-              return (
-                <div key={yrs} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 52, flexShrink: 0 }}>{t.s4age} {ageAt}</div>
-                  <div style={{ flex: 1, height: 8, background: "var(--bg-raised)" }}>
-                    <div style={{ height: "100%", width: `${Math.min(100, (yrs / p.yearsToRetire) * 100)}%`, background: sel.color, opacity: 0.6 }} />
-                  </div>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--ink)", width: 72, textAlign: "right", flexShrink: 0 }}>{fmtM(val)}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ── Tier 5: IKIGAI ──────────────────────────────────────────────────────────
-  const sel       = p.style ? STYLES[p.style] : null;
-  const ikColor   = p.ikigaiReadiness >= 100 ? "var(--caution)" : p.ikigaiReadiness >= 60 ? "var(--bull)" : "var(--muted)";
-  const ikBarW    = Math.min(100, p.ikigaiReadiness);
-  return (
-    <div>
-      {header}
-      {/* Ikigai target */}
-      <div style={{ borderBottom: "1px solid var(--line)", padding: "10px 0 12px" }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>{t.ikigaiTitle}</div>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 8, textTransform: "none", letterSpacing: 0 }}>{t.ikigaiFormula}</div>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-display)", fontWeight: 700, color: "var(--caution)", lineHeight: 1, marginBottom: 4 }}>
-          {fmtM(p.ikigaiTarget)}
-        </div>
-        {sel && (
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
-            {fmtThb(p.monthlyExpenses)} × 12 ÷ {(sel.ret * 100).toFixed(0)}% = {fmtM(p.ikigaiTarget)}
-          </div>
-        )}
-      </div>
-      {/* Ikigai readiness */}
-      <div style={{ borderBottom: "1px solid var(--line)", padding: "10px 0 10px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.ikigaiReadiness}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: ikColor }}>{p.ikigaiReadiness}%</span>
-        </div>
-        <div style={{ height: 5, background: "var(--line)" }}>
-          <div style={{ height: "100%", width: `${ikBarW}%`, background: ikColor, transition: "width 800ms ease" }} />
-        </div>
-        {sel && (
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 4 }}>
-            {fmtM(p.projectedValue)} projected → {fmtM(p.ikigaiTarget)} target
-          </div>
-        )}
-      </div>
-      {/* Dalio 6-bucket */}
-      <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "10px 12px", marginTop: 8, marginBottom: 3 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-          <div className="t-micro" style={{ color: "var(--bear)" }}>
-            {lang === "th" ? "Dalio ขั้น 5/6 · วิธีจัดพอร์ตตอนนี้" : lang === "zh" ? "达利欧5/6阶段 · 现在怎么配" : "DALIO 5/6 · HOW TO BUILD THE PORTFOLIO NOW"}
-          </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--bear)", border: "1px solid var(--bear)", padding: "0 4px", lineHeight: 1.6 }}>5/6</div>
-        </div>
-        {([
-          { label: lang === "th" ? "ทอง" : lang === "zh" ? "黄金" : "GOLD",          pct: 15, col: "var(--caution)" },
-          { label: lang === "th" ? "หุ้นปันผล" : lang === "zh" ? "贵族股息" : "ARISTOCRATS", pct: 25, col: "var(--bull)" },
-          { label: lang === "th" ? "โครงสร้างพื้นฐาน" : lang === "zh" ? "基础设施" : "INFRA",       pct: 20, col: "var(--tech)" },
-          { label: lang === "th" ? "พันธบัตร TIPS" : lang === "zh" ? "通胀债券" : "TIPS/BONDS",   pct: 20, col: "var(--muted)" },
-          { label: lang === "th" ? "เงินสด" : lang === "zh" ? "现金" : "CASH",         pct: 15, col: "var(--dim)" },
-          { label: lang === "th" ? "เก็งกำไร" : lang === "zh" ? "投机" : "SPECULATIVE",  pct: 5,  col: "var(--bear)" },
-        ] as { label: string; pct: number; col: string }[]).map(bucket => (
-          <div key={bucket.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: bucket.col, width: 96, flexShrink: 0 }}>{bucket.label}</span>
-            <div style={{ flex: 1, height: 6, background: "var(--bg-raised)" }}>
-              <div style={{ width: `${bucket.pct * 4}%`, height: "100%", background: bucket.col, opacity: 0.8 }} />
-            </div>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: bucket.col, width: 28, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>{bucket.pct}%</span>
-          </div>
-        ))}
-        <div style={{ marginTop: 10, borderTop: "1px solid var(--line)", paddingTop: 10 }}>
-          <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 6 }}>
-            {lang === "th" ? "ไทม์ไลน์สะสม" : lang === "zh" ? "积累时间线" : "ACCUMULATION TIMELINE"}
-          </div>
-          {([
-            { period: "2026–27", action: lang === "th" ? "รักษาทุน ไม่ต้องเร่ง ขั้น 5 ยังอยู่" : lang === "zh" ? "保本守势。不急。第5阶段还在。" : "Preserve capital. Do not chase. Stage 5 is still here.", col: "var(--bear)" },
-            { period: "2028–29", action: lang === "th" ? "ลงทุนตอนโลกตื่นตระหนก ราคาต่ำ = โอกาส" : lang === "zh" ? "恐慌时入场。低价=机会。" : "Deploy when the world is afraid. Low prices are the compensation for courage.", col: "var(--caution)" },
-            { period: "2030+",   action: lang === "th" ? "ทบต้น รอบใหม่เริ่ม แค่อยู่ให้ครบ" : lang === "zh" ? "复利生长。新周期开始。活到那一天。" : "Compound. New cycle begins. Stay alive until then.", col: "var(--bull)" },
-          ] as { period: string; action: string; col: string }[]).map(row => (
-            <div key={row.period} style={{ display: "flex", gap: 8, padding: "4px 0", borderBottom: "1px solid var(--line)", alignItems: "flex-start" }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: row.col, width: 56, flexShrink: 0, fontWeight: 700 }}>{row.period}</span>
-              <span className="t-body" style={{ fontSize: "var(--text-micro)", color: "var(--muted)", lineHeight: 1.4 }}>{row.action}</span>
-            </div>
-          ))}
-        </div>
-        <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 8 }}>
-          {lang === "th" ? "อ้างอิง: Ray Dalio Big Debt Cycles + Wyckoff Method · 2026" : lang === "zh" ? "参考：瑞·达利欧债务周期 + 威科夫理论 · 2026" : "Ref: Ray Dalio Big Debt Cycles + Wyckoff Method · 2026"}
-        </div>
-      </div>
-      {/* Restart */}
-      <button onClick={p.onRestart} style={{
-        background: "transparent", border: "1px solid var(--line)",
-        color: "var(--dim)", fontFamily: "var(--font-mono)",
-        fontSize: "var(--text-micro)", letterSpacing: "0.08em",
-        padding: "0 20px", cursor: "pointer", minHeight: 40, width: "100%", marginTop: 12,
-      }}>
-        {t.s5rs}
-      </button>
-    </div>
+    </Chapter>
   );
 }
 
-// ─── Forecast SVG Chart ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// Ch 7 — COMMITMENT
+// ═══════════════════════════════════════════════════════════════════════════════
 
-function ForecastChart({ data, note }: { data: ForecastData; note: string }) {
-  const { last_close, rows } = data;
-  if (!rows?.length) return null;
+function CommitmentChapter({ t, income, expenses, alloc, target, projected, yearsToRetire }: {
+  t: Translations;
+  income: number; expenses: number; alloc: Allocation;
+  target: number; projected: number; yearsToRetire: number;
+}) {
+  const investable = Math.max(0, income - expenses);
+  const [copied, setCopied] = useState(false);
 
-  const all  = [last_close, ...rows.map(r => r.predicted), ...rows.map(r => r.lower_80), ...rows.map(r => r.upper_80)];
-  const minV = Math.min(...all);
-  const maxV = Math.max(...all);
-  const rng  = maxV - minV || 1;
-  const W = 280; const H = 64;
-
-  const pts  = [last_close, ...rows.map(r => r.predicted)];
-  const toX  = (i: number) => (i / (pts.length - 1)) * W;
-  const toY  = (v: number) => H - ((v - minV) / rng) * (H - 4) - 2;
-
-  const linePath  = pts.map((v, i) => `${i === 0 ? "M" : "L"} ${toX(i).toFixed(1)} ${toY(v).toFixed(1)}`).join(" ");
-  const bandUpper = rows.map((r, i) => `${i === 0 ? "M" : "L"} ${toX(i + 1).toFixed(1)} ${toY(r.upper_80).toFixed(1)}`).join(" ");
-  const bandLower = [...rows].reverse().map((r, i) => `L ${toX(rows.length - i).toFixed(1)} ${toY(r.lower_80).toFixed(1)}`).join(" ");
-  const band      = `${bandUpper} ${bandLower} Z`;
-
-  const last    = rows[rows.length - 1];
-  const dir     = last.predicted >= last_close;
-  const lineCol = dir ? "var(--bull)" : "var(--bear)";
-  const chg     = ((last.predicted / last_close - 1) * 100).toFixed(1);
+  async function share() {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const text = `Retirement target: ${fmtM(target)} · allocation: ${alloc.mm}/${alloc.cm}/${alloc.dv}`;
+    const nav = navigator as unknown as {
+      share?: (d: { title: string; text: string; url: string }) => Promise<void>;
+    };
+    if (nav.share) {
+      try { await nav.share({ title: "Siam Markets · Plan", text, url }); }
+      catch { /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch { /* clipboard blocked */ }
+    }
+  }
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--muted)" }}>{last_close.toFixed(2)}</span>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: lineCol, fontWeight: 700 }}>
-          {last.predicted.toFixed(2)}  {dir ? "▲" : "▼"} {dir ? "+" : ""}{chg}%
+    <Chapter tag={t.ch7}>
+      <ChapterHead text={t.commHead} />
+
+      <div style={{
+        padding: "16px 0",
+        borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
+      }}>
+        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 10 }}>
+          {t.commYouAre}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px" }}>
+          <div>
+            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commIncomeLabel}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
+              {fmtThb(income)}
+            </div>
+          </div>
+          <div>
+            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commExpenseLabel}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
+              {fmtThb(expenses)}
+            </div>
+          </div>
+          <div>
+            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commTargetLabel}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--caution)" }}>
+              {fmtM(target)}
+            </div>
+          </div>
+          <div>
+            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commProjectedLabel}</div>
+            <div style={{
+              fontFamily: "var(--font-mono)", fontSize: "var(--text-body)",
+              fontWeight: 700, color: projected >= target ? "var(--bull)" : "var(--bear)",
+            }}>
+              {fmtM(projected)}
+            </div>
+          </div>
+          <div style={{ gridColumn: "span 2", paddingTop: 4 }}>
+            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commAllocLabel}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700 }}>
+              <span style={{ color: "var(--tech)" }}>{alloc.mm}%</span>{" · "}
+              <span style={{ color: "var(--bull)" }}>{alloc.cm}%</span>{" · "}
+              <span style={{ color: "var(--bear)" }}>{alloc.dv}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ paddingTop: 12 }}>
+        {[t.commAct1, t.commAct2(fmtThb(investable)), t.commAct3].map((line, i) => (
+          <div key={i} style={{
+            display: "flex", gap: 14, padding: "12px 0",
+            borderBottom: i < 2 ? "1px solid var(--line)" : "none",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
+              fontWeight: 700, color: "var(--caution)", flexShrink: 0, paddingTop: 1,
+              width: 24,
+            }}>
+              0{i + 1}
+            </div>
+            <div className="t-body" style={{ color: "var(--muted)", lineHeight: 1.55 }}>
+              {line}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ paddingTop: 16, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <button onClick={share} style={{
+          fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
+          color: "#000", background: "var(--caution)",
+          border: "none", borderBottom: "3px solid rgba(0,0,0,0.25)",
+          padding: "0 22px", cursor: "pointer", minHeight: 44,
+          letterSpacing: "0.1em", fontWeight: 700,
+        }}>
+          {copied ? t.commCopy : t.commShare}
+        </button>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>
+          {yearsToRetire} yrs · {alloc.mm}/{alloc.cm}/{alloc.dv}
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: 56, display: "block" }} aria-label="SET 5-day AI forecast">
-        <path d={band} fill={lineCol} fillOpacity={0.12} stroke="none" />
-        <line x1={toX(0)} y1={toY(last_close)} x2={toX(pts.length - 1)} y2={toY(last_close)}
-          stroke="var(--line)" strokeWidth="1" strokeDasharray="4 3" />
-        <path d={linePath} fill="none" stroke={lineCol} strokeWidth={2} />
-        {rows.map((r, i) => (
-          <circle key={i} cx={toX(i + 1).toFixed(1)} cy={toY(r.predicted).toFixed(1)} r={2.5} fill={lineCol} />
-        ))}
-        <circle cx={toX(0).toFixed(1)} cy={toY(last_close).toFixed(1)} r={3} fill="var(--ink)" />
-      </svg>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
-        <span className="t-micro" style={{ color: "var(--dim)" }}>Today</span>
-        <span className="t-micro" style={{ color: "var(--dim)" }}>{rows[rows.length - 1]?.target_date}</span>
+
+      <div className="t-micro" style={{
+        color: "var(--dim)", lineHeight: 1.6, textTransform: "none", letterSpacing: 0,
+        marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)",
+      }}>
+        {t.commNoSave}
       </div>
-      <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 4 }}>{note}</div>
-    </div>
+    </Chapter>
   );
 }
 
-// ─── Context Panel (desktop right column) ────────────────────────────────────
-
-type ContextProps = {
-  lang: Lang; t: Translations;
-  age: number; salary: number; investable: number;
-  retirementTarget: number; style: StyleKey | null;
-  projectedValue: number; readiness: number; onTrack: boolean;
-  forecast: ForecastData | null; yearsToRetire: number;
-  activeTier: 1|2|3|4|5|null; currentLevel: number;
-};
-
-function ContextPanel(p: ContextProps) {
-  const sel    = p.style ? STYLES[p.style] : null;
-  const maxAbs = Math.max(...WORLD_2024.map(m => Math.abs(m.ytd)));
-  const hasInv = p.investable > 0;
-
-  const milestoneYears: number[] = [];
-  for (let y = 5; y <= p.yearsToRetire; y += 5) milestoneYears.push(y);
-  if (milestoneYears[milestoneYears.length - 1] !== p.yearsToRetire) milestoneYears.push(p.yearsToRetire);
-
-  const ctxKey = p.activeTier ?? Math.max(1, Math.min(5, p.currentLevel)) as 1|2|3|4|5;
-  const ctxNote: Record<1|2|3|4|5, Record<Lang, string>> = {
-    1: { en: "Income is the foundation. Every constraint upstream traces back here.", th: "รายได้คือรากฐาน ข้อจำกัดทุกอย่างมาจากจุดนี้", zh: "收入是基础，所有上游约束都追溯于此。" },
-    2: { en: "Every extra ฿1,000/month invested compounds to ≈ ฿1.6M over 30 years at 7%.", th: "ทุก ฿1,000/เดือนที่ลงทุนเพิ่ม ≈ ฿1.6M ใน 30 ปีที่ 7%", zh: "每多投1,000铢/月，30年7%收益约复利至160万铢。" },
-    3: { en: "Choose the style you can hold through market crashes without selling.", th: "เลือกสไตล์ที่คุณยึดได้แม้ตลาดร่วงหนัก โดยไม่ขาย", zh: "选择即便市场崩溃也能坚守、不会抛售的风格。" },
-    4: { en: "The world is the market. SET is one instrument in it.", th: "โลกคือตลาด SET เป็นแค่หนึ่งในนั้น", zh: "世界就是市场，泰股只是其中一个工具。" },
-    5: { en: "Passive income at IKIGAI level = money pressure ends. That is the whole game.", th: "รายได้ passive ระดับ IKIGAI = แรงกดดันเรื่องเงินหายไป นั่นคือทั้งหมดของเกม", zh: "被动收入达到IKIGAI水平=金钱压力消失。这就是整个游戏。" },
-  };
-
-  return (
-    <>
-      {/* Context note */}
-      <div style={{ borderBottom: "1px solid var(--line)", paddingBottom: 12 }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 6 }}>
-          {p.activeTier ? `TIER ${p.activeTier} · ${["", p.t.t1, p.t.t2, p.t.t3, p.t.t4, p.t.t5][p.activeTier]}` : `LEVEL ${p.currentLevel} / 5`}
-        </div>
-        <div className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6 }}>
-          {ctxNote[ctxKey]?.[p.lang]}
-        </div>
-      </div>
-
-      {/* World markets */}
-      <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "12px 16px" }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 12 }}>{p.t.s4ref}</div>
-        {[...WORLD_2024].sort((a, b) => b.ytd - a.ytd).map(m => {
-          const pos    = m.ytd >= 0;
-          const barPct = (Math.abs(m.ytd) / maxAbs) * 100;
-          const col    = pos ? "var(--bull)" : "var(--bear)";
-          return (
-            <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: m.label === "SET" ? "var(--caution)" : "var(--muted)", width: 72, flexShrink: 0 }}>{m.label}</div>
-              <div style={{ flex: 1, height: 16, background: "var(--bg-raised)", position: "relative" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${barPct}%`, background: col, opacity: 0.75, transition: "width 600ms ease" }} />
-              </div>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: col, width: 52, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>
-                {pos ? "+" : ""}{m.ytd}%
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* SET Forecast */}
-      <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "12px 16px" }}>
-        <div className="t-micro" style={{ color: "var(--caution)", marginBottom: 10 }}>{p.t.s4ai}</div>
-        {p.forecast
-          ? <ForecastChart data={p.forecast} note={p.t.s4note} />
-          : <div className="t-micro" style={{ color: "var(--dim)", padding: "8px 0", textTransform: "none", letterSpacing: 0 }}>
-              {p.lang === "th" ? "กำลังโหลด…" : p.lang === "zh" ? "加载中…" : "Loading forecast…"}
-            </div>
-        }
-      </div>
-
-      {/* Style matrix */}
-      {hasInv && (
-        <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "12px 16px" }}>
-          <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 10 }}>
-            {p.lang === "th" ? "เปรียบเทียบ 4 สไตล์ · ข้อมูลเดียวกัน" : p.lang === "zh" ? "四种风格对比 · 相同输入" : "STYLE MATRIX · SAME INPUTS · 4 PATHS"}
-          </div>
-          {(Object.entries(STYLES) as [StyleKey, typeof STYLES[StyleKey]][]).map(([key, s]) => {
-            const proj    = projectAt(p.investable, s.ret, p.yearsToRetire);
-            const diffPct = p.retirementTarget > 0 ? Math.round((proj / p.retirementTarget - 1) * 100) : 0;
-            const isSel   = p.style === key;
-            const label   = p.lang === "zh" ? s.zh : p.lang === "th" ? s.th : s.en;
-            return (
-              <div key={key} style={{
-                display: "flex", alignItems: "center", gap: 8, padding: "7px 0",
-                borderBottom: "1px solid var(--line)",
-                background: isSel ? `color-mix(in srgb, ${s.color} 6%, transparent)` : "transparent",
-              }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isSel ? s.color : "var(--muted)", width: 68, flexShrink: 0, fontWeight: isSel ? 700 : 400 }}>{label}{isSel ? " ▶" : ""}</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 36, flexShrink: 0 }}>+{(s.ret * 100).toFixed(0)}%</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isSel ? s.color : "var(--ink)", fontWeight: isSel ? 700 : 400, flex: 1, textAlign: "right" }}>{fmtM(proj)}</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: diffPct >= 0 ? "var(--bull)" : "var(--bear)", fontWeight: 700, width: 44, textAlign: "right", flexShrink: 0 }}>
-                  {diffPct >= 0 ? "+" : ""}{diffPct}%
-                </div>
-              </div>
-            );
-          })}
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 6 }}>
-            {p.lang === "th" ? "% เทียบกับเป้าหมายเกษียณของคุณ" : p.lang === "zh" ? "% 相对于你的退休目标" : "% vs your retirement target"}
-          </div>
-        </div>
-      )}
-
-      {/* Inverse calculator */}
-      {p.retirementTarget > 0 && (
-        <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "12px 16px" }}>
-          <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 10 }}>
-            {p.lang === "th" ? `ต้องลงทุนเดือนละเท่าไหร่เพื่อ ${fmtM(p.retirementTarget)}` : p.lang === "zh" ? `每月需投多少才能达到 ${fmtM(p.retirementTarget)}` : `MONTHLY NEEDED TO HIT ${fmtM(p.retirementTarget)}`}
-          </div>
-          {(Object.entries(STYLES) as [StyleKey, typeof STYLES[StyleKey]][]).map(([key, s]) => {
-            const needed = monthlyNeeded(p.retirementTarget, s.ret, p.yearsToRetire);
-            const canHit = p.investable >= needed;
-            const isSel  = p.style === key;
-            const label  = p.lang === "zh" ? s.zh : p.lang === "th" ? s.th : s.en;
-            return (
-              <div key={key} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isSel ? s.color : "var(--muted)", width: 68, flexShrink: 0, fontWeight: isSel ? 700 : 400 }}>{label}</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 36, flexShrink: 0 }}>+{(s.ret * 100).toFixed(0)}%</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: canHit ? "var(--bull)" : "var(--bear)", fontWeight: 700, flex: 1, textAlign: "right" }}>
-                  {fmtThb(Math.ceil(needed / 100) * 100)}/mo
-                </div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: canHit ? "var(--bull)" : "var(--bear)", width: 44, textAlign: "right", flexShrink: 0 }}>
-                  {canHit ? "✓" : "✗"}
-                </div>
-              </div>
-            );
-          })}
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 6 }}>
-            {p.lang === "th" ? `เปรียบกับรายรับของคุณ ${fmtThb(p.investable)}/เดือน` : p.lang === "zh" ? `你当前可投：${fmtThb(p.investable)}/月` : `Your current investable: ${fmtThb(p.investable)}/mo`}
-          </div>
-        </div>
-      )}
-
-      {/* Year-by-year milestones */}
-      {sel && hasInv && (
-        <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "12px 16px" }}>
-          <div className="t-micro" style={{ color: sel.color, marginBottom: 10 }}>
-            {p.lang === "th" ? `วิถีความมั่งคั่ง · ${sel.th} · +${(sel.ret * 100).toFixed(0)}%/ปี` : p.lang === "zh" ? `财富轨迹 · ${sel.zh} · +${(sel.ret * 100).toFixed(0)}%/年` : `WEALTH TRAJECTORY · ${sel.en} · +${(sel.ret * 100).toFixed(0)}%/YR`}
-          </div>
-          <div style={{ display: "flex", gap: 8, padding: "0 0 4px", borderBottom: "1px solid var(--line)", marginBottom: 4 }}>
-            <span className="t-micro" style={{ color: "var(--dim)", width: 52, flexShrink: 0 }}>AGE</span>
-            <span className="t-micro" style={{ color: "var(--dim)", width: 36, flexShrink: 0 }}>+YRS</span>
-            <span className="t-micro" style={{ color: "var(--dim)", flex: 1, textAlign: "right" }}>PROJECTED</span>
-          </div>
-          {milestoneYears.map(yrs => {
-            const val   = projectAt(p.investable, sel.ret, yrs);
-            const ageAt = p.age + yrs;
-            const isRet = yrs === p.yearsToRetire;
-            return (
-              <div key={yrs} style={{
-                display: "flex", gap: 8, padding: "5px 0",
-                borderBottom: isRet ? `1px solid ${sel.color}` : "1px solid var(--line)",
-                background: isRet ? `color-mix(in srgb, ${sel.color} 6%, transparent)` : "transparent",
-              }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isRet ? sel.color : "var(--muted)", width: 52, flexShrink: 0, fontWeight: isRet ? 700 : 400 }}>{ageAt}{isRet ? " ←" : ""}</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 36, flexShrink: 0 }}>+{yrs}</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isRet ? sel.color : "var(--ink)", fontWeight: isRet ? 700 : 400, flex: 1, textAlign: "right" }}>{fmtM(val)}</div>
-              </div>
-            );
-          })}
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 6 }}>
-            {p.lang === "th" ? "ลงทุน " + fmtThb(p.investable) + "/เดือน · ทบต้นรายเดือน · ไม่หักภาษี"
-              : p.lang === "zh" ? `月投 ${fmtThb(p.investable)} · 月复利 · 未扣税`
-              : `${fmtThb(p.investable)}/mo invested · monthly compounding · pre-tax`}
-          </div>
-        </div>
-      )}
-
-      {/* Rule of 72 */}
-      <div style={{ background: "var(--bg)", border: "1px solid var(--line)", padding: "12px 16px" }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 10 }}>
-          {p.lang === "th" ? "กฎ 72 — เงินสองเท่าในกี่ปี?" : p.lang === "zh" ? "72法则 — 几年翻倍？" : "RULE OF 72 — YEARS TO DOUBLE"}
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-          {(Object.entries(STYLES) as [StyleKey, typeof STYLES[StyleKey]][]).map(([key, s]) => {
-            const dbl   = doublesIn(s.ret);
-            const isSel = p.style === key;
-            const label = p.lang === "zh" ? s.zh : p.lang === "th" ? s.th : s.en;
-            return (
-              <div key={key} style={{
-                padding: "8px 10px",
-                background: isSel ? `color-mix(in srgb, ${s.color} 10%, var(--bg-raised))` : "var(--bg-raised)",
-                border: `1px solid ${isSel ? s.color : "var(--line)"}`,
-              }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isSel ? s.color : "var(--muted)" }}>{label}</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.2rem", fontWeight: 700, color: isSel ? s.color : "var(--ink)", lineHeight: 1.1 }}>
-                  {dbl}<span style={{ fontSize: "var(--text-micro)", fontWeight: 400, color: "var(--dim)" }}> yrs</span>
-                </div>
-                <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>+{(s.ret * 100).toFixed(0)}%/yr</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: "auto", paddingTop: 12, borderTop: "1px solid var(--line)" }}>
-        {p.lang === "th"
-          ? "ข้อมูลตลาดโลก: อ้างอิงปี 2024 · AI Forecast: TIMESFM (Google) · ผลตอบแทนในอดีตไม่รับประกันอนาคต"
-          : p.lang === "zh"
-          ? "全球市场：2024年参考数据 · AI预测：TIMESFM（谷歌）· 历史收益不代表未来"
-          : "World markets: 2024 reference · AI forecast: TIMESFM (Google) · Past returns ≠ future results"}
-      </div>
-    </>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// Page
+// ═══════════════════════════════════════════════════════════════════════════════
 
 export default function PlanPage() {
-  const [lang,        setLang]       = useState<Lang>("en");
-  const [activeTier,  setActiveTier] = useState<1|2|3|4|5|null>(null);
-  const [age,         setAge]        = useState(22);
-  const [salary,      setSalary]     = useState(15_000);
-  const [living,      setLiving]     = useState(8_000);
-  const [transport,   setTransport]  = useState(1_500);
-  const [other,       setOther]      = useState(2_000);
-  const [style,       setStyle]      = useState<StyleKey | null>(null);
-  const [forecast,    setForecast]   = useState<ForecastData | null>(null);
+  const [lang,     setLang]     = useState<Lang>("en");
+  const [age,      setAge]      = useState(30);
+  const [income,   setIncome]   = useState(35_000);
+  const [expenses, setExpenses] = useState(TH_MIDDLE_CLASS_BASELINE);
+  const [alloc,    setAlloc]    = useState<Allocation>({ mm: 30, cm: 60, dv: 10 });
 
   const t = T[lang];
 
-  useEffect(() => {
-    fetch("/api/forecast-set")
-      .then(r => r.json())
-      .then((d: ForecastData) => { if (d?.rows?.length) setForecast(d); })
-      .catch(() => {});
-  }, []);
+  const yearsToRetire   = Math.max(1, TH_RETIRE_AGE - age);
+  const yearsPostRetire = Math.max(1, TH_LIFE_EXPECTANCY - TH_RETIRE_AGE);
+  const target          = expenses * 12 * yearsPostRetire;
+  const investable      = Math.max(0, income - expenses);
 
-  const yearsToRetire    = Math.max(1, RETIRE - age);
-  const monthlyExpenses  = living + transport + other;
-  const investable       = Math.max(0, salary - monthlyExpenses);
-  const retirementTarget = monthlyExpenses * MONTHS * (LIFE_EXP - RETIRE);
-  const styleReturn      = style ? STYLES[style].ret : 0.07;
-  const ikigaiTarget     = monthlyExpenses > 0 ? (monthlyExpenses * 12) / styleReturn : 0;
+  const projSeries = useMemo(
+    () => projectWithCycle(investable, alloc, yearsToRetire),
+    [investable, alloc, yearsToRetire],
+  );
+  const projected = projSeries[projSeries.length - 1]?.value ?? 0;
 
-  const projectedValue = useMemo(() =>
-    style ? projectAt(investable, STYLES[style].ret, yearsToRetire) : 0,
-    [style, investable, yearsToRetire]
+  const suggestion = useMemo(
+    () => projected < target ? suggestAllocation(investable, target, yearsToRetire) : null,
+    [projected, target, investable, yearsToRetire],
   );
 
-  const onTrack        = projectedValue >= retirementTarget;
-  const readiness      = retirementTarget > 0
-    ? Math.min(150, Math.round((projectedValue / retirementTarget) * 100)) : 0;
-  const ikigaiReadiness = ikigaiTarget > 0
-    ? Math.min(150, Math.round((projectedValue / ikigaiTarget) * 100)) : 0;
-
-  const currentLevel: 0|1|2|3|4|5 =
-    salary   <= 0   ? 0 :
-    investable <= 0 ? 1 :
-    !style          ? 2 :
-    !onTrack        ? 3 :
-    projectedValue < ikigaiTarget ? 4 :
-    5;
-
-  function handleTierClick(n: 1|2|3|4|5) {
-    setActiveTier(prev => prev === n ? null : n);
-  }
-
-  function restart() {
-    setStyle(null);
-    setActiveTier(null);
-  }
-
-  const tierPanelProps = {
-    lang, t,
-    age, setAge, salary, setSalary,
-    living, setLiving, transport, setTransport, other, setOther,
-    style, setStyle,
-    investable, monthlyExpenses, yearsToRetire,
-    retirementTarget, projectedValue, onTrack, readiness,
-    ikigaiTarget, ikigaiReadiness,
-    forecast, onRestart: restart,
-  };
-
-  const contextProps = {
-    lang, t, age, salary, investable,
-    retirementTarget, style, projectedValue, readiness, onTrack,
-    forecast, yearsToRetire,
-    activeTier, currentLevel,
-  };
-
   return (
-    <div className="page page-enter plan-page">
+    <div className="page">
+      {/* Sticky header */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        position: "sticky", top: 0, zIndex: 10,
+        background: "var(--bg)",
+        padding: "8px 0 14px",
+        borderBottom: "1px solid var(--line)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <DigitalBeaver size={20} color="var(--caution)" animated aria-hidden />
+          <span style={{
+            fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
+            color: "var(--dim)", letterSpacing: "0.12em",
+          }}>
+            {t.appTag}
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: 2 }}>
+          {(["en", "th", "zh"] as Lang[]).map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{
+              fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
+              color: lang === l ? "#000" : "var(--dim)",
+              background: lang === l ? "var(--caution)" : "var(--bg-raised)",
+              border: "1px solid var(--line)",
+              borderBottom: lang === l ? "3px solid rgba(0,0,0,0.3)" : "1px solid var(--line)",
+              padding: "0 12px", cursor: "pointer", letterSpacing: "0.06em",
+              minHeight: 32, fontWeight: lang === l ? 700 : 400,
+            }}>
+              {l === "en" ? "EN" : l === "th" ? "ไทย" : "中"}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* ── Wizard column ──────────────────────────────────────────── */}
-      <div className="plan-wizard">
+      {/* Narrative — centered single column */}
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <HookChapter      t={t} />
+        <BellCurveChapter t={t} age={age} setAge={setAge} />
+        <NumbersChapter
+          t={t}
+          income={income}     setIncome={setIncome}
+          expenses={expenses} setExpenses={setExpenses}
+          target={target} yearsToRetire={yearsToRetire} yearsPostRetire={yearsPostRetire}
+        />
+        <JustSavingChapter
+          t={t} income={income} expenses={expenses}
+          target={target} yearsToRetire={yearsToRetire}
+        />
+        <CycleChapter     t={t} yearsToRetire={yearsToRetire} />
+        <BuilderChapter
+          t={t} alloc={alloc} setAlloc={setAlloc}
+          projected={projected} target={target} suggestion={suggestion}
+        />
+        <CommitmentChapter
+          t={t} income={income} expenses={expenses}
+          alloc={alloc} target={target} projected={projected}
+          yearsToRetire={yearsToRetire}
+        />
 
-        {/* Language toggle */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2, marginBottom: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <DigitalBeaver size={20} color="var(--caution)" animated aria-hidden />
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.1em" }}>
-              SIAM · PLAN
-            </span>
-          </div>
-          <div style={{ display: "flex", gap: 2 }}>
-            {(["en","th","zh"] as Lang[]).map(l => (
-              <button key={l} onClick={() => setLang(l)} style={{
-                fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-                color: lang === l ? "#000" : "var(--dim)",
-                background: lang === l ? "var(--caution)" : "var(--bg-raised)",
-                border: "1px solid var(--line)",
-                borderBottom: lang === l ? "3px solid rgba(0,0,0,0.3)" : "1px solid var(--line)",
-                padding: "0 12px", cursor: "pointer", letterSpacing: "0.06em", minHeight: 32,
-                fontWeight: lang === l ? 700 : 400,
-              }}>
-                {l === "en" ? "EN" : l === "th" ? "ไทย" : "中"}
-              </button>
-            ))}
+        <div style={{
+          marginTop: 48, paddingTop: 24, paddingBottom: 32,
+          borderTop: "1px solid var(--line)", textAlign: "center",
+        }}>
+          <div className="t-micro" style={{
+            color: "var(--dim)", textTransform: "none", letterSpacing: 0, lineHeight: 1.6,
+          }}>
+            {t.footnote}
           </div>
         </div>
-
-        {/* Pyramid */}
-        <PyramidSVG
-          currentLevel={currentLevel}
-          activeTier={activeTier}
-          onTierClick={handleTierClick}
-          t={t}
-        />
-
-        {/* Level indicator */}
-        <LevelIndicator
-          currentLevel={currentLevel}
-          activeTier={activeTier}
-          t={t} lang={lang}
-          onTrack={onTrack}
-          investable={investable}
-          style={style}
-        />
-
-        {/* Tier detail */}
-        {activeTier !== null ? (
-          <TierPanel tier={activeTier} {...tierPanelProps} />
-        ) : (
-          <div style={{
-            padding: "24px 0",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-          }}>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.1em" }}>
-              {t.tapStart}
-            </div>
-            <div style={{ display: "flex", gap: 4 }}>
-              {([1,2,3,4,5] as (1|2|3|4|5)[]).map(n => (
-                <button
-                  key={n}
-                  onClick={() => handleTierClick(n)}
-                  style={{
-                    fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-                    padding: "6px 10px", minHeight: 32,
-                    background: n <= currentLevel ? "rgba(0,200,150,0.1)" : n === currentLevel + 1 ? "rgba(255,149,0,0.1)" : "var(--bg-raised)",
-                    border: `1px solid ${n <= currentLevel ? "var(--bull)" : n === currentLevel + 1 ? "var(--caution)" : "var(--line)"}`,
-                    color: n <= currentLevel ? "var(--bull)" : n === currentLevel + 1 ? "var(--caution)" : "var(--dim)",
-                    cursor: "pointer",
-                    fontWeight: n === currentLevel + 1 ? 700 : 400,
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  {[t.t1, t.t2, t.t3, t.t4, t.t5][n - 1]}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
-
-      {/* ── Context panel (desktop only) ───────────────────────────── */}
-      <div className="plan-context">
-        <ContextPanel {...contextProps} />
-      </div>
-
     </div>
   );
 }

@@ -55,7 +55,7 @@ export default function TradePage() {
 
   // Live OHLCV fetch with mock fallback. State lives per-symbol via key in
   // a Map so switching tabs doesn't re-fetch what we already have.
-  const [ohlcvBySymbol, setOhlcvBySymbol] = useState<Record<string, { data: OHLCV[]; source: "live"|"mock"; lastUpdated: string; note: string }>>({});
+  const [ohlcvBySymbol, setOhlcvBySymbol] = useState<Record<string, { data: OHLCV[]; source: "live"|"mock"|"cache"; lastUpdated: string; note: string }>>({});
 
   useEffect(() => {
     if (ohlcvBySymbol[stock.symbol]) return;     // already loaded
@@ -92,7 +92,7 @@ export default function TradePage() {
 
   const live = ohlcvBySymbol[stock.symbol];
   const data = live?.data ?? stock.mock;     // graceful fallback while loading
-  const dataSource: "live" | "mock" = live?.source ?? "mock";
+  const dataSource: "live" | "mock" | "cache" = live?.source ?? "mock";
   const lastUpdated = live?.lastUpdated ?? null;
   const current = data[data.length - 1];
   const ref = getReference(stock.symbol);
@@ -155,7 +155,7 @@ export default function TradePage() {
             <div style={{ marginTop: 6 }}>
               <DataFreshness
                 timestamp={lastUpdated}
-                source={dataSource}
+                source={dataSource === "cache" ? "cached" : dataSource}
                 label="Yahoo Finance · OHLCV"
                 warnAfterMinutes={1440}   // EOD data — 1d before "stale"
                 staleAfterMinutes={4320}  // 3d before "offline"
@@ -179,7 +179,7 @@ export default function TradePage() {
                   letterSpacing: "0.1em",
                   padding: "6px 12px",
                   cursor: "pointer",
-                  minHeight: 36,
+                  minHeight: 44,
                 }}
               >
                 {s.symbol.replace(".BK", "")}
@@ -367,7 +367,7 @@ function SignalTab({
                 value={accountSize}
                 onChange={(e) => onAccount(Number(e.target.value))}
                 className="t-mono"
-                style={{ width: "100%", background: "var(--bg-raised)", border: "1px solid var(--line)", color: "var(--ink)", padding: "8px 10px", fontSize: "0.8125rem", minHeight: 36 }}
+                style={{ width: "100%", background: "var(--bg-raised)", border: "1px solid var(--line)", color: "var(--ink)", padding: "8px 10px", fontSize: "0.8125rem", minHeight: 44 }}
               />
             </div>
             <div>
@@ -377,7 +377,7 @@ function SignalTab({
                 value={riskPct}
                 onChange={(e) => onRisk(Number(e.target.value))}
                 className="t-mono"
-                style={{ width: "100%", background: "var(--bg-raised)", border: "1px solid var(--line)", color: "var(--ink)", padding: "8px 10px", fontSize: "0.8125rem", minHeight: 36 }}
+                style={{ width: "100%", background: "var(--bg-raised)", border: "1px solid var(--line)", color: "var(--ink)", padding: "8px 10px", fontSize: "0.8125rem", minHeight: 44 }}
               />
             </div>
             {sizing && tech.signal.entry ? (
