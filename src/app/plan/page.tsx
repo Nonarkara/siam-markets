@@ -1,672 +1,123 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { fmtThb } from "@/lib/format";
-import { DigitalBeaver } from "@/components/Mascot/DigitalBeaver";
+import { useState, useMemo, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import {
+  type Lang,
+  type GeoKey,
+  type StyleKey,
+  GEOS,
+  INVEST,
+  pureSavings,
+  investAccum,
+  fmtC,
+  cycleStageForOffset,
+} from "@/components/Plan/plan-data";
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Plan page — narrative finance journey
-// 7 chapters · Kiyosaki tone · Dalio-driven projection · 3-bucket builder
-// All copy is honest about what this is and is not (illustrative, not advice).
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════════════════
+   PLAN DASHBOARD  v3 — Financial Intelligence
+   Single-page dashboard. No scroll wizard. No pyramid.
+   Elegant. Data-rich. Educational.
+   ══════════════════════════════════════════════════════════════════════════════ */
 
-// ─── Thailand reference constants ────────────────────────────────────────────
+type LocKey = "en" | "th" | "zh";
 
-const TH_LIFE_EXPECTANCY              = 78;       // World Bank 2023
-const TH_RETIRE_AGE                   = 60;
-const TH_MIDDLE_CLASS_BASELINE        = 18_000;   // NESDC 2024, THB/mo
-const TH_MEDIAN_SAVINGS_AT_RETIREMENT = 350_000;  // BoT 2023 survey, THB (referenced in copy)
-
-const NOW_YEAR = 2026;
-
-// ─── Dalio cycle phase mapping ───────────────────────────────────────────────
-
-interface CyclePhase {
-  stage:    number;
-  label:    string;
-  meanRate: number;   // expected equity rate for the year
-}
-
-function cycleStageForOffset(yearOffset: number): CyclePhase {
-  if (yearOffset <= 2)  return { stage: 5, label: "FRAG",   meanRate:  0.01 };
-  if (yearOffset <= 4)  return { stage: 6, label: "RESET",  meanRate: -0.05 };
-  if (yearOffset <= 8)  return { stage: 1, label: "RISE",   meanRate:  0.15 };
-  if (yearOffset <= 16) return { stage: 2, label: "BUBBLE", meanRate:  0.11 };
-  if (yearOffset <= 19) return { stage: 3, label: "PEAK",   meanRate:  0.10 };
-  if (yearOffset <= 24) return { stage: 4, label: "UNWIND", meanRate:  0.02 };
-  return cycleStageForOffset(yearOffset - 25);
-}
-
-// ─── Asset betas vs cycle ────────────────────────────────────────────────────
-
-const MM_BETA = 0.3;
-const CM_BETA = 1.0;
-const DV_BETA = 2.5;
-
-interface Allocation { mm: number; cm: number; dv: number }  // each 0–100, sum 100
-
-function portfolioRateForCycle(cycleRate: number, a: Allocation): number {
-  const mmRet = 0.04 + MM_BETA * (cycleRate - 0.07);
-  const cmRet = CM_BETA * cycleRate;
-  const dvRet = DV_BETA * cycleRate;
-  return (a.mm / 100) * mmRet + (a.cm / 100) * cmRet + (a.dv / 100) * dvRet;
-}
-
-interface YearPoint {
-  year:     number;
-  value:    number;
-  phase:    string;
-  yearRate: number;
-}
-
-function projectWithCycle(
-  monthly: number,
-  alloc:   Allocation,
-  years:   number,
-): YearPoint[] {
-  if (years <= 0 || monthly <= 0) return [];
-  const out: YearPoint[] = [];
-  let value = 0;
-  for (let y = 0; y < years; y++) {
-    const stage = cycleStageForOffset(y);
-    const rate  = portfolioRateForCycle(stage.meanRate, alloc);
-    const mRate = rate / 12;
-    const yrContrib = Math.abs(mRate) < 1e-9
-      ? monthly * 12
-      : monthly * ((Math.pow(1 + mRate, 12) - 1) / mRate);
-    value = value * (1 + rate) + yrContrib;
-    out.push({ year: NOW_YEAR + y, value, phase: stage.label, yearRate: rate });
-  }
-  return out;
-}
-
-// Simple compound (for the "just save" chapter)
-function projectAt(monthly: number, annualRate: number, years: number): number {
-  if (years <= 0 || monthly <= 0) return 0;
-  if (annualRate === 0) return monthly * 12 * years;
-  const mr = annualRate / 12;
-  return monthly * ((Math.pow(1 + mr, years * 12) - 1) / mr);
-}
-
-// Suggested allocation: scan a coarse grid, return first that meets target
-function suggestAllocation(monthly: number, target: number, years: number): Allocation | null {
-  if (monthly <= 0 || target <= 0 || years <= 0) return null;
-  const candidates: Allocation[] = [
-    { mm: 70, cm: 28, dv:  2 },
-    { mm: 50, cm: 45, dv:  5 },
-    { mm: 30, cm: 60, dv: 10 },
-    { mm: 20, cm: 70, dv: 10 },
-    { mm: 15, cm: 70, dv: 15 },
-    { mm: 10, cm: 70, dv: 20 },
-    { mm:  5, cm: 70, dv: 25 },
-  ];
-  for (const a of candidates) {
-    const series = projectWithCycle(monthly, a, years);
-    const final  = series[series.length - 1]?.value ?? 0;
-    if (final >= target) return a;
-  }
-  return null;
-}
-
-// ─── Format helpers ──────────────────────────────────────────────────────────
-
-function fmtM(v: number): string {
-  if (v >= 1_000_000) return `฿${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 1_000)     return `฿${(v / 1_000).toFixed(0)}K`;
-  return fmtThb(Math.round(v));
-}
-
-// ─── Translations ────────────────────────────────────────────────────────────
-
-type Lang = "en" | "th" | "zh";
-
-interface Translations {
-  appTag: string;
-  ch1: string; ch2: string; ch3: string; ch4: string; ch5: string; ch6: string; ch7: string;
-  hookHead: string; hookSub: string; hookFig: string; hookCite: string; hookHint: string;
-  curveHead: string; curveBody: string;
-  curveLabelPeak: string; curveLabelEnd: string; curveAge: string; curvePost: string;
-  nHead:    string;
-  nIncome:  string; nExpense: string;
-  nTarget:  (years: number, amount: string) => string;
-  nYrsLeft: (n: number) => string;
-  nYrsPost: (n: number) => string;
-  saveHead: string; saveMatt: string; saveBank: string; saveTarget: string;
-  saveResult: (shortBy: string) => string;
-  saveOnTrack: string; saveCite: string;
-  cycleHead: string; cycleBody: string; cycleNote: string;
-  cyclePhaseHere: string; cycleRetAge: string;
-  buildHead: string;
-  buildMM:  string; buildMMd: string;
-  buildCM:  string; buildCMd: string;
-  buildDV:  string; buildDVd: string;
-  buildSum: string;
-  buildProj: string; buildOK: string;
-  buildShort: (amt: string) => string;
-  buildSugg:  (mm: number, cm: number, dv: number) => string;
-  buildNoSugg: string;
-  commHead: string; commYouAre: string;
-  commIncomeLabel: string; commExpenseLabel: string;
-  commTargetLabel: string; commProjectedLabel: string; commAllocLabel: string;
-  commAct1: string;
-  commAct2: (amt: string) => string;
-  commAct3: string;
-  commShare: string; commCopy: string;
-  commNoSave: string;
-  footnote: string;
-}
-
-const T: Record<Lang, Translations> = {
+const L: Record<LocKey, {
+  title: string; subtitle: string;
+  forecastTitle: string; forecastSub: string;
+  age: string; salary: string; location: string;
+  need: string; save: string; savedLabel: string; gap: string; shortBy: (s: string) => string; surplus: (s: string) => string;
+  closeGap: string; closesGap: string; onlySave: string;
+  investTitle: string; investSub: string;
+  actions: string; disclaimer: string;
+  ready: string; projected: string; target: string;
+  yrsToRetire: (n: number) => string;
+  cycleNote: string;
+  risk: Record<string, string>;
+}> = {
   en: {
-    appTag: "SIAM · PLAN",
-    ch1: "01 · HOOK",     ch2: "02 · CURVE",   ch3: "03 · NUMBERS",
-    ch4: "04 · SAVING",   ch5: "05 · CYCLE",   ch6: "06 · BUILDER",
-    ch7: "07 · COMMIT",
-    hookHead: "Do you know your own finance?",
-    hookSub:  "No. Most don't. The ones who do retire on time.",
-    hookFig:  "฿350,000",
-    hookCite: "median Thai household savings AT retirement · BoT 2023",
-    hookHint: "scroll · find out what yours has to be",
-    curveHead: "The curve nobody draws for you.",
-    curveBody: "Federer was the best at 27. Magnus Carlsen peaked at 31. The athletes you know are retired by 35. You will hit the same curve — you just don't see your peak until you're past it. The years on the way down are paid for by the years on the way up. Did you stack enough?",
-    curveLabelPeak: "peak",
-    curveLabelEnd:  "78",
-    curveAge:       "AGE",
-    curvePost:      "you · today",
-    nHead:    "Two numbers. That's all.",
-    nIncome:  "income · per month",
-    nExpense: "expenses · per month",
-    nTarget:  (yrs: number) => `To live ${yrs} years after 60 at middle-class minimum in Thailand, you need this the day you turn 60:`,
-    nYrsLeft: (n: number) => `${n} years to build`,
-    nYrsPost: (n: number) => `${n} years after`,
-    saveHead: "What happens if you just save?",
-    saveMatt: "MATTRESS · 0%",
-    saveBank: "BANK · 1% real",
-    saveTarget: "TARGET",
-    saveResult: (s: string) => `Short by ${s}. Saving keeps the number. It loses the value.`,
-    saveOnTrack: "Saving alone gets you there. Most don't have your income.",
-    saveCite: "The Thai baht lost ~30% of purchasing power 2014–2024 · BoT CPI",
-    cycleHead: "The world isn't a smooth line.",
-    cycleBody: "Stages from Ray Dalio's Big Debt Crises (2018). Pattern match across ~16 historical cycles. No fixed duration. Not a forecast — a structure recognition.",
-    cycleNote: "rate per year if you went 100% equities. your portfolio rate depends on allocation.",
-    cyclePhaseHere: "we are here · stage 5 FRAG",
-    cycleRetAge:    "your 60",
-    buildHead: "Now allocate. Watch the number react.",
-    buildMM:  "MONEY MARKET",
-    buildMMd: "deposits · gov bonds · ~4%/yr · inflation eats some",
-    buildCM:  "CAPITAL MARKET",
-    buildCMd: "mutual funds · equities · 7–10%/yr long-term · volatile",
-    buildDV:  "DERIVATIVES",
-    buildDVd: "options · leverage · crypto · −100% to +600% · 90% lose",
-    buildSum: "SUM",
-    buildProj:  "PROJECTED AT 60",
-    buildOK:    "✓ ON TRACK",
-    buildShort: (a: string) => `✗ STILL SHORT BY ${a}`,
-    buildSugg:  (mm: number, cm: number, dv: number) => `Try ${mm} / ${cm} / ${dv} to close the gap.`,
-    buildNoSugg: "Even aggressive can't close the gap. Income or expenses must change.",
-    commHead: "Three things, and you walk away.",
-    commYouAre:        "YOUR PLAN",
-    commIncomeLabel:   "INCOME",
-    commExpenseLabel:  "EXPENSES",
-    commTargetLabel:   "TARGET · AT 60",
-    commProjectedLabel:"PROJECTED",
-    commAllocLabel:    "ALLOCATION",
-    commAct1: "Open auto-invest at a TH broker — Krungsri, Kasikorn, SCB, Bualuang.",
-    commAct2: (a: string) => `Set a monthly transfer of ${a} into the chosen mix. Don't touch it.`,
-    commAct3: "Review once every 12 months. Rebalance. Then forget it again.",
-    commShare:  "share this plan",
-    commCopy:   "link copied",
-    commNoSave: "This page does not save your numbers. Take a screenshot. Talk to a real advisor. Or send this link to a friend who needs it.",
-    footnote:   "Rates derived from Ray Dalio Big Debt Crises (2018) · illustrative only · not investment advice",
+    title: "Your Financial Horizon",
+    subtitle: "Age. Salary. Location. See what the next 50 years hold — and what you must do about it.",
+    forecastTitle: "The Economy of the Next 50 Years",
+    forecastSub: "Based on Ray Dalio's cycle framework. History doesn't repeat, but it rhymes.",
+    age: "YOUR AGE", salary: "STARTING SALARY", location: "WHERE YOU LIVE",
+    need: "YOU NEED", save: "YOU'LL SAVE", savedLabel: "SAVED", gap: "THE GAP",
+    shortBy: (s: string) => `Short by ${s}`,
+    surplus: (s: string) => `Surplus of ${s}`,
+    closeGap: "HOW TO CLOSE THE GAP",
+    closesGap: "CLOSES GAP",
+    onlySave: "Saving only",
+    risk: { LOW: "LOW", MEDIUM: "MEDIUM", HIGH: "HIGH", VARIABLE: "VARIABLE", EXTREME: "EXTREME" },
+    investTitle: "Investment Paths",
+    investSub: "Choose a strategy. Watch the projection change.",
+    actions: "YOUR NEXT 3 MOVES",
+    disclaimer: "Nominal values · No inflation adjustment · Past returns ≠ future · Illustrative only",
+    ready: "READY", projected: "PROJECTED", target: "TARGET",
+    yrsToRetire: (n: number) => `${n} years to retire`,
+    cycleNote: "Cycle phases: Fragility → Reset → Rise → Bubble → Peak → Unwind",
   },
   th: {
-    appTag: "SIAM · แผน",
-    ch1: "01 · เปิด",    ch2: "02 · เส้นโค้ง",  ch3: "03 · ตัวเลข",
-    ch4: "04 · ออม",     ch5: "05 · วัฏจักร",  ch6: "06 · จัดพอร์ต",
-    ch7: "07 · ลงมือ",
-    hookHead: "คุณรู้จักการเงินของคุณดีพอไหม?",
-    hookSub:  "ไม่หรอก คนส่วนมากไม่รู้ คนที่รู้ คือคนที่เกษียณทันเวลา",
-    hookFig:  "฿350,000",
-    hookCite: "ค่ามัธยฐานเงินออมครัวเรือนไทย ณ วันเกษียณ · ธปท. 2023",
-    hookHint: "เลื่อนลง · ดูตัวเลขของคุณ",
-    curveHead: "เส้นโค้งที่ไม่มีใครวาดให้คุณดู",
-    curveBody: "เฟเดอเรอร์ที่ดีที่สุดตอนอายุ 27 คาร์ลเซนสุดยอดตอน 31 นักกีฬาที่คุณรู้จักเลิกเล่นกันที่ 35 คุณก็จะเจอเส้นโค้งเดียวกัน — เพียงแต่จะเห็นจุดสูงสุดของตัวเองได้ตอนผ่านไปแล้ว ปีที่กำลังตกต่ำต้องอาศัยเงินที่ปีขาขึ้นเก็บไว้ คุณเก็บพอหรือยัง?",
-    curveLabelPeak: "จุดพีค",
-    curveLabelEnd:  "78",
-    curveAge:       "อายุ",
-    curvePost:      "คุณ · วันนี้",
-    nHead:    "แค่สองตัวเลข",
-    nIncome:  "รายได้ · ต่อเดือน",
-    nExpense: "ค่าใช้จ่าย · ต่อเดือน",
-    nTarget:  (yrs: number) => `เพื่อให้อยู่ได้ ${yrs} ปีหลังอายุ 60 ที่ระดับชนชั้นกลางในประเทศไทย คุณต้องมีจำนวนนี้ในวันที่อายุครบ 60:`,
-    nYrsLeft: (n: number) => `เหลือ ${n} ปีก่อนเกษียณ`,
-    nYrsPost: (n: number) => `${n} ปีหลังเกษียณ`,
-    saveHead: "ถ้าออมเงินอย่างเดียว จะเป็นยังไง?",
-    saveMatt: "ใต้หมอน · 0%",
-    saveBank: "ฝากธนาคาร · 1% จริง",
-    saveTarget: "เป้าหมาย",
-    saveResult: (s: string) => `ขาดอยู่ ${s} การออมเก็บตัวเลขไว้ได้ แต่เก็บมูลค่าไว้ไม่ได้`,
-    saveOnTrack: "ออมอย่างเดียวก็พอ แต่คนส่วนใหญ่ไม่มีรายได้เท่าคุณ",
-    saveCite: "เงินบาทเสียกำลังซื้อ ~30% ระหว่าง 2014–2024 · ธปท. CPI",
-    cycleHead: "โลกไม่ใช่เส้นตรงเรียบๆ",
-    cycleBody: "ขั้นจากหนังสือ Big Debt Crises ของ Ray Dalio (2018) จับรูปแบบจากวัฏจักรในประวัติศาสตร์ ~16 รอบ ไม่มีระยะเวลาที่แน่นอน ไม่ใช่การพยากรณ์ — เป็นการรู้จักโครงสร้าง",
-    cycleNote: "อัตราต่อปีหากลงหุ้น 100% อัตราพอร์ตจริงขึ้นกับการจัดสรรของคุณ",
-    cyclePhaseHere: "เราอยู่ตรงนี้ · ขั้น 5 FRAG",
-    cycleRetAge:    "อายุ 60 ของคุณ",
-    buildHead: "ลองจัดสรรดู ดูตัวเลขเปลี่ยน",
-    buildMM:  "ตลาดเงิน",
-    buildMMd: "เงินฝาก · พันธบัตรรัฐ · ~4%/ปี · เงินเฟ้อกินบ้าง",
-    buildCM:  "ตลาดทุน",
-    buildCMd: "กองทุนรวม · หุ้น · 7–10%/ปี ระยะยาว · ผันผวน",
-    buildDV:  "อนุพันธ์",
-    buildDVd: "ออปชั่น · เลเวอเรจ · คริปโต · −100% ถึง +600% · 90% ขาดทุน",
-    buildSum: "รวม",
-    buildProj:  "ประมาณการตอนอายุ 60",
-    buildOK:    "✓ ตรงตามเป้า",
-    buildShort: (a: string) => `✗ ขาดอยู่ ${a}`,
-    buildSugg:  (mm: number, cm: number, dv: number) => `ลอง ${mm} / ${cm} / ${dv} เพื่อปิดช่องว่าง`,
-    buildNoSugg: "ถึงจะเสี่ยงสุด ก็ยังไม่ถึงเป้า ต้องปรับรายได้หรือค่าใช้จ่าย",
-    commHead: "สามอย่าง แล้วเดินจากไปได้",
-    commYouAre:         "แผนของคุณ",
-    commIncomeLabel:    "รายได้",
-    commExpenseLabel:   "ค่าใช้จ่าย",
-    commTargetLabel:    "เป้า · 60",
-    commProjectedLabel: "ประมาณการ",
-    commAllocLabel:     "การจัดสรร",
-    commAct1: "เปิดบัญชีลงทุนอัตโนมัติกับโบรกเกอร์ไทย — กรุงศรี กสิกร SCB บัวหลวง",
-    commAct2: (a: string) => `ตั้งโอนเงินเข้าทุกเดือน ${a} ห้ามแตะ`,
-    commAct3: "ทบทวนปีละครั้ง ปรับสมดุล แล้วลืมมันไป",
-    commShare:  "ส่งแผนนี้",
-    commCopy:   "คัดลอกลิงก์แล้ว",
-    commNoSave: "หน้านี้ไม่ได้บันทึกตัวเลขของคุณ บันทึกหน้าจอไว้ คุยกับที่ปรึกษาตัวจริง หรือส่งลิงก์นี้ให้เพื่อนที่ต้องการ",
-    footnote:   "อ้างอิงอัตราจาก Ray Dalio Big Debt Crises (2018) · เพียงตัวอย่าง · ไม่ใช่คำแนะนำการลงทุน",
+    title: "ขอบฟ้าทางการเงินของคุณ",
+    subtitle: "อายุ เงินเดือน ที่อยู่ ดูว่า 50 ปีข้างหน้าเป็นอย่างไร และคุณต้องทำอะไร",
+    forecastTitle: "เศรษฐกิจ 50 ปีข้างหน้า",
+    forecastSub: "จากกรอบวัฏจักรของ Ray Dalio ประวัติศาสตร์ไม่ซ้ำ แต่มันร้องคำราม",
+    age: "อายุของคุณ", salary: "เงินเดือนเริ่มต้น", location: "ที่อยู่ของคุณ",
+    need: "ที่คุณต้องการ", save: "ที่คุณจะออมได้", savedLabel: "ออมได้", gap: "ช่องว่าง",
+    shortBy: (s: string) => `ขาดอีก ${s}`,
+    surplus: (s: string) => `เหลือ ${s}`,
+    closeGap: "วิธีปิดช่องว่าง",
+    closesGap: "ปิดช่องว่างได้",
+    onlySave: "ออมอย่างเดียว",
+    risk: { LOW: "ต่ำ", MEDIUM: "ปานกลาง", HIGH: "สูง", VARIABLE: "ผันผวน", EXTREME: "สูงมาก" },
+    investTitle: "เส้นทางการลงทุน",
+    investSub: "เลือกกลยุทธ์ ดูการคาดการณ์เปลี่ยน",
+    actions: "3 ขั้นตอนต่อไป",
+    disclaimer: "ค่าเงินตามตัว · ไม่ปรับเงินเฟ้อ · ผลตอบแทนในอดีตไม่รับประกันอนาคต · เพียงตัวอย่าง",
+    ready: "พร้อม", projected: "ประมาณการ", target: "เป้าหมาย",
+    yrsToRetire: (n: number) => `เหลือ ${n} ปีก่อนเกษียณ`,
+    cycleNote: "ขั้นวัฏจักร: ความเปราะบาง → รีเซ็ต → ขาขึ้น → ฟองสบู่ → จุดสูงสุด → คลายตัว",
   },
   zh: {
-    appTag: "SIAM · 计划",
-    ch1: "01 · 钩子",  ch2: "02 · 曲线",  ch3: "03 · 数字",
-    ch4: "04 · 储蓄",  ch5: "05 · 周期",  ch6: "06 · 配置",
-    ch7: "07 · 行动",
-    hookHead: "你真的了解自己的财务吗？",
-    hookSub:  "不。大多数人都不。了解的人，会准时退休。",
-    hookFig:  "฿350,000",
-    hookCite: "退休时泰国家庭储蓄中位数 · 泰央行 2023",
-    hookHint: "向下滑动 · 算出你自己的数字",
-    curveHead: "没人为你画过的那条曲线。",
-    curveBody: "费德勒27岁登顶。卡尔森31岁达到巅峰。你认识的运动员35岁就退役。你也会遇到同一条曲线 — 只是过了顶点才会发现。下坡的年份要靠上坡的年份养着。你攒够了吗？",
-    curveLabelPeak: "顶点",
-    curveLabelEnd:  "78",
-    curveAge:       "年龄",
-    curvePost:      "你 · 今天",
-    nHead:    "两个数字。仅此而已。",
-    nIncome:  "月收入",
-    nExpense: "月支出",
-    nTarget:  (yrs: number) => `要在60岁后于泰国按中产基本生活水准过 ${yrs} 年，你需要在60岁那天拥有:`,
-    nYrsLeft: (n: number) => `还有 ${n} 年`,
-    nYrsPost: (n: number) => `退休后 ${n} 年`,
-    saveHead: "如果只是储蓄会怎样？",
-    saveMatt: "床垫下 · 0%",
-    saveBank: "银行存款 · 1% 实际",
-    saveTarget: "目标",
-    saveResult: (s: string) => `还差 ${s}。储蓄保住了数字，失去了价值。`,
-    saveOnTrack: "光储蓄就够了。大多数人没你这样的收入。",
-    saveCite: "泰铢2014–2024年累计贬值约30%购买力 · 泰央行 CPI",
-    cycleHead: "世界不是一条直线。",
-    cycleBody: "阶段来自瑞·达利欧《大债务危机》(2018)。模式识别基于约16个历史周期。没有固定期限。不是预测 — 是对结构的认知。",
-    cycleNote: "100%股票时的年化率。组合实际利率取决于你的配置。",
-    cyclePhaseHere: "我们在这 · 第5阶段 FRAG",
-    cycleRetAge:    "你的60岁",
-    buildHead: "现在配置。看数字反应。",
-    buildMM:  "货币市场",
-    buildMMd: "存款 · 政府债 · ~4%/年 · 通胀吃掉一些",
-    buildCM:  "资本市场",
-    buildCMd: "公募基金 · 股票 · 长期7–10%/年 · 短期波动",
-    buildDV:  "衍生品",
-    buildDVd: "期权 · 杠杆 · 加密 · −100% 到 +600% · 90%亏损",
-    buildSum: "合计",
-    buildProj:  "60岁预计",
-    buildOK:    "✓ 达标",
-    buildShort: (a: string) => `✗ 还差 ${a}`,
-    buildSugg:  (mm: number, cm: number, dv: number) => `试试 ${mm} / ${cm} / ${dv} 来补齐。`,
-    buildNoSugg: "即便激进配置也补不齐。必须调整收入或支出。",
-    commHead: "三件事，然后你可以离开。",
-    commYouAre:         "你的计划",
-    commIncomeLabel:    "收入",
-    commExpenseLabel:   "支出",
-    commTargetLabel:    "目标 · 60",
-    commProjectedLabel: "预计",
-    commAllocLabel:     "配置",
-    commAct1: "在泰国券商开自动定投账户 — 大城、开泰、SCB、Bualuang。",
-    commAct2: (a: string) => `设置每月自动转账 ${a} 进入你选的配置。别碰它。`,
-    commAct3: "每12个月回看一次。再平衡。然后再忘掉它。",
-    commShare:  "分享这份计划",
-    commCopy:   "链接已复制",
-    commNoSave: "本页不保存你的数字。截图。和真正的顾问聊聊。或把链接发给需要的朋友。",
-    footnote:   "利率参考自瑞·达利欧《大债务危机》(2018) · 仅作示例 · 不构成投资建议",
+    title: "你的财务视野",
+    subtitle: "年龄、薪资、所在地。看看未来50年会怎样——以及你必须做什么。",
+    forecastTitle: "未来50年的经济",
+    forecastSub: "基于瑞·达利欧的周期框架。历史不会重复，但会押韵。",
+    age: "你的年龄", salary: "起始薪资", location: "你居住的地方",
+    need: "你需要", save: "你能存下", savedLabel: "已存", gap: "缺口",
+    shortBy: (s: string) => `还差 ${s}`,
+    surplus: (s: string) => `多出 ${s}`,
+    closeGap: "如何填补缺口",
+    closesGap: "可填补缺口",
+    onlySave: "仅靠储蓄",
+    risk: { LOW: "低", MEDIUM: "中", HIGH: "高", VARIABLE: "波动", EXTREME: "极高" },
+    investTitle: "投资路径",
+    investSub: "选择策略，观察预测变化。",
+    actions: "你的下3步",
+    disclaimer: "名义值 · 不含通胀调整 · 历史收益不代表未来 · 仅供参考",
+    ready: "准备度", projected: "预测", target: "目标",
+    yrsToRetire: (n: number) => `还有 ${n} 年退休`,
+    cycleNote: "周期阶段：脆弱 → 重置 → 上升 → 泡沫 → 峰值 →  unwind",
   },
 };
 
-// ─── Slider primitive ────────────────────────────────────────────────────────
+/* ─── 50-Year Economic Forecast Chart ─────────────────────────────────────── */
 
-function Slider({ value, min, max, step, onChange, accent }: {
-  value: number; min: number; max: number; step: number;
-  onChange: (v: number) => void; accent?: string;
-}) {
-  return (
-    <input
-      type="range" min={min} max={max} step={step} value={value}
-      onChange={e => onChange(Number(e.target.value))}
-      style={{
-        width: "100%", height: 3, minHeight: 44, display: "block",
-        accentColor: accent ?? "var(--caution)", cursor: "pointer",
-      }}
-    />
-  );
-}
+function ForecastChart({ yearsToShow = 50 }: { yearsToShow?: number }) {
+  const W = 900, H = 220, PAD = 30;
+  const chartW = W - PAD * 2;
+  const chartH = H - PAD * 2;
 
-// ─── Chapter wrapper ─────────────────────────────────────────────────────────
+  // Generate cycle data
+  const data = useMemo(() => {
+    const out: { year: number; phase: string; rate: number; idx: number }[] = [];
+    for (let i = 0; i < yearsToShow; i++) {
+      const stage = cycleStageForOffset(i);
+      out.push({ year: 2026 + i, phase: stage.label, rate: stage.meanRate, idx: i });
+    }
+    return out;
+  }, [yearsToShow]);
 
-function Chapter({ tag, children }: { tag: string; children: React.ReactNode }) {
-  return (
-    <section style={{
-      padding: "36px 0 44px",
-      borderTop: "1px solid var(--line)",
-      display: "flex", flexDirection: "column",
-      gap: 16,
-    }}>
-      <div style={{
-        fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-        color: "var(--dim)", letterSpacing: "0.16em",
-      }}>
-        {tag}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function ChapterHead({ text }: { text: string }) {
-  return (
-    <h2 style={{
-      fontFamily: "var(--font-display, 'Josefin Sans'), sans-serif",
-      fontSize: "var(--text-display)",
-      fontWeight: 700, color: "var(--ink)", lineHeight: 1.1, margin: 0,
-      letterSpacing: "-0.01em",
-    }}>
-      {text}
-    </h2>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 1 — HOOK
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function HookChapter({ t }: { t: Translations }) {
-  return (
-    <Chapter tag={t.ch1}>
-      <ChapterHead text={t.hookHead} />
-      <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
-        {t.hookSub}
-      </p>
-      <div style={{
-        marginTop: 12, padding: "16px 0",
-        borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
-      }}>
-        <div style={{
-          fontFamily: "var(--font-mono)", fontSize: "var(--text-display)",
-          fontWeight: 700, color: "var(--caution)", lineHeight: 1,
-        }}>
-          {t.hookFig}
-        </div>
-        <div className="t-micro" style={{
-          color: "var(--dim)", marginTop: 6, textTransform: "none", letterSpacing: 0,
-        }}>
-          {t.hookCite}
-        </div>
-      </div>
-      <div className="t-micro" style={{ color: "var(--muted)", marginTop: 4 }}>
-        ↓ {t.hookHint}
-      </div>
-    </Chapter>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 2 — BELL CURVE
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function BellCurveChapter({ t, age, setAge }: {
-  t: Translations; age: number; setAge: (v: number) => void;
-}) {
-  const W = 600, H = 200;
-  const PEAK_AGE = 42;
-  function ageToX(a: number) { return ((a - 18) / (78 - 18)) * W; }
-  function capability(a: number) {
-    const d = (a - PEAK_AGE) / 24;
-    return Math.max(0, 1 - d * d);
-  }
-  function capToY(c: number) { return H - 30 - c * (H - 60); }
-
-  const points: string[] = [];
-  for (let a = 18; a <= 78; a++) {
-    points.push(`${ageToX(a).toFixed(1)},${capToY(capability(a)).toFixed(1)}`);
-  }
-  const dotX = ageToX(age);
-  const dotY = capToY(capability(age));
-
-  return (
-    <Chapter tag={t.ch2}>
-      <ChapterHead text={t.curveHead} />
-      <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.7, margin: 0 }}>
-        {t.curveBody}
-      </p>
-
-      <div style={{ marginTop: 12, padding: "12px 0", borderTop: "1px solid var(--line)" }}>
-        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}
-          aria-label="Capability vs age curve"
-        >
-          <line x1={0} y1={H - 30} x2={W} y2={H - 30} stroke="var(--line)" strokeWidth={1} />
-          <polyline points={points.join(" ")} fill="none" stroke="var(--ink)" strokeWidth={1.5} opacity={0.7} />
-          <line x1={ageToX(PEAK_AGE)} y1={H - 30} x2={ageToX(PEAK_AGE)} y2={capToY(1)} stroke="var(--dim)" strokeDasharray="3 3" strokeWidth={1} />
-          <circle cx={dotX} cy={dotY} r={6} fill="var(--caution)" />
-          <line x1={dotX} y1={dotY} x2={dotX} y2={H - 30} stroke="var(--caution)" strokeWidth={1.5} />
-          <text x={dotX} y={H - 12} fill="var(--caution)" fontSize="13" fontFamily="var(--font-mono)" fontWeight={700}
-            textAnchor={age < 28 ? "start" : age > 68 ? "end" : "middle"}>
-            {age}
-          </text>
-          <text x={W - 4} y={H - 12} fill="var(--dim)" fontSize="11" fontFamily="var(--font-mono)" textAnchor="end">
-            {t.curveLabelEnd}
-          </text>
-          <text x={ageToX(PEAK_AGE)} y={capToY(1) - 8} fill="var(--dim)" fontSize="11" fontFamily="var(--font-mono)" textAnchor="middle">
-            {t.curveLabelPeak} · {PEAK_AGE}
-          </text>
-        </svg>
-      </div>
-
-      <div style={{ paddingTop: 4 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.curveAge}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--caution)" }}>
-            {age}
-          </span>
-        </div>
-        <Slider value={age} min={18} max={65} step={1} onChange={setAge} />
-        <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 8 }}>
-          {t.curvePost}
-        </div>
-      </div>
-    </Chapter>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 3 — NUMBERS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function NumbersChapter({ t, income, setIncome, expenses, setExpenses, target, yearsToRetire, yearsPostRetire }: {
-  t: Translations;
-  income: number;   setIncome:   (v: number) => void;
-  expenses: number; setExpenses: (v: number) => void;
-  target: number; yearsToRetire: number; yearsPostRetire: number;
-}) {
-  return (
-    <Chapter tag={t.ch3}>
-      <ChapterHead text={t.nHead} />
-
-      <div style={{ padding: "12px 0", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.nIncome.toUpperCase()}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
-            {fmtThb(income)}
-          </span>
-        </div>
-        <Slider value={income} min={5_000} max={300_000} step={1_000} onChange={setIncome} />
-      </div>
-
-      <div style={{ padding: "12px 0", borderBottom: "1px solid var(--line)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-          <span className="t-micro" style={{ color: "var(--dim)" }}>{t.nExpense.toUpperCase()}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
-            {fmtThb(expenses)}
-          </span>
-        </div>
-        <Slider value={expenses} min={8_000} max={100_000} step={500} onChange={setExpenses} />
-      </div>
-
-      <div style={{ display: "flex", gap: 32, paddingTop: 8 }}>
-        <div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--caution)" }}>
-            {yearsToRetire}
-          </div>
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
-            {t.nYrsLeft(yearsToRetire)}
-          </div>
-        </div>
-        <div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--muted)" }}>
-            {yearsPostRetire}
-          </div>
-          <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
-            {t.nYrsPost(yearsPostRetire)}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 8, padding: "16px 0 0", borderTop: "1px solid var(--line)" }}>
-        <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
-          {t.nTarget(yearsPostRetire, "")}
-        </p>
-        <div style={{
-          marginTop: 12,
-          fontFamily: "var(--font-mono)", fontSize: "var(--text-display)",
-          fontWeight: 700, color: "var(--caution)", lineHeight: 1,
-        }}>
-          {fmtM(target)}
-        </div>
-      </div>
-    </Chapter>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 4 — JUST SAVING
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function JustSavingChapter({ t, income, expenses, target, yearsToRetire }: {
-  t: Translations;
-  income: number; expenses: number; target: number; yearsToRetire: number;
-}) {
-  const investable = Math.max(0, income - expenses);
-  const mattress   = investable * 12 * yearsToRetire;
-  const bank       = projectAt(investable, 0.01, yearsToRetire);
-  const best       = Math.max(mattress, bank);
-  const shortBy    = Math.max(0, target - best);
-  const maxBar     = Math.max(target, best) || 1;
-  const wMatt      = (mattress / maxBar) * 100;
-  const wBank      = (bank / maxBar)     * 100;
-
-  return (
-    <Chapter tag={t.ch4}>
-      <ChapterHead text={t.saveHead} />
-
-      <div style={{ marginTop: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 124, flexShrink: 0 }}>
-            {t.saveMatt}
-          </div>
-          <div style={{ flex: 1, height: 18, background: "var(--bg-raised)", position: "relative" }}>
-            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${wMatt}%`, background: "var(--muted)", opacity: 0.6 }} />
-          </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--ink)", width: 78, textAlign: "right", flexShrink: 0 }}>
-            {fmtM(mattress)}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", width: 124, flexShrink: 0 }}>
-            {t.saveBank}
-          </div>
-          <div style={{ flex: 1, height: 18, background: "var(--bg-raised)", position: "relative" }}>
-            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${wBank}%`, background: "var(--ink)", opacity: 0.7 }} />
-          </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--ink)", width: 78, textAlign: "right", flexShrink: 0 }}>
-            {fmtM(bank)}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--caution)", width: 124, flexShrink: 0 }}>
-            {t.saveTarget}
-          </div>
-          <div style={{ flex: 1, height: 18, background: "var(--bg-raised)", position: "relative" }}>
-            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: "100%", background: "var(--caution)", opacity: 0.85 }} />
-          </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--caution)", width: 78, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>
-            {fmtM(target)}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 18, padding: "16px 0 0", borderTop: "1px solid var(--line)" }}>
-        <p className="t-body" style={{
-          color: shortBy > 0 ? "var(--bear)" : "var(--bull)",
-          lineHeight: 1.6, margin: 0, fontWeight: 700,
-        }}>
-          {shortBy > 0 ? t.saveResult(fmtM(shortBy)) : t.saveOnTrack}
-        </p>
-        <div className="t-micro" style={{ color: "var(--dim)", marginTop: 10, textTransform: "none", letterSpacing: 0 }}>
-          {t.saveCite}
-        </div>
-      </div>
-    </Chapter>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 5 — CYCLE
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function CycleChapter({ t, yearsToRetire }: { t: Translations; yearsToRetire: number }) {
-  const ILLU_MONTHLY = 10_000;
-  const ILLU_ALLOC: Allocation = { mm: 0, cm: 100, dv: 0 };
-  const series = useMemo(
-    () => projectWithCycle(ILLU_MONTHLY, ILLU_ALLOC, Math.max(yearsToRetire, 20)),
-    [yearsToRetire],
-  );
-
-  if (series.length === 0) return (
-    <Chapter tag={t.ch5}><ChapterHead text={t.cycleHead} /></Chapter>
-  );
-
-  const W = 600, H = 200;
-  const vals = series.map(p => p.value);
-  const maxV = Math.max(...vals);
-  const minV = Math.min(...vals, 0);
-  const rng  = (maxV - minV) || 1;
-  function xAt(i: number) { return (i / (series.length - 1)) * W; }
-  function yAt(v: number) { return H - 38 - ((v - minV) / rng) * (H - 60); }
-  const path = series.map((p, i) => `${i === 0 ? "M" : "L"} ${xAt(i).toFixed(1)} ${yAt(p.value).toFixed(1)}`).join(" ");
-
-  const retX = yearsToRetire <= series.length ? xAt(yearsToRetire - 1) : null;
-
+  // Phase colors via design tokens — see commit 5a734b4 (no hardcoded hex)
   const phaseColors: Record<string, string> = {
     FRAG:   "var(--bear)",
     RESET:  "var(--bear)",
@@ -676,417 +127,485 @@ function CycleChapter({ t, yearsToRetire }: { t: Translations; yearsToRetire: nu
     UNWIND: "var(--muted)",
   };
 
+  const maxRate = 0.2;
+  const minRate = -0.08;
+  const range = maxRate - minRate;
+
+  const toX = (i: number) => PAD + (i / (data.length - 1)) * chartW;
+  const toY = (r: number) => PAD + chartH - ((r - minRate) / range) * chartH;
+
+  // Area path
+  const areaPath = data.map((d, i) => {
+    const x = toX(i);
+    const y = toY(d.rate);
+    return `${i === 0 ? `M ${x} ${H - PAD}` : ""} L ${x} ${y}`;
+  }).join(" ") + ` L ${toX(data.length - 1)} ${H - PAD} Z`;
+
+  // Line path
+  const linePath = data.map((d, i) => {
+    const cmd = i === 0 ? "M" : "L";
+    return `${cmd} ${toX(i).toFixed(1)} ${toY(d.rate).toFixed(1)}`;
+  }).join(" ");
+
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true });
+
   return (
-    <Chapter tag={t.ch5}>
-      <ChapterHead text={t.cycleHead} />
-      <p className="t-body" style={{ color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
-        {t.cycleBody}
-      </p>
+    <motion.div ref={ref} initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.8 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
+        {/* Zero line */}
+        <line x1={PAD} y1={toY(0)} x2={W - PAD} y2={toY(0)} stroke="var(--line)" strokeWidth={1} strokeDasharray="4 4" />
 
-      <div style={{ marginTop: 12 }}>
-        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}
-          aria-label="Year-by-year equity projection with cycle phases"
-        >
-          <line x1={0} y1={yAt(0)} x2={W} y2={yAt(0)} stroke="var(--line)" strokeDasharray="3 3" />
+        {/* Phase bands */}
+        {data.map((d, i) => {
+          if (i === data.length - 1) return null;
+          const x1 = toX(i);
+          const x2 = toX(i + 1);
+          return (
+            <rect key={i} x={x1} y={H - PAD - 16} width={x2 - x1} height={10}
+              fill={phaseColors[d.phase] || "var(--muted)"} opacity={0.5} />
+          );
+        })}
 
-          {series.map((p, i) => {
-            const x  = xAt(i);
-            const x2 = i < series.length - 1 ? xAt(i + 1) : W;
-            return (
-              <rect key={i} x={x} y={H - 28} width={x2 - x} height={7}
-                fill={phaseColors[p.phase] ?? "var(--muted)"} opacity={0.55} />
-            );
-          })}
+        {/* Area */}
+        <motion.path
+          d={areaPath}
+          fill="url(#forecastGrad)"
+          opacity={0.25}
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 0.25 } : {}}
+          transition={{ duration: 1.5 }}
+        />
 
-          <path d={path} fill="none" stroke="var(--caution)" strokeWidth={2} />
-          {series.map((p, i) => (
-            <circle key={i} cx={xAt(i)} cy={yAt(p.value)} r={2.5}
-              fill={p.yearRate < 0 ? "var(--bear)" : "var(--bull)"} />
-          ))}
+        {/* Line */}
+        <motion.path
+          d={linePath}
+          fill="none"
+          stroke="var(--caution)"
+          strokeWidth={2}
+          initial={{ pathLength: 0 }}
+          animate={inView ? { pathLength: 1 } : {}}
+          transition={{ duration: 2, ease: [0.23, 1, 0.32, 1] }}
+        />
 
-          {retX !== null && (
-            <>
-              <line x1={retX} y1={20} x2={retX} y2={H - 28} stroke="var(--caution)" strokeWidth={1.5} />
-              <text x={retX} y={16} fill="var(--caution)" fontSize="11" fontFamily="var(--font-mono)" textAnchor="middle">
-                {t.cycleRetAge}
-              </text>
-            </>
-          )}
+        {/* Year labels (every 10 years) */}
+        {[0, 10, 20, 30, 40, 49].map((idx) => (
+          <text key={idx} x={toX(idx)} y={H - 4} textAnchor="middle"
+            fill="var(--dim)" fontSize="10" fontFamily="var(--font-mono)">
+            {data[idx]?.year}
+          </text>
+        ))}
 
-          {(["FRAG", "RESET", "RISE", "BUBBLE", "PEAK", "UNWIND"] as const).map(label => {
-            const firstIdx = series.findIndex(p => p.phase === label);
-            if (firstIdx < 0) return null;
-            return (
-              <text key={label} x={xAt(firstIdx) + 2} y={H - 12} fill={phaseColors[label]}
-                fontSize="9" fontFamily="var(--font-mono)" textAnchor="start" opacity={0.9}>
-                {label}
-              </text>
-            );
-          })}
-        </svg>
-      </div>
+        {/* Phase labels (first occurrence) */}
+        {["FRAG", "RESET", "RISE", "BUBBLE", "PEAK", "UNWIND"].map((phase) => {
+          const idx = data.findIndex((d) => d.phase === phase);
+          if (idx < 0) return null;
+          return (
+            <text key={phase} x={toX(idx) + 4} y={H - PAD - 20}
+              fill={phaseColors[phase]} fontSize="9" fontFamily="var(--font-mono)" opacity={0.9}>
+              {phase}
+            </text>
+          );
+        })}
 
-      <div className="t-micro" style={{
-        color: "var(--dim)", marginTop: 8, textTransform: "none", letterSpacing: 0, lineHeight: 1.5,
-      }}>
-        {t.cycleNote} · {t.cyclePhaseHere}
-      </div>
-    </Chapter>
+        <defs>
+          <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--caution)" stopOpacity={0.6} />
+            <stop offset="100%" stopColor="var(--caution)" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+      </svg>
+    </motion.div>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 6 — BUILDER
-// ═══════════════════════════════════════════════════════════════════════════════
+/* ─── Slider ──────────────────────────────────────────────────────────────── */
 
-function BuilderChapter({ t, alloc, setAlloc, projected, target, suggestion }: {
-  t: Translations;
-  alloc: Allocation; setAlloc: (a: Allocation) => void;
-  projected: number; target: number;
-  suggestion: Allocation | null;
+function Slider({ label, value, min, max, step, onChange, fmt, accent = "var(--caution)" }: {
+  label: string; value: number; min: number; max: number; step: number;
+  onChange: (v: number) => void; fmt: (v: number) => string; accent?: string;
 }) {
-  function updateBucket(key: keyof Allocation, newVal: number) {
-    const v   = Math.max(0, Math.min(100, Math.round(newVal)));
-    const old = alloc[key];
-    const delta = v - old;
-    const others = (["mm", "cm", "dv"] as (keyof Allocation)[]).filter(k => k !== key);
-    const otherSum = others.reduce((s, k) => s + alloc[k], 0);
-    let n: Allocation = { ...alloc, [key]: v };
-    if (otherSum === 0) {
-      const split = (100 - v) / 2;
-      n = { ...n, [others[0]]: split, [others[1]]: split };
-    } else {
-      n = {
-        ...n,
-        [others[0]]: Math.max(0, alloc[others[0]] - (delta * alloc[others[0]]) / otherSum),
-        [others[1]]: Math.max(0, alloc[others[1]] - (delta * alloc[others[1]]) / otherSum),
-      };
-    }
-    const r: Allocation = {
-      mm: Math.round(n.mm),
-      cm: Math.round(n.cm),
-      dv: Math.round(n.dv),
-    };
-    const total = r.mm + r.cm + r.dv;
-    if (total !== 100) {
-      const adj = 100 - total;
-      const tgt = others.reduce((a, b) => r[a] > r[b] ? a : b);
-      r[tgt] = Math.max(0, r[tgt] + adj);
-    }
-    setAlloc(r);
-  }
+  return (
+    <div style={{ padding: "16px 20px", background: "var(--bg-raised)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.12em" }}>{label}</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "1.4rem", fontWeight: 700, color: accent, lineHeight: 1 }}>{fmt(value)}</span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        style={{ width: "100%", accentColor: accent, cursor: "pointer", minHeight: 24 }} />
+    </div>
+  );
+}
 
-  const shortBy = Math.max(0, target - projected);
+/* ─── Gap Bar ─────────────────────────────────────────────────────────────── */
+
+function GapBar({ saved, target, currency, labels }: { saved: number; target: number; currency: string; labels: { target: string; saved: string; gap: string; shortBy: (s: string) => string; surplus: (s: string) => string } }) {
+  const pct = target > 0 ? Math.min(100, Math.round((saved / target) * 100)) : 0;
+  const isSurplus = saved >= target;
+  const gap = Math.abs(target - saved);
+  const gapStr = `${currency}${Math.round(gap).toLocaleString()}`;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {/* Target */}
+        <div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.1em", marginBottom: 6 }}>{labels.target}</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "clamp(1.5rem, 4vw, 2.2rem)", fontWeight: 700, color: "var(--caution)", lineHeight: 1 }}>
+            {currency}{Math.round(target).toLocaleString()}
+          </div>
+        </div>
+        {/* Saved */}
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.1em", marginBottom: 6 }}>{labels.saved}</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "clamp(1.5rem, 4vw, 2.2rem)", fontWeight: 700, color: "var(--muted)", lineHeight: 1 }}>
+            {currency}{Math.round(saved).toLocaleString()}
+          </div>
+        </div>
+      </div>
+
+      {/* Bar */}
+      <div style={{ height: 8, background: "var(--line)", overflow: "hidden", position: "relative" }}>
+        <motion.div
+          style={{ height: "100%", background: isSurplus ? "var(--bull)" : "var(--caution)" }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
+        />
+        <div style={{ position: "absolute", right: 0, top: -18, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dim)" }}>
+          {pct}%
+        </div>
+      </div>
+
+      {/* Gap */}
+      <div style={{
+        padding: "14px 18px",
+        background: isSurplus ? "rgba(0,255,136,0.06)" : "rgba(255,45,85,0.06)",
+        border: `1px solid ${isSurplus ? "rgba(0,255,136,0.25)" : "rgba(255,45,85,0.25)"}`,
+        textAlign: "center",
+      }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.1em", marginBottom: 4 }}>{labels.gap}</div>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: "clamp(1.2rem, 3vw, 1.6rem)", fontWeight: 700, color: isSurplus ? "var(--bull)" : "var(--bear)", lineHeight: 1 }}>
+          {isSurplus ? `✓ ${labels.surplus(gapStr)}` : `✗ ${labels.shortBy(gapStr)}`}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Investment Path Card ────────────────────────────────────────────────── */
+
+function InvestCard({ style, lang, geo, monthly, growth, years, target, selected, closesGap, riskLabel, onClick }: {
+  style: { key: StyleKey; icon: string; label: Record<Lang, string>; ret: number; risk: string; color: string; desc: Record<Lang, string> };
+  lang: Lang; geo: GeoKey; monthly: number; growth: number; years: number; target: number;
+  selected: boolean; closesGap: string; riskLabel: string; onClick: () => void;
+}) {
+  const projected = investAccum(monthly, growth, style.ret, years);
+  const pct = target > 0 ? Math.round((projected / target) * 100) : 0;
   const onTrack = projected >= target;
 
-  const buckets: { key: keyof Allocation; label: string; desc: string; col: string }[] = [
-    { key: "mm", label: t.buildMM, desc: t.buildMMd, col: "var(--tech)" },
-    { key: "cm", label: t.buildCM, desc: t.buildCMd, col: "var(--bull)" },
-    { key: "dv", label: t.buildDV, desc: t.buildDVd, col: "var(--bear)" },
-  ];
-
   return (
-    <Chapter tag={t.ch6}>
-      <ChapterHead text={t.buildHead} />
-
-      <div style={{ marginTop: 12 }}>
-        {buckets.map(b => (
-          <div key={b.key} style={{
-            padding: "14px 0",
-            borderTop: "1px solid var(--line)",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-              <span style={{
-                fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-                color: b.col, letterSpacing: "0.08em", fontWeight: 700,
-              }}>
-                {b.label}
-              </span>
-              <span style={{
-                fontFamily: "var(--font-mono)", fontSize: "var(--text-body)",
-                fontWeight: 700, color: b.col,
-              }}>
-                {alloc[b.key]}%
-              </span>
-            </div>
-            <Slider value={alloc[b.key]} min={0} max={100} step={1}
-              onChange={v => updateBucket(b.key, v)} accent={b.col} />
-            <div className="t-micro" style={{
-              color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 4,
-            }}>
-              {b.desc}
-            </div>
+    <motion.button
+      onClick={onClick}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      style={{
+        padding: "18px",
+        background: selected ? `color-mix(in srgb, ${style.color} 8%, var(--bg-raised))` : "var(--bg-raised)",
+        border: `1px solid ${selected ? style.color : "var(--line)"}`,
+        cursor: "pointer",
+        textAlign: "left",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        transition: "all 0.2s ease",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ fontSize: 24 }}>{style.icon}</span>
+        <div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: selected ? style.color : "var(--muted)", letterSpacing: "0.06em" }}>
+            {style.label[lang]}
           </div>
-        ))}
-      </div>
-
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "10px 0",
-        borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
-      }}>
-        <span className="t-micro" style={{ color: "var(--dim)" }}>{t.buildSum}</span>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--muted)" }}>
-          {alloc.mm + alloc.cm + alloc.dv}%
-        </span>
-      </div>
-
-      <div style={{ paddingTop: 14 }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4 }}>
-          {t.buildProj}
-        </div>
-        <div style={{
-          fontFamily: "var(--font-mono)", fontSize: "var(--text-display)",
-          fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)", lineHeight: 1,
-        }}>
-          {fmtM(projected)}
-        </div>
-        <div style={{
-          fontFamily: "var(--font-mono)", fontSize: "var(--text-body)",
-          fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)", marginTop: 8,
-        }}>
-          {onTrack ? t.buildOK : t.buildShort(fmtM(shortBy))}
-        </div>
-        {!onTrack && (
-          <div className="t-micro" style={{
-            color: "var(--caution)", marginTop: 6, textTransform: "none", letterSpacing: 0,
-          }}>
-            {suggestion
-              ? t.buildSugg(suggestion.mm, suggestion.cm, suggestion.dv)
-              : t.buildNoSugg}
-          </div>
-        )}
-      </div>
-    </Chapter>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Ch 7 — COMMITMENT
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function CommitmentChapter({ t, income, expenses, alloc, target, projected, yearsToRetire }: {
-  t: Translations;
-  income: number; expenses: number; alloc: Allocation;
-  target: number; projected: number; yearsToRetire: number;
-}) {
-  const investable = Math.max(0, income - expenses);
-  const [copied, setCopied] = useState(false);
-
-  async function share() {
-    if (typeof window === "undefined") return;
-    const url = window.location.href;
-    const text = `Retirement target: ${fmtM(target)} · allocation: ${alloc.mm}/${alloc.cm}/${alloc.dv}`;
-    const nav = navigator as unknown as {
-      share?: (d: { title: string; text: string; url: string }) => Promise<void>;
-    };
-    if (nav.share) {
-      try { await nav.share({ title: "Siam Markets · Plan", text, url }); }
-      catch { /* user cancelled */ }
-    } else {
-      try {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch { /* clipboard blocked */ }
-    }
-  }
-
-  return (
-    <Chapter tag={t.ch7}>
-      <ChapterHead text={t.commHead} />
-
-      <div style={{
-        padding: "16px 0",
-        borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
-      }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 10 }}>
-          {t.commYouAre}
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px" }}>
-          <div>
-            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commIncomeLabel}</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
-              {fmtThb(income)}
-            </div>
-          </div>
-          <div>
-            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commExpenseLabel}</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
-              {fmtThb(expenses)}
-            </div>
-          </div>
-          <div>
-            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commTargetLabel}</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--caution)" }}>
-              {fmtM(target)}
-            </div>
-          </div>
-          <div>
-            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commProjectedLabel}</div>
-            <div style={{
-              fontFamily: "var(--font-mono)", fontSize: "var(--text-body)",
-              fontWeight: 700, color: projected >= target ? "var(--bull)" : "var(--bear)",
-            }}>
-              {fmtM(projected)}
-            </div>
-          </div>
-          <div style={{ gridColumn: "span 2", paddingTop: 4 }}>
-            <div className="t-micro" style={{ color: "var(--dim)" }}>{t.commAllocLabel}</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700 }}>
-              <span style={{ color: "var(--tech)" }}>{alloc.mm}%</span>{" · "}
-              <span style={{ color: "var(--bull)" }}>{alloc.cm}%</span>{" · "}
-              <span style={{ color: "var(--bear)" }}>{alloc.dv}%</span>
-            </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dim)" }}>
+            +{(style.ret * 100).toFixed(0)}%/yr · {riskLabel}
           </div>
         </div>
       </div>
 
-      <div style={{ paddingTop: 12 }}>
-        {[t.commAct1, t.commAct2(fmtThb(investable)), t.commAct3].map((line, i) => (
-          <div key={i} style={{
-            display: "flex", gap: 14, padding: "12px 0",
-            borderBottom: i < 2 ? "1px solid var(--line)" : "none",
-            alignItems: "flex-start",
-          }}>
-            <div style={{
-              fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-              fontWeight: 700, color: "var(--caution)", flexShrink: 0, paddingTop: 1,
-              width: 24,
-            }}>
-              0{i + 1}
-            </div>
-            <div className="t-body" style={{ color: "var(--muted)", lineHeight: 1.55 }}>
-              {line}
-            </div>
-          </div>
-        ))}
+      <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--dim)", lineHeight: 1.5 }}>
+        {style.desc[lang]}
       </div>
 
-      <div style={{ paddingTop: 16, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <button onClick={share} style={{
-          fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-          color: "#000", background: "var(--caution)",
-          border: "none", borderBottom: "3px solid rgba(0,0,0,0.25)",
-          padding: "0 22px", cursor: "pointer", minHeight: 44,
-          letterSpacing: "0.1em", fontWeight: 700,
-        }}>
-          {copied ? t.commCopy : t.commShare}
-        </button>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>
-          {yearsToRetire} yrs · {alloc.mm}/{alloc.cm}/{alloc.dv}
-        </span>
-      </div>
-
-      <div className="t-micro" style={{
-        color: "var(--dim)", lineHeight: 1.6, textTransform: "none", letterSpacing: 0,
-        marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)",
-      }}>
-        {t.commNoSave}
-      </div>
-    </Chapter>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Page
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export default function PlanPage() {
-  const [lang,     setLang]     = useState<Lang>("en");
-  const [age,      setAge]      = useState(30);
-  const [income,   setIncome]   = useState(35_000);
-  const [expenses, setExpenses] = useState(TH_MIDDLE_CLASS_BASELINE);
-  const [alloc,    setAlloc]    = useState<Allocation>({ mm: 30, cm: 60, dv: 10 });
-
-  const t = T[lang];
-
-  const yearsToRetire   = Math.max(1, TH_RETIRE_AGE - age);
-  const yearsPostRetire = Math.max(1, TH_LIFE_EXPECTANCY - TH_RETIRE_AGE);
-  const target          = expenses * 12 * yearsPostRetire;
-  const investable      = Math.max(0, income - expenses);
-
-  const projSeries = useMemo(
-    () => projectWithCycle(investable, alloc, yearsToRetire),
-    [investable, alloc, yearsToRetire],
-  );
-  const projected = projSeries[projSeries.length - 1]?.value ?? 0;
-
-  const suggestion = useMemo(
-    () => projected < target ? suggestAllocation(investable, target, yearsToRetire) : null,
-    [projected, target, investable, yearsToRetire],
-  );
-
-  return (
-    <div className="page">
-      {/* Sticky header */}
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        position: "sticky", top: 0, zIndex: 10,
-        background: "var(--bg)",
-        padding: "8px 0 14px",
-        borderBottom: "1px solid var(--line)",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <DigitalBeaver size={20} color="var(--caution)" animated aria-hidden />
-          <span style={{
-            fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-            color: "var(--dim)", letterSpacing: "0.12em",
-          }}>
-            {t.appTag}
+      <div style={{ marginTop: "auto", paddingTop: 10, borderTop: `1px solid ${selected ? style.color : "var(--line)"}` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: selected ? style.color : "var(--dim)" }}>
+            → {fmtC(projected, geo)}
+          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)" }}>
+            {onTrack ? `✓ ${closesGap}` : `${pct}%`}
           </span>
         </div>
+      </div>
+    </motion.button>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MAIN PAGE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+export default function PlanPage() {
+  const [lang, setLang] = useState<Lang>("en");
+  const [geo, setGeo] = useState<GeoKey>("th");
+  const [age, setAge] = useState(30);
+  const [salary, setSalary] = useState(GEOS.th.defaultSalary);
+  const [salaryGrowth, setSalaryGrowth] = useState(0.03);
+  const [investStyle, setInvestStyle] = useState<StyleKey | null>(null);
+
+  const g = GEOS[geo];
+  const retireAge = g.retireAge;
+  const yearsToRetire = Math.max(1, retireAge - age);
+  const yearsPostRetire = Math.max(5, g.lifeExp - retireAge);
+
+  // Target: expenses-based using geo default living as baseline
+  const target = g.retireRef; // Use geo reference as target baseline
+
+  // Investable = salary - basic expenses (using geo defaults as baseline)
+  const expenses = g.defaultLiving + g.defaultTransport + g.defaultOther;
+  const investable = Math.max(0, salary - expenses);
+
+  // Savings-only projection
+  const savingsOnly = pureSavings(investable, salaryGrowth, yearsToRetire);
+
+  // With investment
+  const styleData = investStyle ? INVEST.find((s) => s.key === investStyle) : null;
+  const withInvest = styleData ? investAccum(investable, salaryGrowth, styleData.ret, yearsToRetire) : savingsOnly;
+
+  const t = L[lang];
+
+  return (
+    <div className="page page-enter" style={{ width: "100%", maxWidth: 920, margin: "0 auto", padding: "24px 16px 80px" }}>
+
+      {/* ─── Header ─────────────────────────────────────────────────────────── */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 40, paddingBottom: 16, borderBottom: "1px solid var(--line)" }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.15em" }}>PLAN</span>
         <div style={{ display: "flex", gap: 2 }}>
-          {(["en", "th", "zh"] as Lang[]).map(l => (
-            <button key={l} onClick={() => setLang(l)} style={{
-              fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-              color: lang === l ? "#000" : "var(--dim)",
-              background: lang === l ? "var(--caution)" : "var(--bg-raised)",
-              border: "1px solid var(--line)",
-              borderBottom: lang === l ? "3px solid rgba(0,0,0,0.3)" : "1px solid var(--line)",
-              padding: "0 12px", cursor: "pointer", letterSpacing: "0.06em",
-              minHeight: 32, fontWeight: lang === l ? 700 : 400,
-            }}>
+          {(["en", "th", "zh"] as const).map((l) => (
+            <button key={l} onClick={() => setLang(l)}
+              style={{
+                fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
+                color: lang === l ? "#000" : "var(--dim)",
+                background: lang === l ? "var(--caution)" : "var(--bg-raised)",
+                border: "1px solid var(--line)", padding: "4px 12px",
+                cursor: "pointer", fontWeight: lang === l ? 700 : 400,
+              }}>
               {l === "en" ? "EN" : l === "th" ? "ไทย" : "中"}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Narrative — centered single column */}
-      <div style={{ maxWidth: 720, margin: "0 auto" }}>
-        <HookChapter      t={t} />
-        <BellCurveChapter t={t} age={age} setAge={setAge} />
-        <NumbersChapter
-          t={t}
-          income={income}     setIncome={setIncome}
-          expenses={expenses} setExpenses={setExpenses}
-          target={target} yearsToRetire={yearsToRetire} yearsPostRetire={yearsPostRetire}
-        />
-        <JustSavingChapter
-          t={t} income={income} expenses={expenses}
-          target={target} yearsToRetire={yearsToRetire}
-        />
-        <CycleChapter     t={t} yearsToRetire={yearsToRetire} />
-        <BuilderChapter
-          t={t} alloc={alloc} setAlloc={setAlloc}
-          projected={projected} target={target} suggestion={suggestion}
-        />
-        <CommitmentChapter
-          t={t} income={income} expenses={expenses}
-          alloc={alloc} target={target} projected={projected}
-          yearsToRetire={yearsToRetire}
-        />
-
-        <div style={{
-          marginTop: 48, paddingTop: 24, paddingBottom: 32,
-          borderTop: "1px solid var(--line)", textAlign: "center",
+      {/* ─── Title ──────────────────────────────────────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ marginBottom: 40 }}>
+        <h1 style={{
+          fontFamily: "var(--font-elegant)",
+          fontSize: "clamp(2rem, 5vw, 3.2rem)",
+          fontWeight: 500,
+          color: "var(--ink)",
+          lineHeight: 1.1,
+          margin: "0 0 12px",
+          letterSpacing: "-0.01em",
         }}>
-          <div className="t-micro" style={{
-            color: "var(--dim)", textTransform: "none", letterSpacing: 0, lineHeight: 1.6,
-          }}>
-            {t.footnote}
+          {t.title}
+        </h1>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--muted)", lineHeight: 1.6, maxWidth: 560, margin: 0 }}>
+          {t.subtitle}
+        </p>
+      </motion.div>
+
+      {/* ─── 50-Year Forecast ───────────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.1 }}
+        style={{ marginBottom: 40, padding: "20px", background: "var(--bg-raised)", border: "1px solid var(--line)" }}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.15em", marginBottom: 6 }}>
+            {t.forecastTitle}
           </div>
+          <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--muted)", lineHeight: 1.5 }}>
+            {t.forecastSub}
+          </div>
+        </div>
+        <ForecastChart />
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--dim)", marginTop: 8, letterSpacing: "0.04em" }}>
+          {t.cycleNote}
+        </div>
+      </motion.div>
+
+      {/* ─── Inputs ─────────────────────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.2 }}
+        style={{ marginBottom: 40 }}
+      >
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+          <Slider label={t.age} value={age} min={18} max={65} step={1}
+            onChange={setAge} fmt={(v) => `${v}`} accent="var(--caution)" />
+          <Slider label={t.salary} value={salary} min={0} max={g.salaryMax} step={1000}
+            onChange={setSalary} fmt={(v) => fmtC(v, geo)} accent="var(--tech)" />
+
+          {/* Geo picker */}
+          <div style={{ padding: "16px 20px", background: "var(--bg-raised)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.12em" }}>{t.location}</span>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4 }}>
+              {(Object.entries(GEOS) as [GeoKey, typeof GEOS.th][]).map(([k, cfg]) => (
+                <button key={k} onClick={() => { setGeo(k); setSalary(cfg.defaultSalary); }}
+                  style={{
+                    padding: "8px 4px",
+                    background: geo === k ? "rgba(0,180,255,0.1)" : "transparent",
+                    border: `1px solid ${geo === k ? "var(--tech)" : "var(--line)"}`,
+                    color: geo === k ? "var(--tech)" : "var(--muted)",
+                    fontFamily: "var(--font-mono)", fontSize: 10,
+                    cursor: "pointer", textAlign: "center",
+                  }}>
+                  <div style={{ fontSize: 16 }}>{cfg.flag}</div>
+                  <div>{cfg.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Salary growth */}
+        <div style={{ marginTop: 12 }}>
+          <Slider label={lang === "en" ? "SALARY GROWTH / YEAR" : lang === "th" ? "การเพิ่มเงินเดือนต่อปี" : "年薪增长率"}
+            value={salaryGrowth} min={0} max={0.15} step={0.005}
+            onChange={setSalaryGrowth} fmt={(v) => `${(v * 100).toFixed(0)}%`} accent="var(--bull)" />
+        </div>
+      </motion.div>
+
+      {/* ─── Years to retire insight ────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        style={{ textAlign: "center", marginBottom: 32, padding: "16px", background: "var(--bg-raised)", border: "1px solid var(--line)" }}
+      >
+        <span style={{ fontFamily: "var(--font-elegant)", fontSize: "clamp(1.5rem, 4vw, 2.2rem)", fontWeight: 500, color: "var(--tech)" }}>
+          {2026 + yearsToRetire}
+        </span>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--muted)", marginLeft: 8 }}>
+          · {t.yrsToRetire(yearsToRetire)}
+        </span>
+      </motion.div>
+
+      {/* ─── Gap Visualization ──────────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.35 }}
+        style={{ marginBottom: 40, padding: "24px", background: "var(--bg-raised)", border: "1px solid var(--line)" }}
+      >
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.15em", marginBottom: 20 }}>
+          {t.closeGap}
+        </div>
+        <GapBar saved={savingsOnly} target={target} currency={g.currency} labels={{ target: t.target, saved: t.savedLabel, gap: t.gap, shortBy: t.shortBy, surplus: t.surplus }} />
+      </motion.div>
+
+      {/* ─── Investment Paths ───────────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.45 }}
+        style={{ marginBottom: 40 }}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.15em", marginBottom: 6 }}>
+            {t.investTitle}
+          </div>
+          <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--muted)", lineHeight: 1.5 }}>
+            {t.investSub}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
+          {INVEST.map((s, i) => (
+            <motion.div key={s.key} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.06 }}>
+              <InvestCard
+                style={s}
+                lang={lang}
+                geo={geo}
+                monthly={investable}
+                growth={salaryGrowth}
+                years={yearsToRetire}
+                target={target}
+                selected={investStyle === s.key}
+                closesGap={t.closesGap}
+                riskLabel={t.risk[s.risk] || s.risk}
+                onClick={() => setInvestStyle(s.key)}
+              />
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ─── Projected Comparison ───────────────────────────────────────────── */}
+      {investStyle && styleData && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          style={{ marginBottom: 40, padding: "24px", background: "var(--bg-raised)", border: `1px solid ${styleData.color}` }}
+        >
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, textAlign: "center" }}>
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", marginBottom: 6 }}>{t.onlySave}</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.3rem", fontWeight: 700, color: "var(--muted)" }}>{fmtC(savingsOnly, geo)}</div>
+            </div>
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", marginBottom: 6 }}>{styleData.label[lang]}</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.3rem", fontWeight: 700, color: styleData.color }}>{fmtC(withInvest, geo)}</div>
+            </div>
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", marginBottom: 6 }}>{t.target}</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.3rem", fontWeight: 700, color: "var(--caution)" }}>{fmtC(target, geo)}</div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ─── Action Steps ───────────────────────────────────────────────────── */}
+      {investStyle && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} style={{ marginBottom: 40 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.15em", marginBottom: 16 }}>
+            {t.actions}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              lang === "en" ? "Open a brokerage or fund account. Start with the minimum." : lang === "th" ? "เปิดบัญชีหุ้นหรือกองทุน เริ่มที่จำนวนขั้นต่ำ" : "开设证券或基金账户。从最低金额开始。",
+              lang === "en" ? `Set auto-transfer of ${fmtC(investable, geo)}/mo on salary day. Don't touch it.` : lang === "th" ? `ตั้งโอนอัตโนมัติ ${fmtC(investable, geo)}/เดือน วันที่ได้เงินเดือน ห้ามแตะ` : `设置发薪日自动转账 ${fmtC(investable, geo)}/月。不要碰它。`,
+              lang === "en" ? "Review every 12 months. Rebalance. Then forget it again." : lang === "th" ? "ทบทวนทุก 12 เดือน ปรับสมดุล แล้วลืมมันไป" : "每12个月审视一次。再平衡。然后再忘掉它。",
+            ].map((text, i) => (
+              <div key={i} style={{ display: "flex", gap: 14, padding: "14px 16px", background: "var(--bg-raised)", border: "1px solid var(--line)", alignItems: "flex-start" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: styleData?.color || "var(--caution)", flexShrink: 0, minWidth: 28 }}>0{i + 1}</div>
+                <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: "var(--muted)", lineHeight: 1.55 }}>{text}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* ─── Disclaimer ─────────────────────────────────────────────────────── */}
+      <div style={{ textAlign: "center", paddingTop: 24, borderTop: "1px solid var(--line)" }}>
+        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--dim)", lineHeight: 1.6, fontStyle: "italic" }}>
+          {t.disclaimer}
         </div>
       </div>
     </div>
