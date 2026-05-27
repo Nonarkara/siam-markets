@@ -22,14 +22,11 @@ import { fetchHistoricalPrices } from "@/lib/api/yahoo";
 import { MOCK_OHLCV_PTT, MOCK_OHLCV_ADVANC, MOCK_OHLCV_KBANK } from "@/lib/api/mock";
 import type { ApiResponse, OHLCV } from "@/lib/types";
 
-export const runtime    = "edge";
-export const revalidate = 300;
+// Static JSON import — bundled at build time, works on Cloudflare edge runtime.
+import pricesCache from "@/lib/data/cache/prices.json";
 
-const MOCK_BY_SYMBOL: Record<string, OHLCV[]> = {
-  "PTT.BK":    MOCK_OHLCV_PTT,
-  "ADVANC.BK": MOCK_OHLCV_ADVANC,
-  "KBANK.BK":  MOCK_OHLCV_KBANK,
-};
+export const runtime = "edge";
+export const revalidate = 300;
 
 export interface TechnicalData {
   symbol:     string;
@@ -58,34 +55,21 @@ export interface TechnicalData {
   lastPrice:  number;
   lastVolume: number;
   // Provenance — read by the UI's <DataFreshness> badge
-  source:     "live" | "mock";
+  source:     "live" | "mock" | "cache";
   lastUpdated: string;
   note:       string;
 }
 
-async function loadOhlcv(symbol: string, range: "1mo"|"3mo"|"6mo"|"1y" = "6mo"): Promise<{ data: OHLCV[]; source: "live"|"mock"; note: string }> {
-  if (process.env.YAHOO_KILLSWITCH === "true") {
-    const mock = MOCK_BY_SYMBOL[symbol] ?? MOCK_OHLCV_PTT;
-    return { data: mock, source: "mock", note: "YAHOO_KILLSWITCH=true — synthetic data only" };
-  }
+async function loadOhlcv(symbol: string, range: "1mo"|"3mo"|"6mo"|"1y" = "6mo"): Promise<{ data: OHLCV[]; source: "live"|"mock"|"cache"; note: string }> {
   try {
-    const points = await fetchHistoricalPrices(symbol, range, "1d");
-    if (!points || points.length < 50) {
-      const mock = MOCK_BY_SYMBOL[symbol] ?? MOCK_OHLCV_PTT;
-      return { data: mock, source: "mock", note: "Yahoo returned insufficient data — using synthetic OHLCV" };
+    const data = pricesCache as Record<string, OHLCV[]>;
+    const ohlcv = data[symbol];
+    if (!ohlcv || ohlcv.length < 50) {
+      throw new Error("Insufficient data in cache");
     }
-    const ohlcv: OHLCV[] = points.map(p => ({
-      date:   p.date,
-      open:   p.open  ?? p.close,
-      high:   p.high  ?? p.close,
-      low:    p.low   ?? p.close,
-      close:  p.close,
-      volume: p.volume ?? 0,
-    }));
-    return { data: ohlcv, source: "live", note: `Yahoo Finance · ${ohlcv.length} daily bars` };
+    return { data: ohlcv, source: "cache", note: `Local JSON Cache · ${ohlcv.length} daily bars` };
   } catch (err) {
-    const mock = MOCK_BY_SYMBOL[symbol] ?? MOCK_OHLCV_PTT;
-    return { data: mock, source: "mock", note: `Yahoo error: ${err instanceof Error ? err.message : "unknown"}` };
+    return { data: [], source: "mock", note: `Cache error: ${err instanceof Error ? err.message : "unknown"}` };
   }
 }
 
