@@ -1132,7 +1132,7 @@ textarea:focus-visible {
   cursor: pointer;
   transition: all var(--dur) var(--ease);
 }
-.plan-v3-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(255,214,10,0.2); }
+.plan-v3-cta:hover { transform: translateY(-2px); border-color: var(--caution); }
 .plan-v3-cta:active { transform: translateY(0); }
 
 .plan-v3-restart-btn {

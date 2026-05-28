@@ -898,3 +898,49 @@ export function projectWithCycleV2(
   }
   return out;
 }
+
+/* ─── 4-bucket cycle projection (active model) ──────────────────────────────────
+   Adds a SAVING bucket (bank/cash, beta 0) to the 3-bucket model above.
+   The Dalio cycle (cycleStageForOffset) drives capital-market and derivative
+   returns; saving + money-market are mostly cycle-insensitive. This is the
+   engine the live /plan page rides — the forecast chart shows the same rates.   */
+
+export interface Allocation4 { saving: number; mm: number; cm: number; dv: number } // sum 100
+
+const SAVING_RATE = 0.01; // bank/cash — beta 0, ignores the cycle
+
+export function portfolioRate4(cycleRate: number, a: Allocation4): number {
+  const saveRet = SAVING_RATE;
+  const mmRet   = 0.04 + MM_BETA * (cycleRate - 0.07); // money market — light cycle tilt
+  const cmRet   = CM_BETA * cycleRate;                 // capital market — rides the cycle
+  const dvRet   = DV_BETA * cycleRate;                 // derivatives — amplified
+  return (a.saving / 100) * saveRet
+       + (a.mm     / 100) * mmRet
+       + (a.cm     / 100) * cmRet
+       + (a.dv     / 100) * dvRet;
+}
+
+// Year-by-year accumulation with salary growth. Final value = last element.
+export function projectWithCycle4(
+  monthly: number,
+  growth:  number,
+  alloc:   Allocation4,
+  years:   number,
+): YearPoint[] {
+  if (years <= 0 || monthly <= 0) return [];
+  const out: YearPoint[] = [];
+  let value = 0;
+  let m = monthly;
+  for (let y = 0; y < years; y++) {
+    const stage = cycleStageForOffset(y);
+    const rate  = portfolioRate4(stage.meanRate, alloc);
+    const mRate = rate / 12;
+    const yrContrib = Math.abs(mRate) < 1e-9
+      ? m * 12
+      : m * ((Math.pow(1 + mRate, 12) - 1) / mRate);
+    value = value * (1 + rate) + yrContrib;
+    out.push({ year: 2026 + y, value, phase: stage.label, yearRate: rate });
+    m *= 1 + growth;
+  }
+  return out;
+}
