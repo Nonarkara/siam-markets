@@ -168,7 +168,7 @@ export function SignalCard({
         <button
           onClick={shareCard}
           style={{
-            flex: 1, padding: "8px 12px", minHeight: 36,
+            flex: 1, padding: "8px 12px", minHeight: 44,
             background: "transparent",
             border: `1px solid ${color}`,
             color,

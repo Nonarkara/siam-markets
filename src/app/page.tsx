@@ -7,6 +7,7 @@ import { DividendLeaderboard } from "@/components/Subway/DividendLeaderboard";
 import { EarningsCountdown } from "@/components/Subway/EarningsCountdown";
 import { CommodityMicro } from "@/components/Subway/CommodityMicro";
 import { QuantumRadar } from "@/components/Intelligence/QuantumRadar";
+import { CycleIntelligencePanel } from "@/components/Intelligence/CycleIntelligencePanel";
 
 import { VIXCurve } from "@/components/Market/VIXCurve";
 import { EconCalendar } from "@/components/Intelligence/EconCalendar";
@@ -137,7 +138,7 @@ export default async function DeskPage() {
         padding: "3px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0,
       }}>
         <span className="t-micro" style={{ color: "var(--dim)" }}>
-          PULSE = prices · BUYS = value stocks · INTEL = signals · PORTFOLIO = your money
+          four quadrants · what the market is doing · what's cheap · what the signals say · what you're building
         </span>
         <span className="t-micro" style={{ color: "var(--dim)", fontFamily: "var(--font-mono)" }}>
           {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })}
@@ -245,8 +246,11 @@ export default async function DeskPage() {
             <div style={{ padding: "3px 8px", borderBottom: "1px solid var(--line-dim)" }}>
               <VIXCurve compact />
             </div>
-            <div style={{ padding: "3px 8px" }}>
+            <div style={{ padding: "3px 8px", borderBottom: "1px solid var(--line-dim)" }}>
               <EconCalendar compact />
+            </div>
+            <div style={{ padding: "3px 8px" }}>
+              <CycleIntelligencePanel />
             </div>
           </SubwayQuadrant>
 
@@ -256,7 +260,7 @@ export default async function DeskPage() {
           <SubwayQuadrant title="MONEY" lineColor="var(--caution)" href="/money">
             <div style={{ padding: "3px 8px", borderBottom: "1px solid var(--line-dim)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span className="t-micro" style={{ color: "var(--dim)", letterSpacing: "0.14em", fontSize: "0.4375rem" }}>DREAM PORTFOLIO</span>
+                <span className="t-micro" style={{ color: "var(--dim)", letterSpacing: "0.14em", fontSize: "0.4375rem" }}>REFERENCE PORTFOLIO</span>
                 <span className="t-micro" style={{ color: "var(--braun-yellow, #ffd000)", border: "1px solid var(--braun-yellow, #ffd000)", padding: "0 3px", fontSize: "0.4375rem" }}>EDU</span>
               </div>
               <PortfolioQuadrantSummary />
@@ -276,8 +280,8 @@ export default async function DeskPage() {
             <div style={{ padding: "3px 8px" }}>
               <Link href="/plan" style={{ textDecoration: "none" }}>
                 <div style={{ borderLeft: "2px solid var(--braun-yellow, #ffd000)", padding: "3px 8px", background: "var(--bg)" }}>
-                  <span className="t-micro" style={{ color: "var(--braun-yellow, #ffd000)", fontSize: "0.4375rem" }}>RICH DAD WISDOM · </span>
-                  <span className="t-body" style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>Savers are losers. Build assets →</span>
+                  <span className="t-micro" style={{ color: "var(--braun-yellow, #ffd000)", fontSize: "0.4375rem" }}>KIYOSAKI · </span>
+                  <span className="t-body" style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>An asset puts money in your pocket. Build the plan →</span>
                 </div>
               </Link>
             </div>

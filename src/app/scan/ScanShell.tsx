@@ -7,6 +7,7 @@ import { MOCK_STOCKS, MOCK_GLOBAL_STOCKS } from "@/lib/api/mock";
 import { DataFreshness } from "@/components/DataFreshness/DataFreshness";
 import type { StockFundamentals } from "@/lib/types";
 import type { ScannerData } from "@/app/api/scanner/route";
+import type { AristocratEntry } from "@/app/api/aristocrats/route";
 
 const SECTORS = ["all", "Energy", "Financials", "Technology", "Consumer", "Healthcare", "Industrials", "Materials", "Real Estate", "Communication", "Utilities"];
 
@@ -68,7 +69,7 @@ function CompactTimeline({ symbol, name, sector }: { symbol: string; name: strin
 }
 
 export function ScanShell() {
-  const [market, setMarket] = useState<"thai" | "global">("thai");
+  const [market, setMarket] = useState<"thai" | "global" | "aristocrats">("thai");
   const [sector, setSector] = useState("all");
   const [selected, setSelected] = useState<StockFundamentals | null>(null);
 
@@ -77,6 +78,11 @@ export function ScanShell() {
   const [thaiStocks, setThaiStocks] = useState<StockFundamentals[]>(MOCK_STOCKS);
   const [thaiSource, setThaiSource] = useState<"supabase" | "mock">("mock");
   const [thaiUpdated, setThaiUpdated] = useState<string | null>(null);
+
+  // Dividend Aristocrats — live Yahoo prices + hardcoded dividend metadata
+  const [aristocrats, setAristocrats] = useState<AristocratEntry[]>([]);
+  const [aristocratsLoading, setAristocraticLoading] = useState(false);
+  const [selectedAristocrat, setSelectedAristocrat] = useState<AristocratEntry | null>(null);
 
   useEffect(() => {
     fetch("/api/scanner")
@@ -89,6 +95,16 @@ export function ScanShell() {
       })
       .catch(() => { /* keep mock fallback */ });
   }, []);
+
+  useEffect(() => {
+    if (market !== "aristocrats" || aristocrats.length > 0) return;
+    setAristocraticLoading(true);
+    fetch("/api/aristocrats")
+      .then(r => r.json() as Promise<{ aristocrats: AristocratEntry[] }>)
+      .then(j => { setAristocrats(j.aristocrats ?? []); })
+      .catch(() => {})
+      .finally(() => setAristocraticLoading(false));
+  }, [market, aristocrats.length]);
 
   const stocks = market === "thai" ? thaiStocks : MOCK_GLOBAL_STOCKS;
   const filtered = sector === "all" ? stocks : stocks.filter(s => s.sector.toLowerCase() === sector.toLowerCase());
@@ -117,7 +133,7 @@ export function ScanShell() {
         display: "flex", alignItems: "center", gap: 10, padding: "5px 12px",
         borderBottom: "1px solid var(--line)", flexShrink: 0, flexWrap: "wrap",
       }}>
-        <span className="t-mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--ink)", marginRight: 8 }}>VALUE SCANNER</span>
+        <span className="t-mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--ink)", marginRight: 8 }}>GRAHAM / BUFFETT</span>
         {market === "thai" && (
           <DataFreshness
             timestamp={thaiUpdated}
@@ -132,47 +148,73 @@ export function ScanShell() {
           <DataFreshness timestamp={null} source="mock" compact />
         )}
         <span className="t-micro" style={{ color: "var(--dim)", marginRight: 8 }}>MARKET</span>
-        {(["thai", "global"] as const).map(m => (
-          <button
-            key={m}
-            onClick={() => { setMarket(m); setSelected(null); }}
-            style={{
-              background: market === m ? "var(--bg-surface)" : "transparent",
-              border: `1px solid ${market === m ? "var(--bull)" : "var(--line-dim)"}`,
-              color: market === m ? "var(--bull)" : "var(--muted)",
-              fontFamily: "var(--font-mono)", fontSize: "0.5625rem", letterSpacing: "0.1em",
-              padding: "2px 8px", cursor: "pointer",
-            }}
-          >
-            {m.toUpperCase()}
-          </button>
-        ))}
-        <div style={{ width: 1, height: 14, background: "var(--line-dim)" }} />
-        <select
-          value={sector}
-          onChange={e => setSector(e.target.value)}
-          style={{
-            background: "var(--bg)", border: "1px solid var(--line-dim)", color: "var(--muted)",
-            fontFamily: "var(--font-mono)", fontSize: "0.5625rem", padding: "2px 6px", outline: "none",
-          }}
-        >
-          {SECTORS.map(s => <option key={s} value={s}>{s === "all" ? "ALL SECTORS" : s.toUpperCase()}</option>)}
-        </select>
-        <span className="t-micro" style={{ color: "var(--dim)", marginLeft: "auto", maxWidth: 280, textAlign: "right" }}>
-          {filtered.length} stocks · {filtered.filter(s => s.marginOfSafety > 0).length} below Graham value
-        </span>
+        {(["thai", "global", "aristocrats"] as const).map(m => {
+          const isArist = m === "aristocrats";
+          const accentColor = isArist ? "var(--caution)" : "var(--bull)";
+          return (
+            <button
+              key={m}
+              onClick={() => { setMarket(m); setSelected(null); setSelectedAristocrat(null); }}
+              style={{
+                background: market === m ? "var(--bg-surface)" : "transparent",
+                border: `1px solid ${market === m ? accentColor : "var(--line-dim)"}`,
+                color: market === m ? accentColor : "var(--muted)",
+                fontFamily: "var(--font-mono)", fontSize: "0.5625rem", letterSpacing: "0.1em",
+                padding: "2px 8px", cursor: "pointer",
+              }}
+            >
+              {m === "aristocrats" ? "ARISTOCRATS" : m.toUpperCase()}
+            </button>
+          );
+        })}
+        {market !== "aristocrats" && (
+          <>
+            <div style={{ width: 1, height: 14, background: "var(--line-dim)" }} />
+            <select
+              value={sector}
+              onChange={e => setSector(e.target.value)}
+              style={{
+                background: "var(--bg)", border: "1px solid var(--line-dim)", color: "var(--muted)",
+                fontFamily: "var(--font-mono)", fontSize: "0.5625rem", padding: "2px 6px", outline: "none",
+              }}
+            >
+              {SECTORS.map(s => <option key={s} value={s}>{s === "all" ? "ALL SECTORS" : s.toUpperCase()}</option>)}
+            </select>
+            <span className="t-micro" style={{ color: "var(--dim)", marginLeft: "auto", maxWidth: 280, textAlign: "right" }}>
+              {filtered.length} stocks · {filtered.filter(s => s.marginOfSafety > 0).length} below Graham value
+            </span>
+          </>
+        )}
+        {market === "aristocrats" && (
+          <span className="t-micro" style={{ color: "var(--dim)", marginLeft: "auto" }}>
+            S&amp;P Dividend Aristocrats · 25+ consecutive yrs · Dalio Stage 5 pick
+          </span>
+        )}
       </div>
 
-      {/* Human-readable explanation */}
-      <div style={{ padding: "4px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0, background: "var(--bg-raised)" }}>
-        <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
-          <strong style={{ color: "var(--ink)" }}>MOS</strong> = Margin of Safety — how far below true value a stock trades.
-          <strong style={{ color: "var(--ink)" }}> Graham №</strong> = estimated fair value.
-          Green = meets Buffett criteria.
-        </span>
-      </div>
+      {/* Methodology note — honest about what this is and isn't */}
+      {market !== "aristocrats" && (
+        <div style={{ padding: "4px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0, background: "var(--bg-raised)" }}>
+          <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
+            Graham № = √(22.5 × EPS × BVPS). A ceiling price, not a buy signal.
+            MOS = room to absorb being wrong about the inputs.
+            <span style={{ color: "var(--dim)" }}> This screen finds the room. It says nothing about timing, management, or the macro cycle.</span>
+          </span>
+        </div>
+      )}
+
+      {/* ── ARISTOCRATS VIEW ─────────────────────────────────────────────── */}
+      {market === "aristocrats" && (
+        <AristocraticView
+          entries={aristocrats}
+          loading={aristocratsLoading}
+          selected={selectedAristocrat}
+          onSelect={setSelectedAristocrat}
+        />
+      )}
 
       {/* Main: Chart left, Numbers right */}
+      {market !== "aristocrats" && (
       <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "1.2fr 1fr", overflow: "hidden" }}>
         {/* LEFT — Chart + timeline */}
         <div style={{ borderRight: "1px solid var(--line)", display: "flex", flexDirection: "column", minHeight: 0 }}>
@@ -247,20 +289,20 @@ export function ScanShell() {
             </div>
           )}
 
-          {/* AI reasoning */}
+          {/* Why this stock — honest signal summary */}
           {active && (
             <div style={{ padding: "4px 10px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0 }}>
-              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 2, fontSize: "0.5rem" }}>ANALYSIS</div>
+              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 2, fontSize: "0.5rem" }}>SIGNAL · what the numbers say</div>
               <div className="t-body" style={{ fontSize: "0.6875rem", color: "var(--muted)", lineHeight: 1.35 }}>
-                {reasoning}
+                {reasoning || "No clear value signal. Signals require both margin of safety and quality criteria."}
               </div>
             </div>
           )}
 
-          {/* Graham checklist */}
+          {/* Graham criteria — 7 tests, not a verdict */}
           {active && (
             <div style={{ padding: "4px 10px", flex: 1, minHeight: 0, overflow: "hidden" }}>
-              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 3, fontSize: "0.5rem" }}>GRAHAM CHECKLIST</div>
+              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 3, fontSize: "0.5rem" }}>GRAHAM · 7 criteria · passes shown in green</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px 8px" }}>
                 <CheckRow label="P/E ≤ 15" pass={active.pe <= 15} />
                 <CheckRow label="P/B ≤ 1.5" pass={active.pb <= 1.5} />
@@ -275,35 +317,254 @@ export function ScanShell() {
           )}
         </div>
       </div>
+      )} {/* end market !== aristocrats main grid */}
 
-      {/* Bottom film strip */}
+      {/* Bottom film strip — only for thai/global */}
+      {market !== "aristocrats" && (
+        <div style={{
+          borderTop: "1px solid var(--line)", padding: "3px 10px",
+          flexShrink: 0, overflowX: "auto", scrollbarWidth: "none",
+          display: "flex", gap: 3,
+        }}>
+          {sorted.map(stock => {
+            const isActive = stock.symbol === active?.symbol;
+            return (
+              <button
+                key={stock.symbol}
+                onClick={() => setSelected(stock)}
+                style={{
+                  flexShrink: 0,
+                  background: isActive ? "var(--bg-surface)" : "var(--bg-raised)",
+                  border: `1px solid ${isActive ? "var(--bull)" : "var(--line-dim)"}`,
+                  padding: "3px 8px", cursor: "pointer", textAlign: "left", minWidth: 90,
+                }}
+              >
+                <div className="t-mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: isActive ? "var(--bull)" : "var(--ink)" }}>
+                  {stock.symbol.replace(".BK", "")}
+                </div>
+                <div style={{ display: "flex", gap: 6, marginTop: 1 }}>
+                  <span className="t-mono" style={{ fontSize: "0.5rem", color: stock.pe <= 15 ? "var(--bull)" : "var(--dim)" }}>
+                    P/E {stock.pe.toFixed(1)}
+                  </span>
+                  <span className="t-mono" style={{ fontSize: "0.5rem", color: stock.marginOfSafety >= 30 ? "var(--bull)" : stock.marginOfSafety >= 0 ? "var(--caution)" : "var(--bear)" }}>
+                    MOS {stock.marginOfSafety > 0 ? "+" : ""}{stock.marginOfSafety.toFixed(0)}%
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Dividend Aristocrats View ───────────────────────────────────────────────
+
+function AristocraticView({
+  entries,
+  loading,
+  selected,
+  onSelect,
+}: {
+  entries: AristocratEntry[];
+  loading: boolean;
+  selected: AristocratEntry | null;
+  onSelect: (e: AristocratEntry) => void;
+}) {
+  const active = selected ?? entries[0] ?? null;
+
+  if (loading || entries.length === 0) {
+    return (
+      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+        {/* Context strip */}
+        <div style={{ padding: "4px 12px", borderBottom: "1px solid var(--line-dim)", background: "var(--bg-raised)", flexShrink: 0 }}>
+          <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
+            25+ consecutive years of growing dividends.{" "}
+            <span style={{ color: "var(--dim)" }}>Not a promise of future growth. A track record through 1991, 2001, 2008, 2020.</span>
+          </span>
+        </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span className="t-mono" style={{ fontSize: "0.5625rem", color: "var(--dim)" }}>
+            {loading ? "LOADING LIVE QUOTES…" : "NO DATA"}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  const pct = (v: number | null) => v != null ? (v >= 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`) : "—";
+  const pctCol = (v: number | null) => v == null ? "var(--dim)" : v >= 0 ? "var(--bull)" : "var(--bear)";
+
+  // Sort by dividend yield descending
+  const sorted = [...entries].sort((a, b) => b.divYield - a.divYield);
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Context strip */}
+      <div style={{ padding: "4px 12px", borderBottom: "1px solid var(--line-dim)", background: "var(--bg-raised)", flexShrink: 0 }}>
+        <span className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.4 }}>
+          <strong style={{ color: "var(--caution)" }}>Dividend Aristocrats</strong> — S&amp;P 500 companies with ≥25 consecutive years of dividend growth.
+          In Dalio Stage 5, they provide income stability while capital markets reprice.
+        </span>
+      </div>
+
+      {/* Main 2-col: left = list, right = detail */}
+      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "1fr 1.2fr", overflow: "hidden" }}>
+
+        {/* LEFT — card list */}
+        <div style={{ borderRight: "1px solid var(--line)", overflowY: "auto" }}>
+          {sorted.map(e => {
+            const isActive = e.symbol === active?.symbol;
+            return (
+              <button
+                key={e.symbol}
+                onClick={() => onSelect(e)}
+                style={{
+                  display: "grid", gridTemplateColumns: "40px 1fr auto",
+                  gap: 8, alignItems: "center",
+                  width: "100%", textAlign: "left",
+                  padding: "6px 10px",
+                  background: isActive ? "var(--bg-surface)" : "transparent",
+                  border: "none",
+                  borderBottom: "1px solid var(--line-dim)",
+                  borderLeft: `2px solid ${isActive ? "var(--caution)" : "transparent"}`,
+                  cursor: "pointer",
+                }}
+              >
+                {/* Symbol */}
+                <span className="t-mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: isActive ? "var(--caution)" : "var(--ink)" }}>
+                  {e.symbol}
+                </span>
+                {/* Name + streak */}
+                <div>
+                  <div className="t-body" style={{ fontSize: "0.5625rem", color: "var(--muted)", lineHeight: 1.2 }}>{e.name}</div>
+                  <div className="t-mono" style={{ fontSize: "0.4375rem", color: isActive ? "var(--caution)" : "var(--dim)" }}>
+                    {e.years} YRS · {e.sector.toUpperCase()}
+                  </div>
+                </div>
+                {/* Yield + change */}
+                <div style={{ textAlign: "right" }}>
+                  <div className="t-mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: "var(--caution)" }}>
+                    {e.divYield.toFixed(1)}%
+                  </div>
+                  <div className="t-mono" style={{ fontSize: "0.4375rem", color: pctCol(e.changePct) }}>
+                    {pct(e.changePct)}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* RIGHT — detail */}
+        {active && (
+          <div style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            {/* Header */}
+            <div style={{
+              display: "flex", justifyContent: "space-between", alignItems: "baseline",
+              padding: "6px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0,
+            }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span className="t-mono" style={{ fontSize: "0.875rem", fontWeight: 700 }}>{active.symbol}</span>
+                <span className="t-body" style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>{active.name}</span>
+              </div>
+              <span className="t-mono" style={{ fontSize: "0.8125rem", fontWeight: 700 }}>
+                {active.price != null ? `$${active.price.toFixed(2)}` : "—"}
+              </span>
+            </div>
+
+            {/* Key metrics grid */}
+            <div style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+              borderBottom: "1px solid var(--line-dim)", flexShrink: 0,
+            }}>
+              <AMetric label="DIV YIELD"     value={`${active.divYield.toFixed(1)}%`}             accent="var(--caution)" />
+              <AMetric label="ANNUAL DIV"    value={`$${active.annualDiv.toFixed(2)}/sh`}          accent="var(--caution)" />
+              <AMetric label="STREAK"        value={`${active.years} YRS`}                         accent="var(--bull)" />
+              <AMetric label="TODAY"         value={pct(active.changePct)} col={pctCol(active.changePct)} />
+              <AMetric label="SECTOR"        value={active.sector.toUpperCase().slice(0, 8)} />
+              <AMetric label="NOTE"          value={active.note} />
+            </div>
+
+            {/* Track record note */}
+            <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--line-dim)", flexShrink: 0 }}>
+              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 4, fontSize: "0.4375rem" }}>TRACK RECORD</div>
+              <div className="t-body" style={{ fontSize: "0.5625rem", color: "var(--muted)", lineHeight: 1.6 }}>
+                {active.years} years. That covers the Asian financial crisis, dot-com collapse, 2008, COVID.
+                {" "}
+                {active.divYield >= 3.5
+                  ? `Yield at ${active.divYield.toFixed(1)}% — meaningful income when growth is repricing.`
+                  : active.divYield >= 2
+                  ? `Yield at ${active.divYield.toFixed(1)}% — modest. The investment case is the streak, not the payout.`
+                  : `Yield at ${active.divYield.toFixed(1)}% — minimal. This is held for resilience, not income.`
+                }
+              </div>
+              <div className="t-micro" style={{ color: "var(--dim)", marginTop: 4, fontSize: "0.4375rem", textTransform: "none", letterSpacing: 0 }}>
+                The filter is track record. Past discipline ≠ future guarantee.
+              </div>
+            </div>
+
+            {/* Dalio allocation context */}
+            <div style={{ padding: "8px 12px", flex: 1, minHeight: 0, overflow: "hidden" }}>
+              <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 6, fontSize: "0.4375rem" }}>6-BUCKET PORTFOLIO ROLE</div>
+              {[
+                { label: "GOLD",        pct: 15, col: "var(--caution)", active: false },
+                { label: "ARISTOCRATS", pct: 25, col: "var(--bull)",    active: true  },
+                { label: "INFRA",       pct: 20, col: "var(--tech)",    active: false },
+                { label: "TIPS/BONDS",  pct: 20, col: "var(--muted)",   active: false },
+                { label: "CASH",        pct: 15, col: "var(--dim)",     active: false },
+                { label: "SPECULATIVE", pct: 5,  col: "var(--bear)",    active: false },
+              ].map(b => (
+                <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                  <span style={{
+                    fontFamily: "var(--font-mono)", fontSize: "0.4375rem",
+                    color: b.active ? "var(--caution)" : "var(--dim)",
+                    width: 76, flexShrink: 0,
+                    fontWeight: b.active ? 700 : 400,
+                  }}>{b.label} {b.active ? "← HERE" : ""}</span>
+                  <div style={{ flex: 1, height: 4, background: "var(--bg-raised)" }}>
+                    <div style={{ width: `${b.pct * 4}%`, height: "100%", background: b.col, opacity: b.active ? 1 : 0.4 }} />
+                  </div>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.4375rem", color: b.col, width: 24, textAlign: "right", flexShrink: 0 }}>{b.pct}%</span>
+                </div>
+              ))}
+              <div className="t-micro" style={{ color: "var(--dim)", textTransform: "none", letterSpacing: 0, marginTop: 6, fontSize: "0.4375rem" }}>
+                Aristocrats = 25% of defensive Stage 5 allocation · Deploy 2028–2029
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom strip — all 8 tickers */}
       <div style={{
         borderTop: "1px solid var(--line)", padding: "3px 10px",
         flexShrink: 0, overflowX: "auto", scrollbarWidth: "none",
         display: "flex", gap: 3,
       }}>
-        {sorted.map(stock => {
-          const isActive = stock.symbol === active?.symbol;
+        {sorted.map(e => {
+          const isActive = e.symbol === active?.symbol;
           return (
             <button
-              key={stock.symbol}
-              onClick={() => setSelected(stock)}
+              key={e.symbol}
+              onClick={() => onSelect(e)}
               style={{
                 flexShrink: 0,
                 background: isActive ? "var(--bg-surface)" : "var(--bg-raised)",
-                border: `1px solid ${isActive ? "var(--bull)" : "var(--line-dim)"}`,
-                padding: "3px 8px", cursor: "pointer", textAlign: "left", minWidth: 90,
+                border: `1px solid ${isActive ? "var(--caution)" : "var(--line-dim)"}`,
+                padding: "3px 8px", cursor: "pointer", textAlign: "left", minWidth: 80,
               }}
             >
-              <div className="t-mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: isActive ? "var(--bull)" : "var(--ink)" }}>
-                {stock.symbol.replace(".BK", "")}
+              <div className="t-mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: isActive ? "var(--caution)" : "var(--ink)" }}>
+                {e.symbol}
               </div>
-              <div style={{ display: "flex", gap: 6, marginTop: 1 }}>
-                <span className="t-mono" style={{ fontSize: "0.5rem", color: stock.pe <= 15 ? "var(--bull)" : "var(--dim)" }}>
-                  P/E {stock.pe.toFixed(1)}
+              <div style={{ display: "flex", gap: 5, marginTop: 1 }}>
+                <span className="t-mono" style={{ fontSize: "0.5rem", color: "var(--caution)" }}>
+                  {e.divYield.toFixed(1)}%
                 </span>
-                <span className="t-mono" style={{ fontSize: "0.5rem", color: stock.marginOfSafety >= 30 ? "var(--bull)" : stock.marginOfSafety >= 0 ? "var(--caution)" : "var(--bear)" }}>
-                  MOS {stock.marginOfSafety > 0 ? "+" : ""}{stock.marginOfSafety.toFixed(0)}%
+                <span className="t-mono" style={{ fontSize: "0.5rem", color: "var(--dim)" }}>
+                  {e.years}yr
                 </span>
               </div>
             </button>
@@ -313,6 +574,23 @@ export function ScanShell() {
     </div>
   );
 }
+
+function AMetric({
+  label, value, accent, col,
+}: {
+  label: string; value: string; accent?: string; col?: string;
+}) {
+  return (
+    <div style={{ padding: "4px 6px", borderRight: "1px solid var(--line-dim)", borderBottom: "1px solid var(--line-dim)" }}>
+      <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 1, fontSize: "0.4375rem", letterSpacing: "0.06em" }}>{label}</div>
+      <div className="t-mono" style={{ fontSize: "0.6875rem", fontWeight: 700, color: col ?? accent ?? "var(--ink)" }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function Metric({ label, value, good }: { label: string; value: string; good?: boolean }) {
   return (

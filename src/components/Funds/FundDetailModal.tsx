@@ -194,7 +194,7 @@ export function FundDetailModal({ fund, isSelected, onToggle, onClose }: Props) 
                 fontSize: "var(--text-micro)",
                 letterSpacing: "0.08em",
                 padding: "8px 14px",
-                minHeight: 36,
+                minHeight: 44,
                 cursor: "pointer",
               }}
             >

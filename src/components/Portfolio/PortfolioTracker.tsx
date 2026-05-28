@@ -52,7 +52,7 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
     padding: "8px 10px",
     width: "100%",
     outline: "none",
-    minHeight: 40,
+    minHeight: 44,
   };
 
   function handleAdd() {
@@ -78,7 +78,7 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
             key={t}
             onClick={() => { setTab(t); setType(t === "fund" ? "fund_rmf" : "stock"); }}
             style={{
-              flex: 1, padding: "8px", minHeight: 36,
+              flex: 1, padding: "8px", minHeight: 44,
               background: tab === t ? "var(--bull)" : "transparent",
               border: `1px solid ${tab === t ? "var(--bull)" : "var(--line)"}`,
               color: tab === t ? "#000" : "var(--muted)",
@@ -94,8 +94,9 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {tab === "stock" ? (
           <div>
-            <div className="t-micro" style={{ marginBottom: 4 }}>TICKER (e.g. KBANK)</div>
+            <label htmlFor="tickerInput" className="t-micro" style={{ display: "block", marginBottom: 4 }}>TICKER (e.g. KBANK)</label>
             <input
+              id="tickerInput"
               style={inputStyle}
               value={symbol}
               onChange={e => {
@@ -108,8 +109,9 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
           </div>
         ) : (
           <div>
-            <div className="t-micro" style={{ marginBottom: 4 }}>FUND CODE</div>
+            <label htmlFor="fundSelect" className="t-micro" style={{ display: "block", marginBottom: 4 }}>FUND CODE</label>
             <select
+              id="fundSelect"
               style={{ ...inputStyle, cursor: "pointer" }}
               value={symbol}
               onChange={e => {
@@ -128,25 +130,25 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
               <option value="CUSTOM">Other (type manually)</option>
             </select>
             {symbol === "CUSTOM" && (
-              <input style={{ ...inputStyle, marginTop: 6 }} placeholder="Fund code" onChange={e => setSymbol(e.target.value)} />
+              <input aria-label="Custom fund code" style={{ ...inputStyle, marginTop: 6 }} placeholder="Fund code" onChange={e => setSymbol(e.target.value)} />
             )}
           </div>
         )}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div>
-            <div className="t-micro" style={{ marginBottom: 4 }}>{tab === "stock" ? "SHARES" : "UNITS"}</div>
-            <input style={inputStyle} type="number" value={shares} onChange={e => setShares(e.target.value)} placeholder="1000" />
+            <label htmlFor="sharesInput" className="t-micro" style={{ display: "block", marginBottom: 4 }}>{tab === "stock" ? "SHARES" : "UNITS"}</label>
+            <input id="sharesInput" style={inputStyle} type="number" value={shares} onChange={e => setShares(e.target.value)} placeholder="1000" />
           </div>
           <div>
-            <div className="t-micro" style={{ marginBottom: 4 }}>AVG BUY PRICE (฿)</div>
-            <input style={inputStyle} type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="141.00" />
+            <label htmlFor="priceInput" className="t-micro" style={{ display: "block", marginBottom: 4 }}>AVG BUY PRICE (฿)</label>
+            <input id="priceInput" style={inputStyle} type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="141.00" />
           </div>
         </div>
 
         <div>
-          <div className="t-micro" style={{ marginBottom: 4 }}>BUY DATE</div>
-          <input style={inputStyle} type="date" value={date} onChange={e => setDate(e.target.value)} />
+          <label htmlFor="dateInput" className="t-micro" style={{ display: "block", marginBottom: 4 }}>BUY DATE</label>
+          <input id="dateInput" style={inputStyle} type="date" value={date} onChange={e => setDate(e.target.value)} />
         </div>
 
         {shares && price && (
@@ -162,7 +164,7 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
           <button onClick={onCancel} style={{
             flex: 1, padding: "10px", background: "transparent",
             border: "1px solid var(--line)", color: "var(--muted)",
-            fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", cursor: "pointer", minHeight: 40,
+            fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", cursor: "pointer", minHeight: 44,
           }}>CANCEL</button>
           <button onClick={handleAdd} disabled={!symbol || !shares || !price} style={{
             flex: 2, padding: "10px",
@@ -170,7 +172,7 @@ function AddHoldingForm({ onAdd, onCancel }: { onAdd: (h: Omit<Holding, "id">) =
             border: "none",
             color: symbol && shares && price ? "#000" : "var(--dim)",
             fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)",
-            fontWeight: 700, letterSpacing: "0.06em", cursor: "pointer", minHeight: 40,
+            fontWeight: 700, letterSpacing: "0.06em", cursor: "pointer", minHeight: 44,
           }}>ADD TO PORTFOLIO →</button>
         </div>
       </div>

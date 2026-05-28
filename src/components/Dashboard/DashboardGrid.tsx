@@ -123,7 +123,7 @@ function AssetRow({ asset }: { asset: YahooQuote }) {
       alignItems: "center",
       padding: "7px 12px",
       borderBottom: "1px solid var(--line)",
-      minHeight: 36,
+      minHeight: 44,
     }}>
       <span className="t-body" style={{ fontSize: "0.8125rem" }}>{asset.name}</span>
       <div style={{ textAlign: "right" }}>
@@ -261,7 +261,7 @@ export function DashboardGrid({
             <Link href="/markets" style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "var(--tech)", textDecoration: "none", letterSpacing: "0.06em" }}>→</Link>
           </div>
           {[...(regionalAsean.slice(0, 3))].map(q => (
-            <div key={q.symbol} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", borderBottom: "1px solid var(--line)", minHeight: 36 }}>
+            <div key={q.symbol} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", borderBottom: "1px solid var(--line)", minHeight: 44 }}>
               <span className="t-body" style={{ fontSize: "0.8125rem" }}>{q.name}</span>
               <div style={{ textAlign: "right" }}>
                 <div className="t-mono" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{fmtNum(q.price, 0)}</div>
@@ -270,7 +270,7 @@ export function DashboardGrid({
             </div>
           ))}
           {[...(regionalChina.slice(0, 2))].map(q => (
-            <div key={q.symbol} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", borderBottom: "1px solid var(--line)", minHeight: 36 }}>
+            <div key={q.symbol} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 12px", borderBottom: "1px solid var(--line)", minHeight: 44 }}>
               <span className="t-body" style={{ fontSize: "0.8125rem" }}>{q.name}</span>
               <div style={{ textAlign: "right" }}>
                 <div className="t-mono" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{fmtNum(q.price, 0)}</div>
@@ -344,7 +344,7 @@ export function DashboardGrid({
               padding: "7px 12px",
               borderBottom: i < 4 ? "1px solid var(--line)" : "none",
               gap: 4,
-              minHeight: 36,
+              minHeight: 44,
               alignItems: "center",
               background: stock.marginOfSafety >= 30 ? "var(--bull-10)" : "transparent",
             }}>
