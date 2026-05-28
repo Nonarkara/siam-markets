@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
+import { EfficientFrontier } from "@/components/Portfolio/EfficientFrontier";
 
-const TABS = ["Tax Calculator", "10-Year Projection"] as const;
+const TABS = ["Tax Calculator", "10-Year Projection", "Optimizer"] as const;
 type Tab = typeof TABS[number];
 
 export default function PortfolioPage() {
@@ -27,7 +28,7 @@ export default function PortfolioPage() {
           border: "1px solid var(--line)",
         }}
       >
-        {TABS.map((t) => (
+        {TABS.map((t, i) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -37,7 +38,7 @@ export default function PortfolioPage() {
               minHeight: 44,
               background: tab === t ? "var(--bg-hover)" : "transparent",
               border: "none",
-              borderRight: t === "Tax Calculator" ? "1px solid var(--line)" : "none",
+              borderRight: i < TABS.length - 1 ? "1px solid var(--line)" : "none",
               color: tab === t ? "var(--bull)" : "var(--muted)",
               fontFamily: "var(--font-body)",
               fontSize: "var(--text-micro)",
@@ -82,6 +83,8 @@ export default function PortfolioPage() {
           </div>
         </div>
       )}
+
+      {tab === "Optimizer" && <EfficientFrontier />}
     </div>
   );
 }

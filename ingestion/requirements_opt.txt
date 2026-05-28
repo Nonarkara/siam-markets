@@ -1,0 +1,7 @@
+# Heavy solver stack for offline portfolio optimization (ingestion/optimize.py).
+# Opt-in — not needed for the light price/fundamentals/macro ingestion.
+# CVXPY is pulled in transitively by Riskfolio-Lib.
+Riskfolio-Lib>=7.0
+yfinance>=0.2.40
+pandas>=2.0.0
+numpy>=1.24.0
