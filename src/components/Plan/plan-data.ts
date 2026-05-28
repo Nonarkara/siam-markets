@@ -920,6 +920,22 @@ export function portfolioRate4(cycleRate: number, a: Allocation4): number {
        + (a.dv     / 100) * dvRet;
 }
 
+// Medium-scenario annual inflation by geo (long-run CPI, illustrative).
+// "Medium" = the central assumption; costs rise at this rate through retirement.
+export const MED_INFLATION: Record<GeoKey, number> = {
+  th: 0.025, us: 0.025, jp: 0.010, eu: 0.020, cn: 0.020, kr: 0.020,
+};
+
+// Inflation-adjusted retirement need: a growing annuity. The first retirement
+// year costs `annualCost0`; each later year costs (1+inflation)× more. Returns
+// the nominal sum across all retirement years — bigger, and honest, vs a flat
+// annualCost0 × years.
+export function inflatedNeed(annualCost0: number, inflation: number, years: number): number {
+  if (years <= 0 || annualCost0 <= 0) return 0;
+  if (inflation <= 0) return annualCost0 * years;
+  return annualCost0 * ((Math.pow(1 + inflation, years) - 1) / inflation);
+}
+
 // Year-by-year accumulation with salary growth. Final value = last element.
 export function projectWithCycle4(
   monthly: number,
