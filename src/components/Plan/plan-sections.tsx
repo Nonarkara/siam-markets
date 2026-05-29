@@ -19,6 +19,7 @@ import {
   SPIRAL_D,
   ptAt,
   EVENTS,
+  JOB_STABILITY,
   pureSavings,
   investAccum,
   savSnaps,
@@ -108,22 +109,13 @@ export function PlanHero({ lang, onBegin }: { lang: Lang; onBegin: () => void })
 
         <div className="plan-spiral-wrap" style={{ maxWidth: 520 }}>
           <svg viewBox="0 0 500 500" className="plan-spiral-svg" aria-label="Economic cycles through civilization history">
-            <defs>
-              <linearGradient id="spGradV3" gradientUnits="userSpaceOnUse" x1="50" y1="250" x2="450" y2="250">
-                <stop offset="0%" stopColor="#1a2a42" />
-                <stop offset="50%" stopColor="#3a6080" />
-                <stop offset="75%" stopColor="#00b4ff" />
-                <stop offset="90%" stopColor="#ffd60a" />
-                <stop offset="100%" stopColor="#ff2d55" />
-              </linearGradient>
-            </defs>
             {[60, 110, 160, 210].map((r) => (
               <circle key={r} cx={250} cy={250} r={r} fill="none" stroke="var(--line)" strokeWidth={0.5} opacity={0.3} />
             ))}
             <motion.path
               d={SPIRAL_D}
               fill="none"
-              stroke="url(#spGradV3)"
+              stroke="var(--line)"
               strokeWidth={1.5}
               strokeLinecap="round"
               initial={{ pathLength: 0 }}
@@ -137,23 +129,23 @@ export function PlanHero({ lang, onBegin }: { lang: Lang; onBegin: () => void })
                 <g key={e.year}>
                   {e.now && (
                     <>
-                      <circle cx={e.pt.x} cy={e.pt.y} r={22} fill="none" stroke="#ff2d55" strokeWidth={0.8} className="plan-now-ring" />
-                      <circle cx={e.pt.x} cy={e.pt.y} r={15} fill="none" stroke="#ff2d55" strokeWidth={1} className="plan-now-ring" style={{ animationDelay: "0.4s" }} />
+                      <circle cx={e.pt.x} cy={e.pt.y} r={22} fill="none" stroke="var(--red-anchor)" strokeWidth={0.8} className="plan-now-ring" />
+                      <circle cx={e.pt.x} cy={e.pt.y} r={15} fill="none" stroke="var(--red-anchor)" strokeWidth={1} className="plan-now-ring" style={{ animationDelay: "0.4s" }} />
                     </>
                   )}
                   <circle
                     cx={e.pt.x}
                     cy={e.pt.y}
                     r={e.now ? 6 : 3.5}
-                    fill={e.now ? "#ff2d55" : e.crisis ? "#ff5055" : "#ffd60a"}
+                    fill={e.now ? "var(--red-anchor)" : e.crisis ? "var(--bear)" : "var(--dim)"}
                     opacity={0.9}
                   />
                   <text
                     x={ax}
                     y={ay}
                     textAnchor={e.pt.x > 250 ? "start" : "end"}
-                    fill={e.now ? "#ff2d55" : e.crisis ? "#ff7070" : "#6e82a0"}
-                    fontSize={e.now ? 9 : 7}
+                    fill={e.now ? "var(--red-anchor)" : e.crisis ? "var(--bear)" : "var(--dim)"}
+                    fontSize={e.now ? "var(--text-micro)" : "var(--text-micro)"}
                     fontFamily="IBM Plex Mono,monospace"
                     fontWeight={e.now ? 700 : 400}
                   >
@@ -168,7 +160,7 @@ export function PlanHero({ lang, onBegin }: { lang: Lang; onBegin: () => void })
               textAnchor="middle"
               dominantBaseline="middle"
               fill="var(--dim)"
-              fontSize={5.5}
+              fontSize="var(--text-micro)"
               fontFamily="IBM Plex Mono,monospace"
               letterSpacing={1}
             >
@@ -177,8 +169,8 @@ export function PlanHero({ lang, onBegin }: { lang: Lang; onBegin: () => void })
           </svg>
         </div>
 
-        <div className="plan-v3-callout" style={{ borderColor: "rgba(255,45,85,0.28)", background: "rgba(255,45,85,0.06)" }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "#ff2d55", letterSpacing: "0.2em", marginBottom: 8 }}>
+        <div className="plan-v3-callout" style={{ borderColor: "var(--line)", background: "var(--bg-raised)" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--red-anchor)", letterSpacing: "0.2em", marginBottom: 8 }}>
             {C.stage}
           </div>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>
@@ -236,7 +228,7 @@ function CycleTimeline({ startYear, endYear }: { startYear: number; endYear: num
                 top: 6,
                 left: 6,
                 fontFamily: "var(--font-mono)",
-                fontSize: 8,
+                fontSize: "var(--text-micro)",
                 color: c.text,
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
@@ -246,14 +238,14 @@ function CycleTimeline({ startYear, endYear }: { startYear: number; endYear: num
             >
               {b.label}
             </div>
-            <div style={{ position: "absolute", bottom: 5, left: 6, fontFamily: "var(--font-mono)", fontSize: 7, color: c.text, opacity: 0.65 }}>
+            <div style={{ position: "absolute", bottom: 5, left: 6, fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: c.text, opacity: 0.65 }}>
               {b.s}–{b.e}
             </div>
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: 4, bottom: 4, fontFamily: "var(--font-mono)", fontSize: 8, color: "var(--dim)" }}>{startYear}</div>
-      <div style={{ position: "absolute", right: 4, bottom: 4, fontFamily: "var(--font-mono)", fontSize: 8, color: "var(--dim)" }}>{endYear}</div>
+      <div style={{ position: "absolute", left: 4, bottom: 4, fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>{startYear}</div>
+      <div style={{ position: "absolute", right: 4, bottom: 4, fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>{endYear}</div>
     </div>
   );
 }
@@ -266,6 +258,8 @@ export function TimeAnchorSection({
   setAge,
   retireAge,
   setRetireAge,
+  jobStability,
+  setJobStability,
 }: {
   lang: Lang;
   geo: GeoKey;
@@ -274,6 +268,8 @@ export function TimeAnchorSection({
   setAge: (a: number) => void;
   retireAge: number;
   setRetireAge: (a: number) => void;
+  jobStability: number;
+  setJobStability: (s: number) => void;
 }) {
   const now = 2026;
   const retireYear = now + Math.max(0, retireAge - age);
@@ -299,9 +295,9 @@ export function TimeAnchorSection({
               className={`plan-v3-geo-card${geo === k ? " active" : ""}`}
               onClick={() => setGeo(k)}
             >
-              <span style={{ fontSize: 28 }}>{cfg.flag}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em" }}>{cfg.name}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
+              <span style={{ fontFamily: "var(--font-display)" }}>{cfg.flag}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, letterSpacing: "0.06em" }}>{cfg.name}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
                 {C.taxLabel} {cfg.taxRate}% · {C.rateLabel} {cfg.interestRate}%
               </span>
             </button>
@@ -345,7 +341,7 @@ export function TimeAnchorSection({
       <Reveal delay={0.2}>
         <div className="plan-v3-insight-box" style={{ marginTop: 32 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-            <span className="plan-v3-big-num" style={{ color: "var(--tech)", fontSize: "clamp(2rem,6vw,3.5rem)" }}>{yearCount}</span>
+            <span className="plan-v3-big-num" style={{ color: "var(--tech)", fontSize: "var(--text-display)" }}>{yearCount}</span>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", color: "var(--muted)" }}>
               {lang === "th" ? "ปีที่คุณเกษียณ" : lang === "zh" ? "你的退休年份" : "is when you retire"}
             </span>
@@ -382,7 +378,7 @@ export function TimeAnchorSection({
 
       <Reveal delay={0.3}>
         <div className="plan-v3-context-pill" style={{ marginTop: 16 }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--dim)", letterSpacing: "0.1em" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", letterSpacing: "0.1em" }}>
             {g.name} CONTEXT
           </span>
           <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--muted)", lineHeight: 1.5 }}>
@@ -451,7 +447,7 @@ export function MaslowPyramidSection({
                   }}
                   onClick={() => toggle(level.id)}
                 >
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>{level.icon}</span>
+                  <span style={{ fontSize: "var(--text-display)", flexShrink: 0 }}>{level.icon}</span>
                   <div style={{ flex: 1, textAlign: "left" }}>
                     <div
                       style={{
@@ -512,7 +508,7 @@ export function MaslowPyramidSection({
                           <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>
                             {C.monthly}
                           </span>
-                          <span style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", fontWeight: 700, color: level.color }}>
+                          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: level.color }}>
                             {fmtC(st.monthly, geo)}/{lang === "th" ? "เดือน" : lang === "zh" ? "月" : "mo"}
                           </span>
                         </div>
@@ -645,7 +641,7 @@ export function SalaryFlowSection({
       <Reveal delay={0.1}>
         <div className="plan-v3-stat-card" style={{ marginBottom: 20 }}>
           <div className="plan-v3-stat-label">{C.growth}</div>
-          <div className="plan-v3-stat-num" style={{ fontSize: "1.8rem" }}>
+          <div className="plan-v3-stat-num">
             {(salaryGrowth * 100).toFixed(0)}%
             <span style={{ fontSize: "var(--text-micro)", color: "var(--dim)", fontWeight: 400, marginLeft: 4 }}>
               /{lang === "th" ? "ปี" : lang === "zh" ? "年" : "yr"}
@@ -691,7 +687,7 @@ export function SalaryFlowSection({
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: 9,
+                    fontSize: "var(--text-micro)",
                     color: "var(--dim)",
                     marginBottom: 4,
                     textTransform: "none",
@@ -733,7 +729,7 @@ export function SalaryFlowSection({
             <span
               style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: "2rem",
+                fontSize: "var(--text-display)",
                 fontWeight: 700,
                 lineHeight: 1,
                 color: investable > 0 ? "var(--bull)" : "var(--bear)",
@@ -785,8 +781,8 @@ export function SalaryFlowSection({
             className="plan-v3-insight-box"
             style={{
               marginTop: 16,
-              borderColor: deficit > 0 ? "rgba(255,45,85,0.3)" : "rgba(0,255,136,0.3)",
-              background: deficit > 0 ? "rgba(255,45,85,0.05)" : "rgba(0,255,136,0.05)",
+              borderColor: deficit > 0 ? "var(--bear)" : "var(--bull)",
+              background: "var(--bg-raised)",
             }}
           >
             <div
@@ -1264,6 +1260,7 @@ export function StickySummary({
   investable,
   salaryGrowth,
   yearsToRetire,
+  projectedFinal,
 }: {
   lang: Lang;
   geo: GeoKey;
@@ -1275,9 +1272,12 @@ export function StickySummary({
   investable: number;
   salaryGrowth: number;
   yearsToRetire: number;
+  projectedFinal?: number;
 }) {
   const style = INVEST.find((s) => s.key === investStyle);
-  const finalInv = style ? investAccum(investable, salaryGrowth, style.ret, yearsToRetire) : 0;
+  const finalInv = projectedFinal !== undefined
+    ? projectedFinal
+    : style ? investAccum(investable, salaryGrowth, style.ret, yearsToRetire) : 0;
   const readiness = retirementTarget > 0 ? Math.min(100, Math.round((finalInv / retirementTarget) * 100)) : 0;
   const readColor = finalInv >= retirementTarget ? "var(--bull)" : readiness > 60 ? "var(--caution)" : "var(--bear)";
 

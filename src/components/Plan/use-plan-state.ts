@@ -5,11 +5,18 @@ import {
   type Lang,
   type GeoKey,
   type StyleKey,
+  type Allocation6,
+  type SafetyMargin,
   GEOS,
   INVEST,
+  DEFAULT_ALLOC_6,
+  JOB_STABILITY,
+  MED_INFLATION,
   pureSavings,
   investAccum,
   fmtC,
+  calculateScenarios,
+  safetyMargin as calcSafetyMargin,
 } from "./plan-data";
 
 export interface NeedState {
@@ -18,6 +25,7 @@ export interface NeedState {
 }
 
 export function usePlanState() {
+  const [step, setStep] = useState(0);
   const [lang, setLang] = useState<Lang>("en");
   const [geo, setGeo] = useState<GeoKey>("th");
   const [age, setAge] = useState(30);
@@ -28,6 +36,8 @@ export function usePlanState() {
   const [transport, setTransport] = useState(GEOS.th.defaultTransport);
   const [other, setOther] = useState(GEOS.th.defaultOther);
   const [investStyle, setInvestStyle] = useState<StyleKey | null>(null);
+  const [jobStability, setJobStability] = useState(3);
+  const [alloc, setAlloc] = useState<Allocation6>(DEFAULT_ALLOC_6);
   const [needs, setNeeds] = useState<Record<number, NeedState>>({
     1: { active: false, monthly: GEOS.th.defaultNeeds[0] },
     2: { active: false, monthly: GEOS.th.defaultNeeds[1] },
@@ -49,6 +59,8 @@ export function usePlanState() {
     setRetireAge(g.retireAge);
     setSalaryGrowth(0.03);
     setInvestStyle(null);
+    setJobStability(3);
+    setAlloc(DEFAULT_ALLOC_6);
     setNeeds({
       1: { active: false, monthly: g.defaultNeeds[0] },
       2: { active: false, monthly: g.defaultNeeds[1] },
@@ -64,6 +76,31 @@ export function usePlanState() {
   const yearsPostRetire = Math.max(5, g.lifeExp - retireAge);
   const totalExpenses = living + transport + other;
   const investable = Math.max(0, salary - totalExpenses);
+  const stabilityFactor = JOB_STABILITY[jobStability - 1]?.factor ?? 0.88;
+
+  // Earnings projection over working life
+  const earningsRaw = useMemo(() => {
+    let total = 0, m = salary;
+    for (let y = 0; y < yearsToRetire; y++) {
+      total += m * 12;
+      m *= 1 + salaryGrowth;
+    }
+    return total;
+  }, [salary, salaryGrowth, yearsToRetire]);
+
+  const earningsReal = useMemo(() => {
+    let total = 0, m = salary;
+    const infl = MED_INFLATION[geo];
+    for (let y = 0; y < yearsToRetire; y++) {
+      total += (m * 12) / Math.pow(1 + infl, y);
+      m *= 1 + salaryGrowth;
+    }
+    return total;
+  }, [salary, salaryGrowth, yearsToRetire, geo]);
+
+  const earningsStable = useMemo(() => {
+    return Math.round(earningsRaw * stabilityFactor);
+  }, [earningsRaw, stabilityFactor]);
 
   const activeNeedsMonthly = useMemo(
     () => Object.values(needs).filter((n) => n.active).reduce((s, n) => s + n.monthly, 0),
@@ -94,6 +131,33 @@ export function usePlanState() {
 
   const deficit = retirementTarget - savingsTotal;
 
+  // 6-bucket scenario engine
+  const scenarios = useMemo(() => {
+    if (investable <= 0 || yearsToRetire <= 0) {
+      return {
+        worst: { label: "WORST CASE", color: "var(--bear)", series: [], finalValue: 0, crossoverYear: null },
+        base: { label: "BASE CASE", color: "var(--caution)", series: [], finalValue: 0, crossoverYear: null },
+        best: { label: "GROWTH WORLD", color: "var(--bull)", series: [], finalValue: 0, crossoverYear: null },
+      };
+    }
+    const s = calculateScenarios(investable, salaryGrowth, alloc, yearsToRetire);
+    // Calculate crossover years against retirement target
+    const findCrossover = (series: { value: number }[]) => {
+      for (let i = 0; i < series.length; i++) {
+        if (series[i].value >= retirementTarget) return i;
+      }
+      return null;
+    };
+    s.worst.crossoverYear = findCrossover(s.worst.series);
+    s.base.crossoverYear = findCrossover(s.base.series);
+    s.best.crossoverYear = findCrossover(s.best.series);
+    return s;
+  }, [investable, salaryGrowth, alloc, yearsToRetire, retirementTarget]);
+
+  const safety = useMemo<SafetyMargin>(() => {
+    return calcSafetyMargin(scenarios.base.finalValue, retirementTarget);
+  }, [scenarios.base.finalValue, retirementTarget]);
+
   function restart() {
     const gg = GEOS[geo];
     setAge(30);
@@ -104,6 +168,8 @@ export function usePlanState() {
     setRetireAge(gg.retireAge);
     setSalaryGrowth(0.03);
     setInvestStyle(null);
+    setJobStability(3);
+    setAlloc(DEFAULT_ALLOC_6);
     setNeeds({
       1: { active: false, monthly: gg.defaultNeeds[0] },
       2: { active: false, monthly: gg.defaultNeeds[1] },
@@ -137,18 +203,31 @@ export function usePlanState() {
     setNeeds,
     investStyle,
     setInvestStyle,
+    jobStability,
+    setJobStability,
+    alloc,
+    setAlloc,
     // derived
     yearsToRetire,
     yearsPostRetire,
     totalExpenses,
     investable,
+    stabilityFactor,
+    earningsRaw,
+    earningsReal,
+    earningsStable,
     activeNeedsMonthly,
     retirementTarget,
     savingsTotal,
     projectedFinal,
     readiness,
     deficit,
+    scenarios,
+    safety,
     geoConfig: g,
+    // ui
+    step,
+    setStep,
     // actions
     restart,
   };

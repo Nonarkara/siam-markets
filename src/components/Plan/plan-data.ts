@@ -8,6 +8,70 @@ export type GeoKey = "th" | "us" | "jp" | "eu" | "cn" | "kr";
 export type StyleKey = "money" | "balanced" | "growth" | "people" | "derivatives";
 export type CycleType = "contraction" | "recovery" | "expansion" | "late";
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   JOB STABILITY  —  5 levels that factor into lifetime earnings projection
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+export interface JobStability {
+  level: 1 | 2 | 3 | 4 | 5;
+  label: Record<Lang, string>;
+  factor: number; // multiplier on working years (1.0 = full, 0.65 = gaps)
+  desc: Record<Lang, string>;
+}
+
+export const JOB_STABILITY: JobStability[] = [
+  {
+    level: 1,
+    factor: 1.0,
+    label: { en: "Iron Rice Bowl", th: "กระทะเหล็ก", zh: "铁饭碗" },
+    desc: {
+      en: "Government, tenure, union. Income is virtually guaranteed.",
+      th: "ราชการ ประจำ สหภาพ รายได้แทบจะการันตี",
+      zh: "政府、编制、工会。收入几乎有保障。",
+    },
+  },
+  {
+    level: 2,
+    factor: 0.95,
+    label: { en: "Stable Corporate", th: "บริษัทมั่นคง", zh: "稳定企业" },
+    desc: {
+      en: "Large corp, unlikely layoffs. Maybe 1 gap year in a lifetime.",
+      th: "บริษัทใหญ่ เลย์ออฟยาก อาจมีช่องว่าง 1 ปีตลอดชีวิต",
+      zh: "大公司，裁员可能性低。一生可能只有1年间隙。",
+    },
+  },
+  {
+    level: 3,
+    factor: 0.88,
+    label: { en: "Typical Private", th: "เอกชนทั่วไป", zh: "普通私企" },
+    desc: {
+      en: "Some risk. 2–3 gap years over a career. The median experience.",
+      th: "มีความเสี่ยง ช่องว่าง 2–3 ปีตลอดอาชีพ ประสบการณ์คนกลาง",
+      zh: "有一定风险。职业生涯中2-3年间隙。典型经历。",
+    },
+  },
+  {
+    level: 4,
+    factor: 0.78,
+    label: { en: "Gig Economy", th: "อิสระ / กิก", zh: "零工经济" },
+    desc: {
+      en: "Income varies. 4–6 lean years. Feast and famine.",
+      th: "รายได้ผันผวน ปีอดอยาก 4–6 ปี มีกินมีอด",
+      zh: "收入波动。4-6个歉收年。饱一顿饿一顿。",
+    },
+  },
+  {
+    level: 5,
+    factor: 0.65,
+    label: { en: "Entrepreneur", th: "ผู้ประกอบการ", zh: "创业者" },
+    desc: {
+      en: "High variance. Possible zero-income years. Big upside, big downside.",
+      th: "ผันผวนสูง อาจมีปีรายได้ศูนย์ ได้มาก เสียมาก",
+      zh: "方差很大。可能出现零收入年份。高收益，高风险。",
+    },
+  },
+];
+
 export interface GeoConfig {
   flag: string;
   name: string;
@@ -712,7 +776,231 @@ export const COPY = {
       disc: "税前 · 名义值 · 不含通货膨胀调整 · 历史收益不代表未来 · 仅供教育参考。",
     },
   },
+  question: {
+    en: {
+      overline: "THE MOST IMPORTANT QUESTION",
+      h1: "Have you ever thought about what you will do when you retire?",
+      body: "Most people, after they lose their will to live — or more importantly, the money to live — don't know what else to do. That shouldn't be the way. Let's find out how much you need, so you can build a life, not just save for one.",
+    },
+    th: {
+      overline: "คำถามที่สำคัญที่สุด",
+      h1: "คุณเคยคิดไหมว่าจะทำอะไรตอนเกษียณ?",
+      body: "คนส่วนใหญ่ พอเสียความอยากมีชีวิต — หรือที่สำคัญกว่า เงินที่จะอยู่ — ไม่รู้จะทำอะไรอีก ไม่ควรเป็นอย่างนั้น มาหากันว่าต้องมีเท่าไหร่ เพื่อสร้างชีวิต ไม่ใช่แค่ออม",
+    },
+    zh: {
+      overline: "最重要的问题",
+      h1: "你有没有想过退休后要做什么？",
+      body: "大多数人，在失去生存意志之后——或者更重要的是，失去生存所需的钱之后——不知道还能做什么。不应该是这样的。让我们找出你需要多少钱，这样你就能建立一种生活，而不仅仅是为之储蓄。",
+    },
+  },
+  earnings: {
+    en: {
+      overline: "WHAT YOU WILL MAKE",
+      h2: "The money your working life produces.",
+      body: "Your salary grows. Inflation erodes. Job gaps happen. Here is the honest math.",
+      rawL: "TOTAL RAW EARNINGS",
+      realL: "AFTER INFLATION",
+      stableL: "AFTER STABILITY",
+      rawSub: "What the numbers say on paper.",
+      realSub: "What that money will actually buy.",
+      stableSub: "What you keep after job gaps.",
+      chartLabel: "Salary trajectory",
+      investableL: "FREE TO INVEST / MONTH",
+    },
+    th: {
+      overline: "สิ่งที่คุณจะได้",
+      h2: "เงินที่ชีวิตการทำงานให้คุณ",
+      body: "เงินเดือนโต เงินเฟ้อกัด ช่องว่างงานเกิด นี่คือเลขจริง",
+      rawL: "รายได้รวมดิบ",
+      realL: "หลังเงินเฟ้อ",
+      stableL: "หลังความมั่นคง",
+      rawSub: "ตัวเลขบนกระดาษ",
+      realSub: "เงินที่ซื้อของได้จริง",
+      stableSub: "ที่เหลือหลังช่องว่างงาน",
+      chartLabel: "เส้นทางเงินเดือน",
+      investableL: "ลงทุนได้ต่อเดือน",
+    },
+    zh: {
+      overline: "你将赚取的",
+      h2: "你的工作生涯产生的钱。",
+      body: "工资增长。通胀侵蚀。职业间隙发生。这是诚实的计算。",
+      rawL: "原始总收入",
+      realL: "扣除通胀后",
+      stableL: "扣除不稳定因素后",
+      rawSub: "纸面上的数字",
+      realSub: "这些钱实际能买到的东西",
+      stableSub: "扣除职业间隙后剩下的",
+      chartLabel: "工资轨迹",
+      investableL: "每月可投资金额",
+    },
+  },
+  safetyMargin: {
+    en: {
+      overline: "HOW FINE ARE YOU?",
+      h2: "Not pass or fail. Degrees of safety.",
+      body: "If your number is exactly the same as what you need, you are not fine. Cancer happens. Markets crash. You need a buffer.",
+      save100L: "IF YOU SAVE 100%",
+      save30L: "IF YOU SAVE 30%",
+      needL: "WHAT YOU NEED",
+      shortBy: (v: string) => `Short by ${v}`,
+      surplus: (v: string) => `Surplus of ${v}`,
+      safetyL: "SAFETY MARGIN",
+      bufferNote: "A buffer of 30%+ means you can travel, help family, and sleep through recessions.",
+    },
+    th: {
+      overline: "คุณพอไหม?",
+      h2: "ไม่ใช่ผ่านหรือตก แต่ระดับความปลอดภัย",
+      body: "ถ้าตัวเลขพอดีกับที่ต้องการ คุณยังไม่ปลอดภัย มะเร็งเกิด ตลาดพัง ต้องมี cushion",
+      save100L: "ถ้าออม 100%",
+      save30L: "ถ้าออม 30%",
+      needL: "ที่ต้องการ",
+      shortBy: (v: string) => `ขาด ${v}`,
+      surplus: (v: string) => `เหลือ ${v}`,
+      safetyL: "MARGIN ความปลอดภัย",
+      bufferNote: " cushion 30%+ แปลว่าเที่ยวได้ ช่วยครอบครัวได้ นอนหลับตลอดภาวะถดถอย",
+    },
+    zh: {
+      overline: "你有多安全？",
+      h2: "不是通过或失败。是安全程度。",
+      body: "如果你的数字刚好等于你需要的，你并不安全。癌症会发生。市场会崩盘。你需要缓冲。",
+      save100L: "如果你储蓄100%",
+      save30L: "如果你储蓄30%",
+      needL: "你需要的",
+      shortBy: (v: string) => `短缺 ${v}`,
+      surplus: (v: string) => `盈余 ${v}`,
+      safetyL: "安全边距",
+      bufferNote: "30%以上的缓冲意味着你可以旅行、帮助家人，在经济衰退中安然入睡。",
+    },
+  },
+  allocator: {
+    en: {
+      overline: "CLOSE THE GAP",
+      h2: "How would you invest the 30% you save?",
+      body: "Saving alone won't get you there. Move the sliders. Watch the scenarios react. Find a mix that lets you sleep at night.",
+      presetL: "RISK PROFILE",
+      suggested: "Suggested for you",
+      bucketL: "YOUR ALLOCATION",
+      scenarioL: "THREE SCENARIOS",
+      worstL: "Wuka 2.0 — deep contraction",
+      baseL: "Base case — cycle average",
+      bestL: "Growth world — expansion",
+      needLineL: "Your need",
+      readinessL: "READINESS",
+      actionsL: "YOUR NEXT 3 MOVES",
+      restart: "START AGAIN",
+      disc: "Illustrative returns. Past performance ≠ future. Educational only. Not investment advice.",
+    },
+    th: {
+      overline: "เติมช่องว่าง",
+      h2: "จะลงทุน 30% ที่ออมไว้อย่างไร?",
+      body: "ออมอย่างเดียวไม่ถึง ขยับสไลด์ ดูสถานการณ์ตอบสนอง หาสัดส่วนที่นอนหลับสบาย",
+      presetL: "โปรไฟล์ความเสี่ยง",
+      suggested: "แนะนำสำหรับคุณ",
+      bucketL: "การจัดสรรของคุณ",
+      scenarioL: "สามสถานการณ์",
+      worstL: "Wuka 2.0 — ถดถอยลึก",
+      baseL: "ฐาน — เฉลี่ยวัฏจักร",
+      bestL: "โลกเติบโต — ขยายตัว",
+      needLineL: "ที่ต้องการ",
+      readinessL: "ความพร้อม",
+      actionsL: "3 สิ่งต่อไป",
+      restart: "เริ่มใหม่",
+      disc: "ผลตอบแทนตัวอย่าง อดีตไม่รับประกันอนาคต เพื่อการศึกษาเท่านั้น ไม่ใช่คำแนะนำการลงทุน",
+    },
+    zh: {
+      overline: "填补缺口",
+      h2: "如何投资你储蓄的30%？",
+      body: "仅靠储蓄不够。拖动滑块。观察情景变化。找到让你晚上能睡着的组合。",
+      presetL: "风险画像",
+      suggested: "为你推荐",
+      bucketL: "你的配置",
+      scenarioL: "三种情景",
+      worstL: "Wuka 2.0 — 深度衰退",
+      baseL: "基准 — 周期平均",
+      bestL: "增长世界 — 扩张期",
+      needLineL: "你的需求",
+      readinessL: "准备度",
+      actionsL: "下3步",
+      restart: "重新开始",
+      disc: "收益仅为示例。历史业绩不代表未来。仅供教育参考。非投资建议。",
+    },
+  },
 } as const;
+
+export const BUCKET_META: {
+  key: keyof Allocation6;
+  label: Record<Lang, string>;
+  desc: Record<Lang, string>;
+  returnNote: Record<Lang, string>;
+  color: string;
+}[] = [
+  {
+    key: "saving",
+    color: "var(--muted)",
+    label: { en: "SAVINGS", th: "เงินออม", zh: "储蓄" },
+    desc: {
+      en: "Rainy day fund. Liquid. Available tomorrow. But it loses to inflation every year.",
+      th: "กองทุนฉุกเฉิน สภาพคล่องสูง ใช้พรุ่งนี้ได้ แต่แพ้เงินเฟ้อทุกปี",
+      zh: "应急储备。流动性高。明天就能用。但每年都输给通胀。",
+    },
+    returnNote: { en: "~1%/yr", th: "~1%/ปี", zh: "~1%/年" },
+  },
+  {
+    key: "mm",
+    color: "var(--tech)",
+    label: { en: "MONEY MARKET", th: "ตลาดเงิน", zh: "货币市场" },
+    desc: {
+      en: "Government bonds, T-bills, fixed deposits. Stable, but locked up for years. The sleep-well money.",
+      th: "พันธบัตรรัฐ บัตรเงินฝากประจำ นิ่ง แต่ล็อกหลายปี เงินนอนหลับสบาย",
+      zh: "国债、国库券、定期存款。稳定，但锁定数年。让人安睡的钱。",
+    },
+    returnNote: { en: "~4%/yr", th: "~4%/ปี", zh: "~4%/年" },
+  },
+  {
+    key: "cm",
+    color: "var(--bull)",
+    label: { en: "CAPITAL MARKET", th: "ตลาดทุน", zh: "资本市场" },
+    desc: {
+      en: "Mutual funds, S&P 500, equities. Rides the cycle. 7–10% long-run. Volatility is the price of admission.",
+      th: "กองทุนรวม หุ้น วิ่งตามวัฏจักร 7–10% ระยะยาว ความผันผวนคือค่าเข้า",
+      zh: "公募基金、标普500、股票。跟随周期。长期7-10%。波动是入场券。",
+    },
+    returnNote: { en: "~7–10%/yr", th: "~7–10%/ปี", zh: "~7-10%/年" },
+  },
+  {
+    key: "dv",
+    color: "var(--bear)",
+    label: { en: "DERIVATIVES", th: "อนุพันธ์", zh: "衍生品" },
+    desc: {
+      en: "Crypto, gold, options, leverage. Amplified returns. 90% of retail traders lose. Only what you can afford to lose.",
+      th: "คริปโต ทอง ออปชัน เลเวอเรจ ขยายแรง 90% รายย่อยขาดทุน ลงแค่ที่เสียได้",
+      zh: "加密货币、黄金、期权、杠杆。放大收益。90%散户亏损。只投输得起的钱。",
+    },
+    returnNote: { en: "highly variable", th: "ผันผวนสูง", zh: "高度波动" },
+  },
+  {
+    key: "self",
+    color: "#7c84ff",
+    label: { en: "INVEST IN SELF", th: "ลงทุนในตัวเอง", zh: "投资自己" },
+    desc: {
+      en: "Education, skills, certifications, health. The highest-return asset nobody talks about. Compounds for life.",
+      th: "การศึกษา ทักษะ ใบประกาศ สุขภาพ สินทรัพย์ผลตอบแทนสูงสุดที่ไม่ค่อยพูดถึง ทบต้นตลอดชีวิต",
+      zh: "教育、技能、认证、健康。没人谈论的最高回报资产。终身复利。",
+    },
+    returnNote: { en: "~15%/yr (skill premium)", th: "~15%/ปี (พรีเมียมทักษะ)", zh: "~15%/年（技能溢价）" },
+  },
+  {
+    key: "people",
+    color: "#ff9500",
+    label: { en: "INVEST IN OTHERS", th: "ลงทุนในคน", zh: "投资他人" },
+    desc: {
+      en: "Friends' businesses, family ventures, micro-lending. Social capital compounds too. Start small, document everything.",
+      th: "ธุรกิจเพื่อน ครอบครัว ปล่อยกู้ย่อย ทุนทางสังคมก็ทบต้น เริ่มเล็ก บันทึกทุกอย่าง",
+      zh: "朋友的生意、家庭企业、小额贷款。社会资本也会复利。从小开始，记录一切。",
+    },
+    returnNote: { en: "~12%/yr (social ROI)", th: "~12%/ปี (ผลตอบแทนทางสังคม)", zh: "~12%/年（社交回报）" },
+  },
+];
 
 export const ACTIONS: Record<StyleKey, Record<Lang, string[]>> = {
   money: {
@@ -828,6 +1116,22 @@ const DV_BETA = 2.5;
 
 export interface Allocation { mm: number; cm: number; dv: number }
 
+/* ─── 6-bucket allocation (expanded from 4-bucket) ────────────────────────────
+   Adds self-investment and invest-in-people buckets for the narrative flow. */
+
+export interface Allocation6 {
+  saving: number;
+  mm: number;
+  cm: number;
+  dv: number;
+  self: number;   // invest in yourself — education, skills, health
+  people: number; // invest in others — friends, family biz, micro-lending
+}
+
+export const DEFAULT_ALLOC_6: Allocation6 = {
+  saving: 30, mm: 20, cm: 30, dv: 5, self: 10, people: 5,
+};
+
 export function portfolioRateForCycle(cycleRate: number, a: Allocation): number {
   const mmRet = 0.04 + MM_BETA * (cycleRate - 0.07);
   const cmRet = CM_BETA * cycleRate;
@@ -840,6 +1144,23 @@ export interface YearPoint {
   value: number;
   phase: string;
   yearRate: number;
+}
+
+export interface ScenarioResult {
+  label: string;
+  color: string;
+  series: YearPoint[];
+  finalValue: number;
+  crossoverYear: number | null; // first year value >= target
+}
+
+export type SafetyLevel = "critical" | "thin" | "comfortable" | "secure" | "abundant";
+
+export interface SafetyMargin {
+  score: number; // 0–200
+  level: SafetyLevel;
+  label: Record<Lang, string>;
+  desc: Record<Lang, string>;
 }
 
 export function projectWithCycle(
@@ -959,4 +1280,267 @@ export function projectWithCycle4(
     m *= 1 + growth;
   }
   return out;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   6-BUCKET SCENARIO ENGINE  —  Worst / Base / Best case projections
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+const SELF_RATE = 0.15;   // invest in yourself — skill premium, illustrative
+const PEOPLE_RATE = 0.12; // invest in others — social ROI, illustrative
+
+function portfolioRate6(cycleRate: number, a: Allocation6): number {
+  const saveRet = SAVING_RATE;
+  const mmRet   = 0.04 + MM_BETA * (cycleRate - 0.07);
+  const cmRet   = CM_BETA * cycleRate;
+  const dvRet   = DV_BETA * cycleRate;
+  const selfRet = SELF_RATE;
+  const pplRet  = PEOPLE_RATE;
+  return (a.saving / 100) * saveRet
+       + (a.mm     / 100) * mmRet
+       + (a.cm     / 100) * cmRet
+       + (a.dv     / 100) * dvRet
+       + (a.self   / 100) * selfRet
+       + (a.people / 100) * pplRet;
+}
+
+// Base case: rides the standard Dalio cycle
+function projectBase(
+  monthly: number,
+  growth: number,
+  alloc: Allocation6,
+  years: number,
+): YearPoint[] {
+  if (years <= 0 || monthly <= 0) return [];
+  const out: YearPoint[] = [];
+  let value = 0;
+  let m = monthly;
+  for (let y = 0; y < years; y++) {
+    const stage = cycleStageForOffset(y);
+    const rate = portfolioRate6(stage.meanRate, alloc);
+    const mRate = rate / 12;
+    const yrContrib = Math.abs(mRate) < 1e-9
+      ? m * 12
+      : m * ((Math.pow(1 + mRate, 12) - 1) / mRate);
+    value = value * (1 + rate) + yrContrib;
+    out.push({ year: 2026 + y, value, phase: stage.label, yearRate: rate });
+    m *= 1 + growth;
+  }
+  return out;
+}
+
+// Worst case: contraction phases hit harder, recovery phases weaker
+function projectWorst(
+  monthly: number,
+  growth: number,
+  alloc: Allocation6,
+  years: number,
+): YearPoint[] {
+  if (years <= 0 || monthly <= 0) return [];
+  const out: YearPoint[] = [];
+  let value = 0;
+  let m = monthly;
+  for (let y = 0; y < years; y++) {
+    const stage = cycleStageForOffset(y);
+    let rate = portfolioRate6(stage.meanRate, alloc);
+    // Amplify negatives, dampen positives
+    if (rate < 0) rate *= 1.6;
+    else rate *= 0.6;
+    // Clamp to reasonable bounds
+    rate = Math.max(-0.18, Math.min(0.25, rate));
+    const mRate = rate / 12;
+    const yrContrib = Math.abs(mRate) < 1e-9
+      ? m * 12
+      : m * ((Math.pow(1 + mRate, 12) - 1) / mRate);
+    value = value * (1 + rate) + yrContrib;
+    out.push({ year: 2026 + y, value, phase: stage.label, yearRate: rate });
+    m *= 1 + growth;
+  }
+  return out;
+}
+
+// Best case: expansion phases amplified, contractions mild
+function projectBest(
+  monthly: number,
+  growth: number,
+  alloc: Allocation6,
+  years: number,
+): YearPoint[] {
+  if (years <= 0 || monthly <= 0) return [];
+  const out: YearPoint[] = [];
+  let value = 0;
+  let m = monthly;
+  for (let y = 0; y < years; y++) {
+    const stage = cycleStageForOffset(y);
+    let rate = portfolioRate6(stage.meanRate, alloc);
+    if (rate > 0) rate *= 1.35;
+    else rate *= 0.5;
+    rate = Math.max(-0.08, Math.min(0.35, rate));
+    const mRate = rate / 12;
+    const yrContrib = Math.abs(mRate) < 1e-9
+      ? m * 12
+      : m * ((Math.pow(1 + mRate, 12) - 1) / mRate);
+    value = value * (1 + rate) + yrContrib;
+    out.push({ year: 2026 + y, value, phase: stage.label, yearRate: rate });
+    m *= 1 + growth;
+  }
+  return out;
+}
+
+export function calculateScenarios(
+  monthly: number,
+  growth: number,
+  alloc: Allocation6,
+  years: number,
+): { worst: ScenarioResult; base: ScenarioResult; best: ScenarioResult } {
+  const w = projectWorst(monthly, growth, alloc, years);
+  const b = projectBase(monthly, growth, alloc, years);
+  const be = projectBest(monthly, growth, alloc, years);
+
+  const makeResult = (series: YearPoint[], label: string, color: string): ScenarioResult => {
+    const finalValue = series.length ? series[series.length - 1].value : 0;
+    return { label, color, series, finalValue, crossoverYear: null };
+  };
+
+  return {
+    worst: makeResult(w, "WORST CASE", "var(--bear)"),
+    base:  makeResult(b, "BASE CASE", "var(--caution)"),
+    best:  makeResult(be, "GROWTH WORLD", "var(--bull)"),
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SAFETY MARGIN  —  How fine are you? Not pass/fail. Degrees.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+export function safetyMargin(projected: number, need: number): SafetyMargin {
+  if (need <= 0) {
+    return {
+      score: 100,
+      level: "comfortable",
+      label: { en: "COMFORTABLE", th: "สบาย", zh: "舒适" },
+      desc: { en: "Need is undefined. Any projection is a bonus.", th: "ไม่มีเป้า ทุกอย่างเป็นของแถม", zh: "目标未定义。任何预测都是额外收获。" },
+    };
+  }
+  const ratio = projected / need;
+  const score = Math.round(ratio * 100);
+
+  if (score < 0) {
+    return {
+      score,
+      level: "critical",
+      label: { en: "CRITICAL", th: "วิกฤต", zh: "危急" },
+      desc: {
+        en: "You will run out of money. Raise income, cut expenses, or invest more aggressively.",
+        th: "เงินจะหมดก่อนตาย เพิ่มรายได้ ลดค่าใช้จ่าย หรือลงทุนเสี่ยงขึ้น",
+        zh: "你的钱会用完。增加收入、减少支出，或更积极投资。",
+      },
+    };
+  }
+  if (score < 10) {
+    return {
+      score,
+      level: "thin",
+      label: { en: "THIN", th: "บาง", zh: "薄弱" },
+      desc: {
+        en: "One medical emergency or market crash wipes you out. You need more buffer.",
+        th: "เหตุฉุกเฉินทางการแพทย์หรือตลาดพังครั้งเดียวจบ ต้องมี cushion มากกว่านี้",
+        zh: "一次医疗紧急情况或市场崩盘就会耗尽你的积蓄。你需要更多缓冲。",
+      },
+    };
+  }
+  if (score < 30) {
+    return {
+      score,
+      level: "comfortable",
+      label: { en: "COMFORTABLE", th: "สบาย", zh: "舒适" },
+      desc: {
+        en: "You can travel, handle surprises, and live without counting every baht.",
+        th: "เที่ยวได้ เจอเรื่องเซอร์ไพรส์ได้ ไม่ต้องนับทุกบาท",
+        zh: "你可以旅行、应对意外，不用数着每一分钱过日子。",
+      },
+    };
+  }
+  if (score < 60) {
+    return {
+      score,
+      level: "secure",
+      label: { en: "SECURE", th: "มั่นคง", zh: "稳固" },
+      desc: {
+        en: "You can help family, leave a legacy, and sleep through any recession.",
+        th: "ช่วยครอบครัวได้ ทิ้งมรดกได้ นอนหลับตลอดภาวะถดถอย",
+        zh: "你可以帮助家人、留下遗产，在任何衰退中都能安睡。",
+      },
+    };
+  }
+  return {
+    score,
+    level: "abundant",
+    label: { en: "ABUNDANT", th: "เหลือเฟือ", zh: "充裕" },
+    desc: {
+      en: "You can fund purpose-driven work. Money becomes a tool, not a worry.",
+      th: "ทุนงานเพื่อจุดมุ่งหมายได้ เงินกลายเป็นเครื่องมือ ไม่ใช่ความกังวล",
+      zh: "你可以资助有意义的工作。钱变成工具，不再是忧虑。",
+    },
+  };
+}
+
+/* ─── Risk profile presets (age + stability → suggested allocation) ─────────── */
+
+export interface RiskPreset {
+  key: string;
+  label: Record<Lang, string>;
+  rationale: Record<Lang, string>;
+  alloc: Allocation6;
+}
+
+export const RISK_PRESETS: RiskPreset[] = [
+  {
+    key: "conservative",
+    label: { en: "Conservative", th: "ระมัดระวัง", zh: "保守" },
+    rationale: {
+      en: "You are closer to retirement or have unstable income. Protect what you have.",
+      th: "ใกล้เกษียณหรือรายได้ไม่แน่นอน ปกป้องสิ่งที่มี",
+      zh: "你接近退休或收入不稳定。保护好已有的。",
+    },
+    alloc: { saving: 40, mm: 35, cm: 20, dv: 0, self: 3, people: 2 },
+  },
+  {
+    key: "moderate",
+    label: { en: "Moderate", th: "ปานกลาง", zh: "稳健" },
+    rationale: {
+      en: "Balanced approach. Some growth, some safety. The path most people should take.",
+      th: "สมดุล เติบโตบ้าง ปลอดภัยบ้าง ทางที่คนส่วนใหญ่ควรเดิน",
+      zh: "平衡策略。部分增长，部分安全。大多数人应该走的路。",
+    },
+    alloc: { saving: 25, mm: 30, cm: 35, dv: 5, self: 3, people: 2 },
+  },
+  {
+    key: "growth",
+    label: { en: "Growth", th: "เติบโต", zh: "成长" },
+    rationale: {
+      en: "You are young with stable income. History shows you will recover from crashes.",
+      th: "อายุน้อย รายได้แน่นอน ประวัติศาสตร์บอกว่าคุณฟื้นตัวจากวิกฤตได้",
+      zh: "你年轻且收入稳定。历史表明你能从危机中恢复。",
+    },
+    alloc: { saving: 15, mm: 20, cm: 45, dv: 10, self: 6, people: 4 },
+  },
+  {
+    key: "aggressive",
+    label: { en: "Aggressive", th: "เสี่ยงสูง", zh: "激进" },
+    rationale: {
+      en: "You have decades ahead and can stomach volatility. Maximum compounding.",
+      th: "มีเวลาอีกหลายทศวรรษ รับความผันผวนได้ ทบต้นสูงสุด",
+      zh: "你还有几十年时间，能承受波动。最大化复利。",
+    },
+    alloc: { saving: 10, mm: 10, cm: 50, dv: 20, self: 6, people: 4 },
+  },
+];
+
+export function suggestPreset(age: number, stabilityLevel: number): RiskPreset | null {
+  const yearsToRetire = Math.max(1, 60 - age);
+  if (yearsToRetire < 10 || stabilityLevel >= 4) return RISK_PRESETS[0]; // conservative
+  if (yearsToRetire < 20 || stabilityLevel === 3) return RISK_PRESETS[1]; // moderate
+  if (yearsToRetire < 30) return RISK_PRESETS[2]; // growth
+  return RISK_PRESETS[3]; // aggressive
 }

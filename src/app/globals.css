@@ -1021,385 +1021,91 @@ textarea:focus-visible {
 @keyframes planIkigaiGlow { 0%,100%{opacity:0.6} 50%{opacity:1} }
 .plan-ikigai-glow { animation: planIkigaiGlow 3s ease-in-out infinite; }
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   PLAN V3 — Multi-geo retirement planner
-   ══════════════════════════════════════════════════════════════════════════════ */
-
-.plan-v3-page {
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-}
-@media (min-width: 1024px) {
-  .plan-v3-page {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-gutter: stable;
-  }
-}
-
-.plan-v3-hero {
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 16px;
-}
-
+/* ─── Plan v4 sections — define the .plan-v3-* classes the section components ──
+   reference (they were undefined → under-styled, non-responsive). Mobile-first
+   base + desktop (≥1024px) landscape: wider container and a .plan-v3-split
+   two-column grid (controls left, teaching aside right). Teaching asides
+   (.plan-v3-teach) are desktop-only enrichment — formulas, year-by-year math,
+   scenario reading — that don't fit a phone. */
 .plan-v3-section {
-  padding: 72px 24px 96px;
-  position: relative;
-  border-bottom: 1px solid var(--line);
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 52px 20px 60px;
+  border-top: 1px solid var(--line);
 }
-@media (min-width: 768px)  { .plan-v3-section { padding: 80px 60px 96px; } }
-@media (min-width: 1024px) {
-  .plan-v3-section {
-    padding: 72px 80px 96px;
-    max-width: 860px;
-    margin: 0 auto;
-    width: 100%;
-    min-height: calc(100dvh - var(--top-h));
-    box-sizing: border-box;
-  }
-}
+.plan-v3-main  { min-width: 0; }
+.plan-v3-teach { display: none; }            /* desktop-only enrichment */
 
-/* ─── Typography ───────────────────────────────────────────────────────────── */
 .plan-v3-overline {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  font-weight: 700;
-  color: var(--dim);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 12px;
+  font-family: var(--font-mono); font-size: var(--text-micro);
+  color: var(--caution); letter-spacing: 0.18em; text-transform: uppercase;
+  display: block; margin-bottom: 10px;
 }
-
-.plan-v3-h1 {
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 5vw, 3rem);
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin: 0 0 16px;
-}
-
 .plan-v3-h2 {
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 3.5vw, 2rem);
-  font-weight: 600;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  margin: 0 0 12px;
+  font-family: var(--font-elegant), Georgia, serif; font-size: var(--text-display);
+  font-weight: 500; color: var(--ink); line-height: 1.12; letter-spacing: -0.01em; margin: 0 0 14px;
 }
-
 .plan-v3-body {
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  color: var(--muted);
-  line-height: 1.6;
-  margin: 0;
-  max-width: 520px;
+  font-family: var(--font-body); font-size: var(--text-body); color: var(--muted);
+  line-height: 1.65; max-width: 60ch; margin: 0;
 }
-
-.plan-v3-mono-sub {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  color: var(--dim);
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-}
-
-/* ─── Buttons ──────────────────────────────────────────────────────────────── */
-.plan-v3-cta {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #000;
-  background: var(--caution);
-  border: none;
-  border-bottom: 3px solid rgba(0,0,0,0.25);
-  padding: 0 28px;
-  min-height: 48px;
-  cursor: pointer;
-  transition: all var(--dur) var(--ease);
-}
-.plan-v3-cta:hover { transform: translateY(-2px); border-color: var(--caution); }
-.plan-v3-cta:active { transform: translateY(0); }
-
-.plan-v3-restart-btn {
-  display: block;
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  background: transparent;
-  border: 1px solid var(--line);
-  padding: 14px;
-  cursor: pointer;
-  transition: all var(--dur) var(--ease);
-}
-.plan-v3-restart-btn:hover { color: var(--ink); border-color: var(--muted); background: var(--bg-hover); }
-
-/* ─── Cards & Containers ───────────────────────────────────────────────────── */
-.plan-v3-stat-card {
-  padding: 16px 18px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-}
-
+.plan-v3-stat-card     { background: var(--bg-raised); border: 1px solid var(--line); padding: 16px; }
+.plan-v3-chart-box     { background: var(--bg-raised); border: 1px solid var(--line); padding: 16px; }
+.plan-v3-readiness-card{ background: var(--bg-raised); border: 1px solid var(--line); padding: 18px 16px; }
+.plan-v3-waterfall     { background: var(--bg-raised); border: 1px solid var(--line); border-left: 3px solid var(--bull); padding: 16px; }
 .plan-v3-stat-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  font-weight: 700;
-  color: var(--dim);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
+  font-family: var(--font-mono); font-size: var(--text-micro); color: var(--dim);
+  letter-spacing: 0.08em; text-transform: uppercase; display: block;
+}
+.plan-v3-stat-num  { font-family: var(--font-mono); font-weight: 700; line-height: 1; }
+.plan-v3-mono-sub  {
+  font-family: var(--font-mono); font-size: var(--text-micro); color: var(--dim);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.plan-v3-restart-btn {
+  background: transparent; border: 1px solid var(--line); color: var(--dim);
+  font-family: var(--font-mono); font-size: var(--text-micro); letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 0 20px; min-height: 44px; cursor: pointer;
+  transition: color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.plan-v3-restart-btn:hover { color: var(--ink); border-color: var(--muted); }
+
+/* Teaching-aside internals */
+.plan-v3-teach-title {
+  font-family: var(--font-mono); font-size: var(--text-micro); color: var(--dim);
+  letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 14px;
+}
+.plan-v3-formula {
+  background: var(--bg-raised); border: 1px solid var(--line);
+  border-left: 2px solid var(--caution); padding: 12px 14px; margin-bottom: 10px;
+}
+.plan-v3-formula-eq {
+  font-family: var(--font-mono); font-size: var(--text-micro); color: var(--ink);
+  line-height: 1.5; word-break: break-word;
+}
+.plan-v3-formula-note {
+  font-family: var(--font-body); font-size: var(--text-micro); color: var(--dim);
+  line-height: 1.5; margin-top: 6px;
+}
+.plan-v3-yr-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.plan-v3-yr-table th, .plan-v3-yr-table td {
+  font-family: var(--font-mono); font-size: var(--text-micro); text-align: right;
+  padding: 5px 4px; border-bottom: 1px solid var(--line);
+}
+.plan-v3-yr-table th { color: var(--dim); font-weight: 400; letter-spacing: 0.04em; }
+.plan-v3-yr-table td { color: var(--ink); }
+.plan-v3-yr-table th:first-child, .plan-v3-yr-table td:first-child { text-align: left; }
+
+@media (min-width: 1024px) {
+  .plan-v3-section { max-width: 940px; padding: 84px 48px 96px; }
+  .plan-v3-split {
+    max-width: 1160px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+    column-gap: 56px;
+    align-items: start;
+  }
+  .plan-v3-split > .plan-v3-intro { grid-column: 1 / -1; }
+  .plan-v3-teach { display: block; }
 }
 
-.plan-v3-stat-num {
-  font-family: var(--font-mono);
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-
-.plan-v3-big-num {
-  font-family: var(--font-mono);
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.plan-v3-callout {
-  padding: 16px 18px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  max-width: 440px;
-  margin: 0 auto;
-}
-
-.plan-v3-insight-box {
-  padding: 18px 20px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-}
-
-.plan-v3-ikigai-box {
-  padding: 20px 22px;
-  background: var(--bg-raised);
-  border: 1px solid rgba(255,149,0,0.25);
-  margin-top: 24px;
-  text-align: center;
-}
-
-.plan-v3-context-pill {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-}
-
-.plan-v3-chart-box {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  padding: 14px 16px;
-}
-
-.plan-v3-readiness-card {
-  padding: 16px 18px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-}
-
-.plan-v3-waterfall {
-  padding: 16px 18px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--bull);
-  margin: 4px 0 20px;
-}
-
-/* ─── Geography ────────────────────────────────────────────────────────────── */
-.plan-v3-geo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-@media (min-width: 440px) { .plan-v3-geo-grid { grid-template-columns: repeat(6, 1fr); } }
-
-.plan-v3-geo-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 4px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  cursor: pointer;
-  transition: all var(--dur) var(--ease);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.plan-v3-geo-card:hover { border-color: var(--muted); background: var(--bg-hover); }
-.plan-v3-geo-card.active { background: rgba(0,180,255,0.08); border-color: var(--tech); color: var(--tech); }
-
-/* ─── Maslow Pyramid ───────────────────────────────────────────────────────── */
-.plan-v3-pyramid {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 2px;
-  margin: 20px 0;
-}
-
-.plan-v3-pyramid-tier {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 16px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  text-align: left;
-  transition: all var(--dur) var(--ease);
-}
-.plan-v3-pyramid-tier:hover { border-color: var(--muted); }
-.plan-v3-pyramid-tier.active { background: color-mix(in srgb, var(--tier-color) 8%, var(--bg-raised)); border-color: var(--tier-color); }
-
-/* ─── Gap Visualization ────────────────────────────────────────────────────── */
-.plan-v3-gap-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 14px 0;
-}
-@media (max-width: 520px) { .plan-v3-gap-grid { grid-template-columns: 1fr; } }
-
-.plan-v3-gap-card {
-  padding: 14px 16px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  cursor: default;
-}
-.plan-v3-gap-card:hover { border-color: var(--muted); }
-
-/* ─── Investment Cards ─────────────────────────────────────────────────────── */
-.plan-v3-invest-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 6px;
-  margin: 14px 0;
-}
-@media (min-width: 520px) { .plan-v3-invest-grid { grid-template-columns: repeat(2, 1fr); } }
-
-.plan-v3-invest-card {
-  padding: 14px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: all var(--dur) var(--ease);
-  position: relative;
-  overflow: hidden;
-  text-align: left;
-}
-.plan-v3-invest-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: currentColor;
-  opacity: 0;
-  transition: opacity var(--dur) var(--ease);
-}
-.plan-v3-invest-card:hover { transform: translateY(-3px); }
-.plan-v3-invest-card:hover::after { opacity: 0.6; }
-.plan-v3-invest-card.selected { background: color-mix(in srgb, currentColor 8%, var(--bg-raised)); border-color: currentColor; }
-.plan-v3-invest-card.selected::after { opacity: 1; }
-
-/* ─── Sticky Summary ───────────────────────────────────────────────────────── */
-.plan-v3-sticky-summary {
-  position: sticky;
-  top: 0;
-  left: 0; right: 0;
-  z-index: 100;
-  background: rgba(0, 0, 5, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
-  padding: 10px 16px;
-}
-:root[data-theme="light"] .plan-v3-sticky-summary { background: rgba(247,246,241,0.94); }
-
-.plan-v3-sticky-inner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.plan-v3-sticky-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 0 14px;
-  flex: 1;
-  text-align: center;
-}
-@media (max-width: 640px) { .plan-v3-sticky-item { padding: 0 8px; } }
-
-.plan-v3-sticky-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.plan-v3-sticky-value {
-  font-family: var(--font-mono);
-  font-size: var(--text-body);
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.2;
-}
-@media (max-width: 640px) { .plan-v3-sticky-value { font-size: var(--text-micro); } }
-
-.plan-v3-sticky-divider {
-  width: 1px;
-  height: 24px;
-  background: var(--line);
-  flex-shrink: 0;
-}
-@media (max-width: 640px) { .plan-v3-sticky-divider { height: 20px; } }
