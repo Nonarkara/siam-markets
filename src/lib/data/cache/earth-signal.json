@@ -1,0 +1,17 @@
+{
+  "generatedAt": null,
+  "status": "pending-gee-auth",
+  "dataset": "GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL",
+  "model": "AlphaEarth Foundations (DeepMind, 2025)",
+  "method": "64-dimensional per-pixel embeddings fuse optical, radar, LiDAR and climate. Year-over-year embedding shift over an area = physical change on the ground. Each economic site below maps to SET tickers; the change magnitude is a leading, satellite-derived activity signal — alt-data that precedes the financial print.",
+  "aois": [
+    { "id": "bkk-suvarnabhumi", "name": "Suvarnabhumi Airport",        "lat": 13.690, "lon": 100.750, "tickers": ["AOT"],                  "theme": "Tourism",    "measures": "Apron / parking / terminal built-up activity → passenger-throughput proxy", "changeYoY": null, "trend": null },
+    { "id": "phuket-tourism",   "name": "Phuket beaches & hotels",     "lat": 7.890,  "lon": 98.300,  "tickers": ["CENTEL", "MINT", "ERW"], "theme": "Tourism",    "measures": "Nightlights + built-up density → tourist occupancy proxy",                   "changeYoY": null, "trend": null },
+    { "id": "map-ta-phut",      "name": "Map Ta Phut petrochem estate","lat": 12.690, "lon": 101.150, "tickers": ["PTTGC", "PTT", "IRPC"],  "theme": "Energy",     "measures": "Industrial built-up + thermal activity → refinery / petrochem run-rate",     "changeYoY": null, "trend": null },
+    { "id": "eec-wha-amata",    "name": "EEC industrial estates",      "lat": 13.360, "lon": 101.060, "tickers": ["WHA", "AMATA", "ROJNA"], "theme": "Industrial", "measures": "Land conversion → new factory / warehouse buildout (FDI inflow)",            "changeYoY": null, "trend": null },
+    { "id": "laem-chabang",     "name": "Laem Chabang Port",           "lat": 13.080, "lon": 100.890, "tickers": ["RCL", "WHA"],            "theme": "Exports",    "measures": "Container-yard occupancy → export volume proxy",                             "changeYoY": null, "trend": null },
+    { "id": "central-rice",     "name": "Central rice plains",         "lat": 14.900, "lon": 100.300, "tickers": ["CPF", "GFPT", "TVO"],    "theme": "Agri",       "measures": "Crop vigour + planted area → food/feed supply & price pressure",             "changeYoY": null, "trend": null },
+    { "id": "isaan-cassava",    "name": "Isaan cassava / sugar belt",  "lat": 15.250, "lon": 102.830, "tickers": ["KSL", "BRR", "KTIS"],    "theme": "Agri",       "measures": "Planted area + harvest cycle → sugar / cassava output",                      "changeYoY": null, "trend": null },
+    { "id": "solar-corridor",   "name": "Utility-scale solar sites",   "lat": 14.800, "lon": 101.500, "tickers": ["GULF", "GPSC", "BGRIM"], "theme": "Energy",     "measures": "New PV-array footprint → renewable capacity additions",                      "changeYoY": null, "trend": null }
+  ]
+}
