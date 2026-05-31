@@ -1109,6 +1109,10 @@ textarea:focus-visible {
   .plan-v3-teach { display: block; }
 }
 
+/* ─── DESK · Position-vs-Forward strip (desktop only) ──────────────────────── */
+.desk-forward-strip { display: none; }
+@media (min-width: 1024px) { .desk-forward-strip { display: block; } }
+
 /* ─── DESK · Market Graph (Obsidian-style relationship web) ─────────────────── */
 .market-graph { background: var(--bg-raised); border: 1px solid var(--line); margin-bottom: 16px; }
 .market-graph-header {
