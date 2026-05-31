@@ -253,23 +253,13 @@ function CycleTimeline({ startYear, endYear }: { startYear: number; endYear: num
 export function TimeAnchorSection({
   lang,
   geo,
-  setGeo,
   age,
-  setAge,
   retireAge,
-  setRetireAge,
-  jobStability,
-  setJobStability,
 }: {
   lang: Lang;
   geo: GeoKey;
-  setGeo: (g: GeoKey) => void;
   age: number;
-  setAge: (a: number) => void;
   retireAge: number;
-  setRetireAge: (a: number) => void;
-  jobStability: number;
-  setJobStability: (s: number) => void;
 }) {
   const now = 2026;
   const retireYear = now + Math.max(0, retireAge - age);
@@ -280,65 +270,11 @@ export function TimeAnchorSection({
   const C = COPY.time[lang];
   const g = GEOS[geo];
 
-  const ageCount = useCountUp(age, 0.8);
   const yearCount = useCountUp(retireYear, 1.0);
 
   return (
     <section className="plan-v3-section" id="plan-time">
-      <SectionHeader overline={C.overline} h2={C.h2} body={C.body} />
-
       <Reveal>
-        <div className="plan-v3-geo-grid">
-          {(Object.entries(GEOS) as [GeoKey, GeoConfig][]).map(([k, cfg]) => (
-            <button
-              key={k}
-              className={`plan-v3-geo-card${geo === k ? " active" : ""}`}
-              onClick={() => setGeo(k)}
-            >
-              <span style={{ fontFamily: "var(--font-display)" }}>{cfg.flag}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, letterSpacing: "0.06em" }}>{cfg.name}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", textTransform: "none", letterSpacing: 0 }}>
-                {C.taxLabel} {cfg.taxRate}% · {C.rateLabel} {cfg.interestRate}%
-              </span>
-            </button>
-          ))}
-        </div>
-      </Reveal>
-
-      <Reveal delay={0.1}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 32 }}>
-          <div className="plan-v3-stat-card">
-            <div className="plan-v3-stat-label">{C.yourAge}</div>
-            <div className="plan-v3-stat-num" style={{ color: "var(--caution)" }}>{ageCount}</div>
-            <input
-              type="range"
-              min={18}
-              max={59}
-              step={1}
-              value={age}
-              onChange={(e) => setAge(+e.target.value)}
-              className="plan-slider"
-              style={{ marginTop: 12 }}
-            />
-          </div>
-          <div className="plan-v3-stat-card">
-            <div className="plan-v3-stat-label">{C.retireAt}</div>
-            <div className="plan-v3-stat-num">{retireAge}</div>
-            <input
-              type="range"
-              min={50}
-              max={70}
-              step={1}
-              value={retireAge}
-              onChange={(e) => setRetireAge(+e.target.value)}
-              className="plan-slider"
-              style={{ marginTop: 12 }}
-            />
-          </div>
-        </div>
-      </Reveal>
-
-      <Reveal delay={0.2}>
         <div className="plan-v3-insight-box" style={{ marginTop: 32 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
             <span className="plan-v3-big-num" style={{ color: "var(--tech)", fontSize: "var(--text-display)" }}>{yearCount}</span>
@@ -394,18 +330,140 @@ export function TimeAnchorSection({
    MASLOW PYRAMID  —  Visual pyramid builder
    ══════════════════════════════════════════════════════════════════════════════ */
 
-export function MaslowPyramidSection({
+export function MaslowPyramidControl({
   lang,
   geo,
   needs,
   setNeeds,
+}: {
+  lang: Lang;
+  geo: GeoKey;
+  needs: Record<number, { active: boolean; monthly: number }>;
+  setNeeds: (n: Record<number, { active: boolean; monthly: number }>) => void;
+}) {
+  const g = GEOS[geo];
+  const C = COPY.needs[lang];
+
+  function toggle(id: number) {
+    setNeeds({ ...needs, [id]: { ...needs[id], active: !needs[id].active } });
+  }
+  function setMonthly(id: number, v: number) {
+    setNeeds({ ...needs, [id]: { ...needs[id], monthly: v } });
+  }
+
+  return (
+    <div className="plan-v3-pyramid">
+      {[...MASLOW].reverse().map((level, idx) => {
+        const st = needs[level.id];
+        const maxV = g.needsMax[MASLOW.length - 1 - idx];
+        const widthPct = 100 - idx * 10;
+        return (
+          <div key={level.id} style={{ width: `${widthPct}%`, margin: "0 auto", position: "relative" }}>
+            <button
+              className={`plan-v3-pyramid-tier${st.active ? " active" : ""}`}
+              style={{
+                color: level.color,
+                borderColor: st.active ? level.color : "var(--line)",
+                background: st.active ? `color-mix(in srgb, ${level.color} 8%, var(--bg-raised))` : "var(--bg-raised)",
+              }}
+              onClick={() => toggle(level.id)}
+            >
+              <span style={{ fontSize: "var(--text-display)", flexShrink: 0 }}>{level.icon}</span>
+              <div style={{ flex: 1, textAlign: "left" }}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-micro)",
+                    fontWeight: 700,
+                    color: st.active ? level.color : "var(--muted)",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  {level.label[lang]}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-micro)",
+                    color: "var(--dim)",
+                    lineHeight: 1.4,
+                    textTransform: "none",
+                    letterSpacing: 0,
+                    marginTop: 2,
+                  }}
+                >
+                  {level.desc[lang]}
+                </div>
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-micro)",
+                  color: st.active ? level.color : "var(--dim)",
+                  flexShrink: 0,
+                  fontWeight: 700,
+                }}
+              >
+                {st.active ? fmtC(st.monthly, geo) : lang === "en" ? "+ ADD" : lang === "th" ? "+ เพิ่ม" : "+ 添加"}
+              </div>
+            </button>
+            <AnimatePresence>
+              {st.active && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <div
+                    style={{
+                      padding: "12px 16px 14px",
+                      background: `color-mix(in srgb, ${level.color} 5%, var(--bg-raised))`,
+                      border: `1px solid ${level.color}`,
+                      borderTop: "none",
+                      marginBottom: 2,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>
+                        {C.monthly}
+                      </span>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: level.color }}>
+                        {fmtC(st.monthly, geo)}/{lang === "th" ? "เดือน" : lang === "zh" ? "月" : "mo"}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={maxV}
+                      step={Math.max(100, maxV / 200)}
+                      value={st.monthly}
+                      onChange={(e) => setMonthly(level.id, +e.target.value)}
+                      className="plan-slider"
+                      style={{ accentColor: level.color }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function MaslowPyramidSection({
+  lang,
+  geo,
+  needs,
   retireAge,
   lifeExp,
 }: {
   lang: Lang;
   geo: GeoKey;
   needs: Record<number, { active: boolean; monthly: number }>;
-  setNeeds: (n: Record<number, { active: boolean; monthly: number }>) => void;
   retireAge: number;
   lifeExp: number;
 }) {
@@ -417,123 +475,12 @@ export function MaslowPyramidSection({
   const ikigai = activeMonthly * 12 * yrs;
   const C = COPY.needs[lang];
 
-  function toggle(id: number) {
-    setNeeds({ ...needs, [id]: { ...needs[id], active: !needs[id].active } });
-  }
-  function setMonthly(id: number, v: number) {
-    setNeeds({ ...needs, [id]: { ...needs[id], monthly: v } });
-  }
-
   const ikigaiDisplay = useCountUp(ikigai, 1.2);
 
   return (
     <section className="plan-v3-section" id="plan-needs">
-      <SectionHeader overline={C.overline} h2={C.h2} body={C.body} />
-
-      <Reveal>
-        <div className="plan-v3-pyramid">
-          {[...MASLOW].reverse().map((level, idx) => {
-            const st = needs[level.id];
-            const maxV = g.needsMax[MASLOW.length - 1 - idx];
-            const widthPct = 100 - idx * 10;
-            return (
-              <div key={level.id} style={{ width: `${widthPct}%`, margin: "0 auto", position: "relative" }}>
-                <button
-                  className={`plan-v3-pyramid-tier${st.active ? " active" : ""}`}
-                  style={{
-                    color: level.color,
-                    borderColor: st.active ? level.color : "var(--line)",
-                    background: st.active ? `color-mix(in srgb, ${level.color} 8%, var(--bg-raised))` : "var(--bg-raised)",
-                  }}
-                  onClick={() => toggle(level.id)}
-                >
-                  <span style={{ fontSize: "var(--text-display)", flexShrink: 0 }}>{level.icon}</span>
-                  <div style={{ flex: 1, textAlign: "left" }}>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-micro)",
-                        fontWeight: 700,
-                        color: st.active ? level.color : "var(--muted)",
-                        letterSpacing: "0.08em",
-                      }}
-                    >
-                      {level.label[lang]}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "var(--text-micro)",
-                        color: "var(--dim)",
-                        lineHeight: 1.4,
-                        textTransform: "none",
-                        letterSpacing: 0,
-                        marginTop: 2,
-                      }}
-                    >
-                      {level.desc[lang]}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-micro)",
-                      color: st.active ? level.color : "var(--dim)",
-                      flexShrink: 0,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {st.active ? fmtC(st.monthly, geo) : lang === "en" ? "+ ADD" : lang === "th" ? "+ เพิ่ม" : "+ 添加"}
-                  </div>
-                </button>
-                <AnimatePresence>
-                  {st.active && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <div
-                        style={{
-                          padding: "12px 16px 14px",
-                          background: `color-mix(in srgb, ${level.color} 5%, var(--bg-raised))`,
-                          border: `1px solid ${level.color}`,
-                          borderTop: "none",
-                          marginBottom: 2,
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>
-                            {C.monthly}
-                          </span>
-                          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: level.color }}>
-                            {fmtC(st.monthly, geo)}/{lang === "th" ? "เดือน" : lang === "zh" ? "月" : "mo"}
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min={0}
-                          max={maxV}
-                          step={Math.max(100, maxV / 200)}
-                          value={st.monthly}
-                          onChange={(e) => setMonthly(level.id, +e.target.value)}
-                          className="plan-slider"
-                          style={{ accentColor: level.color }}
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-      </Reveal>
-
       <AnimatePresence>
-        {activeMonthly > 0 && (
+        {activeMonthly > 0 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -554,6 +501,10 @@ export function MaslowPyramidSection({
               {C.ref(g)}
             </div>
           </motion.div>
+        ) : (
+          <div style={{ padding: 40, textAlign: "center", color: "var(--dim)", fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", border: "1px dashed var(--line)" }}>
+            {lang === "en" ? "Select your target lifestyle" : "เลือกเป้าหมายชีวิตของคุณ"}
+          </div>
         )}
       </AnimatePresence>
     </section>
@@ -568,30 +519,20 @@ export function SalaryFlowSection({
   lang,
   geo,
   salary,
-  setSalary,
   salaryGrowth,
-  setSalaryGrowth,
   living,
-  setLiving,
   transport,
-  setTransport,
   other,
-  setOther,
   yearsToRetire,
   retirementTarget,
 }: {
   lang: Lang;
   geo: GeoKey;
   salary: number;
-  setSalary: (v: number) => void;
   salaryGrowth: number;
-  setSalaryGrowth: (v: number) => void;
   living: number;
-  setLiving: (v: number) => void;
   transport: number;
-  setTransport: (v: number) => void;
   other: number;
-  setOther: (v: number) => void;
   yearsToRetire: number;
   retirementTarget: number;
 }) {
@@ -611,7 +552,6 @@ export function SalaryFlowSection({
   const targetY = toY(retirementTarget);
   const C = COPY.salary[lang];
 
-  const salaryDisplay = useCountUp(salary, 0.6);
   const investableDisplay = useCountUp(investable, 0.6);
   const savTotalDisplay = useCountUp(savTotal, 0.8);
 
@@ -619,104 +559,7 @@ export function SalaryFlowSection({
 
   return (
     <section className="plan-v3-section" id="plan-salary">
-      <SectionHeader overline={C.overline} h2={C.h2} body={C.body} />
-
       <Reveal>
-        <div className="plan-v3-stat-card" style={{ marginBottom: 20 }}>
-          <div className="plan-v3-stat-label">{C.income}</div>
-          <div className="plan-v3-stat-num">{fmtC(salaryDisplay, geo)}</div>
-          <input
-            type="range"
-            min={0}
-            max={g.salaryMax}
-            step={Math.max(500, g.salaryMax / 400)}
-            value={salary}
-            onChange={(e) => setSalary(+e.target.value)}
-            className="plan-slider"
-            style={{ marginTop: 12 }}
-          />
-        </div>
-      </Reveal>
-
-      <Reveal delay={0.1}>
-        <div className="plan-v3-stat-card" style={{ marginBottom: 20 }}>
-          <div className="plan-v3-stat-label">{C.growth}</div>
-          <div className="plan-v3-stat-num">
-            {(salaryGrowth * 100).toFixed(0)}%
-            <span style={{ fontSize: "var(--text-micro)", color: "var(--dim)", fontWeight: 400, marginLeft: 4 }}>
-              /{lang === "th" ? "ปี" : lang === "zh" ? "年" : "yr"}
-            </span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={0.15}
-            step={0.005}
-            value={salaryGrowth}
-            onChange={(e) => setSalaryGrowth(+e.target.value)}
-            className="plan-slider"
-            style={{ marginTop: 12 }}
-          />
-        </div>
-      </Reveal>
-
-      <Reveal delay={0.15}>
-        {/* Spend breakdown bar */}
-        <div style={{ padding: "16px", background: "var(--bg-raised)", border: "1px solid var(--line)", marginBottom: 20 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)" }}>
-              {fmtC(totalExp, geo)} {lang === "th" ? "จ่าย" : lang === "zh" ? "支出" : "spent"}
-            </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: barCol }}>{spentPct}%</span>
-          </div>
-          <div style={{ height: 6, background: "var(--line)", overflow: "hidden" }}>
-            <motion.div
-              style={{ height: "100%", background: barCol }}
-              initial={{ width: 0 }}
-              animate={{ width: `${spentPct}%` }}
-              transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-            />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 14 }}>
-            {[
-              { label: C.livingL, val: living, set: setLiving, max: g.livingMax },
-              { label: C.transportL, val: transport, set: setTransport, max: g.transportMax },
-              { label: C.otherL, val: other, set: setOther, max: g.otherMax },
-            ].map((row) => (
-              <div key={row.label}>
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-micro)",
-                    color: "var(--dim)",
-                    marginBottom: 4,
-                    textTransform: "none",
-                    letterSpacing: 0,
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {row.label}
-                </div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>
-                  {fmtC(row.val, geo)}
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={row.max}
-                  step={Math.max(100, row.max / 200)}
-                  value={row.val}
-                  onChange={(e) => row.set(+e.target.value)}
-                  className="plan-slider"
-                  style={{ accentColor: "var(--muted)" }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-
-      <Reveal delay={0.2}>
         {/* Investable waterfall */}
         <div
           className="plan-v3-waterfall"

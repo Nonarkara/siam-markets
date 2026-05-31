@@ -6,6 +6,7 @@ import { PlanHero, TimeAnchorSection, MaslowPyramidSection, SalaryFlowSection } 
 import { EarningsProjectionSection } from "@/components/Plan/EarningsProjectionSection";
 import { SafetyMarginSection } from "@/components/Plan/SafetyMarginSection";
 import { AssetAllocatorSection } from "@/components/Plan/AssetAllocatorSection";
+import { AgeLens } from "@/components/Plan/AgeLens";
 
 export default function PlanPage() {
   const s = usePlanState();
@@ -90,13 +91,17 @@ export default function PlanPage() {
               <TimeAnchorSection
                 lang={s.lang}
                 geo={s.geo}
-                setGeo={s.setGeo}
                 age={s.age}
-                setAge={s.setAge}
                 retireAge={s.retireAge}
-                setRetireAge={s.setRetireAge}
-                jobStability={s.jobStability}
-                setJobStability={s.setJobStability}
+              />
+              <AgeLens
+                lang={s.lang}
+                age={s.age}
+                retireAge={s.retireAge}
+                salary={s.salary}
+                yearsToRetire={s.yearsToRetire}
+                yearsPostRetire={s.yearsPostRetire}
+                currency={s.geoConfig.currency}
               />
            </div>
          )}
@@ -107,15 +112,10 @@ export default function PlanPage() {
                 lang={s.lang}
                 geo={s.geo}
                 salary={s.salary}
-                setSalary={s.setSalary}
                 salaryGrowth={s.salaryGrowth}
-                setSalaryGrowth={s.setSalaryGrowth}
                 living={s.living}
-                setLiving={s.setLiving}
                 transport={s.transport}
-                setTransport={s.setTransport}
                 other={s.other}
-                setOther={s.setOther}
                 yearsToRetire={s.yearsToRetire}
                 retirementTarget={s.retirementTarget}
               />
@@ -140,7 +140,6 @@ export default function PlanPage() {
                 lang={s.lang}
                 geo={s.geo}
                 needs={s.needs}
-                setNeeds={s.setNeeds}
                 retireAge={s.retireAge}
                 lifeExp={s.geoConfig.lifeExp}
               />
@@ -167,7 +166,6 @@ export default function PlanPage() {
                 investable={s.investable}
                 retirementTarget={s.retirementTarget}
                 alloc={s.alloc}
-                setAlloc={s.setAlloc}
                 scenarios={s.scenarios}
                 onRestart={s.restart}
               />

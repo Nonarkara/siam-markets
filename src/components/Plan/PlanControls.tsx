@@ -4,6 +4,8 @@ import { GEOS } from "./plan-data";
 import type { Lang, GeoKey } from "./plan-data";
 import { COPY } from "./plan-data";
 import { usePlanState } from "./use-plan-state";
+import { MaslowPyramidControl } from "./plan-sections";
+import { AssetAllocatorControl } from "./AssetAllocatorSection";
 
 export function PlanControls({ s }: { s: ReturnType<typeof usePlanState> }) {
   const C_TIME = COPY.time[s.lang];
@@ -75,6 +77,21 @@ export function PlanControls({ s }: { s: ReturnType<typeof usePlanState> }) {
           />
         </div>
 
+        <div className="card" style={{ padding: 16 }}>
+          <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 12 }}>JOB STABILITY</div>
+          <input
+            type="range"
+            min={1} max={5} step={1}
+            value={s.jobStability}
+            onChange={(e) => s.setJobStability(+e.target.value)}
+            style={{ width: "100%", accentColor: "var(--tech)" }}
+          />
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+            <span className="t-micro" style={{ color: "var(--dim)" }}>Low</span>
+            <span className="t-micro" style={{ color: "var(--dim)" }}>High</span>
+          </div>
+        </div>
+
         <button onClick={() => s.setStep(2)} className="btn-secondary" style={{ alignSelf: "flex-end" }}>
           NEXT
         </button>
@@ -139,14 +156,12 @@ export function PlanControls({ s }: { s: ReturnType<typeof usePlanState> }) {
           {s.lang === "th" ? "กำหนดระดับความต้องการในแต่ละเดือนหลังเกษียณ" : "Define your monthly needs after retirement."}
         </p>
         
-        {/* We leave the MaslowPyramidSection in the right pane, and let it manage its own inputs, 
-            or we extract the sliders here. The pyramid is an interactive UI itself, so actually 
-            for step 3, maybe we just tell them to use the pyramid on the right. */}
-        <div className="card" style={{ padding: 16, borderLeft: "3px solid var(--amber-nav)" }}>
-           <div className="t-body" style={{ color: "var(--ink)" }}>
-             {s.lang === "th" ? "👉 ปรับความต้องการของคุณที่ปิรามิดทางด้านขวา" : "👉 Adjust your needs on the pyramid to the right."}
-           </div>
-        </div>
+        <MaslowPyramidControl
+          lang={s.lang}
+          geo={s.geo}
+          needs={s.needs}
+          setNeeds={s.setNeeds}
+        />
 
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24 }}>
            <button onClick={() => s.setStep(2)} className="btn-secondary" style={{ opacity: 0.5 }}>BACK</button>
@@ -159,26 +174,18 @@ export function PlanControls({ s }: { s: ReturnType<typeof usePlanState> }) {
   if (s.step === 4) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <div className="card" style={{ padding: 16 }}>
-          <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 12 }}>JOB STABILITY</div>
-          <input
-            type="range"
-            min={1} max={5} step={1}
-            value={s.jobStability}
-            onChange={(e) => s.setJobStability(+e.target.value)}
-            style={{ width: "100%", accentColor: "var(--tech)" }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
-            <span className="t-micro" style={{ color: "var(--dim)" }}>Low</span>
-            <span className="t-micro" style={{ color: "var(--dim)" }}>High</span>
-          </div>
-        </div>
+        <p className="t-body" style={{ color: "var(--muted)", marginBottom: 16 }}>
+          {s.lang === "th" ? "ปรับสมดุลพอร์ตการลงทุนของคุณ" : "Rebalance your investment portfolio."}
+        </p>
         
-        <div className="card" style={{ padding: 16 }}>
-           <div className="t-body" style={{ color: "var(--ink)" }}>
-             {s.lang === "th" ? "👉 ดูการวิเคราะห์ Asset Allocation และ Scenarios ทางด้านขวา" : "👉 View your Asset Allocation and Scenarios on the right."}
-           </div>
-        </div>
+        <AssetAllocatorControl
+          lang={s.lang}
+          geo={s.geo}
+          age={s.age}
+          jobStability={s.jobStability}
+          alloc={s.alloc}
+          setAlloc={s.setAlloc}
+        />
 
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24 }}>
            <button onClick={() => s.setStep(3)} className="btn-secondary" style={{ opacity: 0.5 }}>BACK</button>

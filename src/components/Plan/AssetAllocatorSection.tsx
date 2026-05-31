@@ -165,90 +165,29 @@ function DualGravityChart({
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════════════════════════ */
 
-export function AssetAllocatorSection({
+export function AssetAllocatorControl({
   lang,
   geo,
   age,
-  retireAge,
   jobStability,
-  investable,
-  retirementTarget,
   alloc,
   setAlloc,
-  scenarios,
-  onRestart,
 }: {
   lang: Lang;
   geo: GeoKey;
   age: number;
-  retireAge: number;
   jobStability: number;
-  investable: number;
-  retirementTarget: number;
   alloc: Allocation6;
   setAlloc: (a: Allocation6) => void;
-  scenarios: { worst: ScenarioResult; base: ScenarioResult; best: ScenarioResult };
-  onRestart: () => void;
 }) {
   const C = COPY.allocator[lang];
-  const TA = TEACH_A[lang];
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const suggested = useMemo(() => suggestPreset(age, jobStability), [age, jobStability]);
   const [expandedBucket, setExpandedBucket] = useState<string | null>(null);
 
-  const suggested = useMemo(() => suggestPreset(age, jobStability), [age, jobStability]);
-  const baseFinal = scenarios.base.finalValue;
-  const readiness = retirementTarget > 0 ? Math.min(200, Math.round((baseFinal / retirementTarget) * 100)) : 0;
-  const readColor = baseFinal >= retirementTarget ? "var(--bull)" : readiness > 60 ? "var(--caution)" : "var(--bear)";
-
-  const readDisplay = useCountUp(readiness, 1.2);
-  const finalDisplay = useCountUp(baseFinal, 1.0);
-
-  const gap = retirementTarget - baseFinal;
-  const onTrack = baseFinal >= retirementTarget;
-
   return (
-    <section ref={ref} className="plan-v3-section plan-v3-split" id="plan-allocator">
-      <motion.div
-        className="plan-v3-intro"
-        initial={{ opacity: 0, y: 24 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        style={{ marginBottom: 40 }}
-      >
-        <div className="plan-v3-overline">{C.overline}</div>
-        <h2 className="plan-v3-h2">{C.h2}</h2>
-        <p className="plan-v3-body">{C.body}</p>
-      </motion.div>
-
-      <div className="plan-v3-main">
-      {/* Gap banner */}
-      {retirementTarget > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          style={{
-            padding: "16px 20px", marginBottom: 24, textAlign: "center",
-            border: `1px solid ${onTrack ? "var(--bull)" : "var(--bear)"}`,
-            background: `color-mix(in srgb, ${onTrack ? "var(--bull)" : "var(--bear)"} 7%, transparent)`,
-          }}
-        >
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)" }}>
-            {onTrack
-              ? `${lang === "th" ? "✓ เกินมา" : lang === "zh" ? "✓ 超出" : "✓ Ahead by"} ${fmtC(Math.abs(gap), geo)}`
-              : `${lang === "th" ? "✗ ขาดอยู่" : lang === "zh" ? "✗ 还差" : "✗ Short by"} ${fmtC(Math.abs(gap), geo)}`}
-          </div>
-        </motion.div>
-      )}
-
+    <div className="plan-v3-allocator-controls">
       {/* Risk profile presets */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.15 }}
-        style={{ marginBottom: 28 }}
-      >
+      <div style={{ marginBottom: 28 }}>
         <div className="plan-v3-stat-label" style={{ marginBottom: 10 }}>{C.presetL}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 6 }}>
           {RISK_PRESETS.map((preset) => {
@@ -261,11 +200,9 @@ export function AssetAllocatorSection({
               alloc.self === preset.alloc.self &&
               alloc.people === preset.alloc.people;
             return (
-              <motion.button
+              <button
                 key={preset.key}
                 onClick={() => setAlloc(preset.alloc)}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
                 style={{
                   padding: "12px 10px",
                   background: isActive ? "color-mix(in srgb, var(--caution) 10%, var(--bg-raised))" : "var(--bg-raised)",
@@ -275,6 +212,7 @@ export function AssetAllocatorSection({
                   display: "flex",
                   flexDirection: "column",
                   gap: 4,
+                  transition: "all 0.2s",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -290,19 +228,14 @@ export function AssetAllocatorSection({
                 <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--dim)", lineHeight: 1.4, textTransform: "none", letterSpacing: 0 }}>
                   {preset.rationale[lang]}
                 </div>
-              </motion.button>
+              </button>
             );
           })}
         </div>
-      </motion.div>
+      </div>
 
       {/* 6-bucket allocator */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        style={{ marginBottom: 28 }}
-      >
+      <div>
         <div className="plan-v3-stat-label" style={{ marginBottom: 12 }}>{C.bucketL}</div>
         {BUCKET_META.map((b) => {
           const val = alloc[b.key];
@@ -362,7 +295,71 @@ export function AssetAllocatorSection({
             {Object.values(alloc).reduce((s, v) => s + v, 0)}%
           </span>
         </div>
-      </motion.div>
+      </div>
+    </div>
+  );
+}
+
+export function AssetAllocatorSection({
+  lang,
+  geo,
+  age,
+  retireAge,
+  jobStability,
+  investable,
+  retirementTarget,
+  alloc,
+  scenarios,
+  onRestart,
+}: {
+  lang: Lang;
+  geo: GeoKey;
+  age: number;
+  retireAge: number;
+  jobStability: number;
+  investable: number;
+  retirementTarget: number;
+  alloc: Allocation6;
+  scenarios: { worst: ScenarioResult; base: ScenarioResult; best: ScenarioResult };
+  onRestart: () => void;
+}) {
+  const C = COPY.allocator[lang];
+  const TA = TEACH_A[lang];
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+
+  const baseFinal = scenarios.base.finalValue;
+  const readiness = retirementTarget > 0 ? Math.min(200, Math.round((baseFinal / retirementTarget) * 100)) : 0;
+  const readColor = baseFinal >= retirementTarget ? "var(--bull)" : readiness > 60 ? "var(--caution)" : "var(--bear)";
+
+  const readDisplay = useCountUp(readiness, 1.2);
+  const finalDisplay = useCountUp(baseFinal, 1.0);
+
+  const gap = retirementTarget - baseFinal;
+  const onTrack = baseFinal >= retirementTarget;
+
+  return (
+    <section ref={ref} className="plan-v3-section plan-v3-split" id="plan-allocator">
+      <div className="plan-v3-main">
+      {/* Gap banner */}
+      {retirementTarget > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          style={{
+            padding: "16px 20px", marginBottom: 24, textAlign: "center",
+            border: `1px solid ${onTrack ? "var(--bull)" : "var(--bear)"}`,
+            background: `color-mix(in srgb, ${onTrack ? "var(--bull)" : "var(--bear)"} 7%, transparent)`,
+          }}
+        >
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: onTrack ? "var(--bull)" : "var(--bear)" }}>
+            {onTrack
+              ? `${lang === "th" ? "✓ เกินมา" : lang === "zh" ? "✓ 超出" : "✓ Ahead by"} ${fmtC(Math.abs(gap), geo)}`
+              : `${lang === "th" ? "✗ ขาดอยู่" : lang === "zh" ? "✗ 还差" : "✗ Short by"} ${fmtC(Math.abs(gap), geo)}`}
+          </div>
+        </motion.div>
+      )}
 
       {/* Scenario comparison chart */}
       <motion.div
