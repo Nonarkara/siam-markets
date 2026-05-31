@@ -7,23 +7,27 @@ import {
   computeSummary, allocationByTheme,
   type FundHolding,
 } from "@/lib/portfolio-data";
-import dreamHistory from "@/lib/data/cache/dream-history.json";
-
-// Live proxy 1-month moves, refreshed by ingestion/track_dream.py.
-const PROXY_MTD = (dreamHistory as { lastRun: string; proxies: Record<string, { mtdPct: number; label: string }> });
+import forwardData from "@/lib/data/cache/forward-view.json";
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   DreamPortfolio — track two books over time and read WHY each holding moves.
-   • EXAMPLE 1 · REAL — the actual held fund book (Fund SuperMart statement).
-   • DREAM · IDEAL — the hindsight long-term allocation already in the repo.
-   Each fund carries a yfinance proxy (its driver) + a one-line thesis. The
-   ingestion cron (ingestion/track_dream.py) appends proxy NAVs to a history
-   file so the patterns compound visibly over time.
+   DreamPortfolio — two books, side by side, with per-fund deep-dive.
+   • EXAMPLE 1 · MINE  — the real held fund book (Fund SuperMart statement).
+   • DREAM · IDEAL     — the hindsight long-term allocation.
+   Hover (desktop) or tap (mobile) any fund on the ladder → it expands to show
+   what happened over the past 6 months + the 90-day forward cone for the index
+   that drives it, plus the thesis. Forecast data: forward-view.json.
    ══════════════════════════════════════════════════════════════════════════════ */
 
+interface FwdSeries {
+  ticker: string; label: string; spot: number; expRet: number; ret6m: number;
+  annVol: number; histPath: number[]; path: number[]; bandLo: number[]; bandHi: number[];
+}
+const FWD = forwardData as { generatedAt: string; model: string; horizonDays: number; series: FwdSeries[] };
+const FWD_MAP = new Map(FWD.series.map(s => [s.ticker, s]));
+
 const PORTFOLIOS = {
-  real:  { label: "EXAMPLE 1 · REAL",  holdings: REAL_HOLDINGS, asOf: REAL_PORTFOLIO_AS_OF },
-  dream: { label: "DREAM · IDEAL",     holdings: HOLDINGS,      asOf: PORTFOLIO_AS_OF },
+  real:  { label: "EXAMPLE 1 · MINE", holdings: REAL_HOLDINGS, asOf: REAL_PORTFOLIO_AS_OF },
+  dream: { label: "DREAM · IDEAL",    holdings: HOLDINGS,      asOf: PORTFOLIO_AS_OF },
 } as const;
 type Which = keyof typeof PORTFOLIOS;
 
@@ -33,17 +37,44 @@ function fmtB(v: number): string {
   return `฿${Math.round(v).toLocaleString()}`;
 }
 
+// Combined past (solid) + forward (dashed + band) mini-chart.
+function PastForwardChart({ fwd }: { fwd: FwdSeries }) {
+  const W = 280, H = 76, n = fwd.histPath.length, m = fwd.path.length, total = n + m - 1;
+  const all = [...fwd.histPath, ...fwd.bandLo, ...fwd.bandHi];
+  const min = Math.min(...all), max = Math.max(...all), rng = max - min || 1;
+  const x = (idx: number) => (idx / total) * (W - 2) + 1;
+  const y = (v: number) => H - 3 - ((v - min) / rng) * (H - 6);
+  const up = fwd.expRet >= 0;
+  const col = up ? "var(--bull)" : "var(--bear)";
+  const nowIdx = n - 1;
+
+  const histLine = fwd.histPath.map((v, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  const futLine  = fwd.path.map((v, i) => `${i === 0 ? "M" : "L"} ${x(nowIdx + i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  const band =
+    fwd.bandHi.map((v, i) => `${i === 0 ? "M" : "L"} ${x(nowIdx + i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ") +
+    " " + [...fwd.bandLo].reverse().map((v, i) => `L ${x(nowIdx + m - 1 - i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ") + " Z";
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: H, display: "block" }} aria-hidden>
+      <path d={band} fill={col} fillOpacity={0.12} stroke="none" />
+      <line x1={x(nowIdx)} y1={2} x2={x(nowIdx)} y2={H - 2} stroke="var(--line)" strokeWidth={1} />
+      <path d={histLine} fill="none" stroke="var(--ink)" strokeWidth={1.5} opacity={0.85} />
+      <path d={futLine}  fill="none" stroke={col} strokeWidth={1.5} strokeDasharray="3 2" />
+      <text x={4} y={11} fill="var(--dim)" fontSize="8" fontFamily="var(--font-mono)">6 MONTHS AGO</text>
+      <text x={W - 4} y={11} fill={col} fontSize="8" fontFamily="var(--font-mono)" textAnchor="end">+90D</text>
+    </svg>
+  );
+}
+
 export function DreamPortfolio() {
   const [which, setWhich] = useState<Which>("real");
+  const [open, setOpen] = useState<string | null>(null);
   const P = PORTFOLIOS[which];
 
   const summary = useMemo(() => computeSummary(P.holdings), [P]);
   const themes  = useMemo(() => allocationByTheme(P.holdings), [P]);
   const sorted  = useMemo(() => [...P.holdings].sort((a, b) => b.gainLossPct - a.gainLossPct), [P]);
   const maxAbs  = useMemo(() => Math.max(...P.holdings.map(h => Math.abs(h.gainLossPct)), 1), [P]);
-
-  const winners = sorted.filter(h => h.gainLossPct > 0).slice(0, 3);
-  const losers  = sorted.filter(h => h.gainLossPct < 0).slice(-3).reverse();
   const themeMax = Math.max(...themes.map(t => t.value), 1);
 
   return (
@@ -52,7 +83,7 @@ export function DreamPortfolio() {
       {/* Portfolio toggle */}
       <div style={{ display: "flex", border: "1px solid var(--line)" }}>
         {(Object.keys(PORTFOLIOS) as Which[]).map((k, i) => (
-          <button key={k} onClick={() => setWhich(k)} style={{
+          <button key={k} onClick={() => { setWhich(k); setOpen(null); }} style={{
             flex: 1, padding: "12px 8px", minHeight: 44,
             background: which === k ? "var(--bg-hover)" : "transparent",
             border: "none", borderRight: i === 0 ? "1px solid var(--line)" : "none",
@@ -76,36 +107,82 @@ export function DreamPortfolio() {
         </div>
       </div>
 
-      {/* Performance ladder — the whole story at a glance */}
+      {/* Performance ladder — hover/tap any fund to expand */}
       <div className="card" style={{ padding: 16 }}>
-        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 14 }}>PERFORMANCE LADDER · return since cost</div>
+        <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 14 }}>
+          PERFORMANCE LADDER · hover or tap a fund for its 6-month past + 90-day forward
+        </div>
         {sorted.map(h => {
           const pos = h.gainLossPct >= 0;
-          const w = (Math.abs(h.gainLossPct) / maxAbs) * 50; // % of half-width
+          const w = (Math.abs(h.gainLossPct) / maxAbs) * 50;
+          const isOpen = open === h.code;
+          const fwd = h.proxy ? FWD_MAP.get(h.proxy) : undefined;
           return (
-            <div key={h.code} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--ink)", width: 118, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.code}</div>
-              <div style={{ flex: 1, height: 14, background: "var(--bg)", position: "relative", display: "flex" }}>
-                <div style={{ width: "50%", height: "100%", display: "flex", justifyContent: "flex-end" }}>
-                  {!pos && <div style={{ width: `${w * 2}%`, height: "100%", background: "var(--bear)", opacity: 0.7 }} />}
+            <div key={h.code} style={{ borderTop: "1px solid var(--line)" }}>
+              <div
+                onMouseEnter={() => setOpen(h.code)}
+                onClick={() => setOpen(isOpen ? null : h.code)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8, padding: "7px 0", cursor: "pointer",
+                  background: isOpen ? "var(--bg-hover)" : "transparent",
+                }}
+              >
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: isOpen ? "var(--caution)" : "var(--ink)", width: 118, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.code}</div>
+                <div style={{ flex: 1, height: 14, background: "var(--bg)", position: "relative", display: "flex" }}>
+                  <div style={{ width: "50%", height: "100%", display: "flex", justifyContent: "flex-end" }}>
+                    {!pos && <div style={{ width: `${w * 2}%`, height: "100%", background: "var(--bear)", opacity: 0.7 }} />}
+                  </div>
+                  <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "var(--line)" }} />
+                  <div style={{ width: "50%", height: "100%" }}>
+                    {pos && <div style={{ width: `${w * 2}%`, height: "100%", background: "var(--bull)", opacity: 0.7 }} />}
+                  </div>
                 </div>
-                <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "var(--line)" }} />
-                <div style={{ width: "50%", height: "100%" }}>
-                  {pos && <div style={{ width: `${w * 2}%`, height: "100%", background: "var(--bull)", opacity: 0.7 }} />}
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: pos ? "var(--bull)" : "var(--bear)", width: 52, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>
+                  {pos ? "+" : ""}{h.gainLossPct.toFixed(0)}%
                 </div>
               </div>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: pos ? "var(--bull)" : "var(--bear)", width: 52, textAlign: "right", flexShrink: 0, fontWeight: 700 }}>
-                {pos ? "+" : ""}{h.gainLossPct.toFixed(0)}%
-              </div>
+
+              {isOpen && (
+                <div style={{ padding: "12px 0 16px", display: "grid", gridTemplateColumns: "1fr", gap: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.1fr) minmax(0,0.9fr)", gap: 16 }}>
+                    {/* Past + forward chart */}
+                    <div>
+                      <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 6 }}>
+                        {h.theme}{h.proxy ? ` · proxy ${h.proxy}` : ""}
+                      </div>
+                      {fwd ? <PastForwardChart fwd={fwd} /> : (
+                        <div className="t-micro" style={{ color: "var(--dim)", padding: "20px 0", textTransform: "none", letterSpacing: 0 }}>
+                          Cash-like sleeve — no market proxy.
+                        </div>
+                      )}
+                      {fwd && (
+                        <div style={{ display: "flex", gap: 18, marginTop: 6 }}>
+                          <span className="t-micro" style={{ color: fwd.ret6m >= 0 ? "var(--bull)" : "var(--bear)" }}>past 6mo {fwd.ret6m >= 0 ? "+" : ""}{(fwd.ret6m * 100).toFixed(0)}%</span>
+                          <span className="t-micro" style={{ color: fwd.expRet >= 0 ? "var(--bull)" : "var(--bear)" }}>fwd 90d {fwd.expRet >= 0 ? "+" : ""}{(fwd.expRet * 100).toFixed(0)}%</span>
+                          <span className="t-micro" style={{ color: "var(--dim)" }}>vol {(fwd.annVol * 100).toFixed(0)}%</span>
+                        </div>
+                      )}
+                    </div>
+                    {/* Stats + thesis */}
+                    <div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
+                        <Stat label="UNITS" value={h.units.toLocaleString(undefined, { maximumFractionDigits: 0 })} />
+                        <Stat label="COST" value={fmtB(h.cost)} />
+                        <Stat label="VALUE" value={fmtB(h.currentValue)} />
+                        <Stat label="SINCE" value={h.investDate} />
+                      </div>
+                      {h.thesis && (
+                        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--muted)", lineHeight: 1.55, marginTop: 10 }}>
+                          {h.thesis}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
-      </div>
-
-      {/* Why winning / why lagging — the analysis */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--gap)" }}>
-        <WhyCard title="WHY THESE ARE WINNING" tint="var(--bull)" rows={winners} />
-        <WhyCard title="WHY THESE ARE LAGGING" tint="var(--bear)" rows={losers} />
       </div>
 
       {/* Theme allocation */}
@@ -122,9 +199,8 @@ export function DreamPortfolio() {
         ))}
       </div>
 
-      {/* Tracking note */}
       <div className="t-micro" style={{ color: "var(--dim)", lineHeight: 1.6, textTransform: "none", letterSpacing: 0, paddingTop: 4 }}>
-        Proxy trends last refreshed {PROXY_MTD.lastRun} via <code style={{ fontFamily: "var(--font-mono)" }}>ingestion/track_dream.py</code> — each fund&apos;s proxy index is fetched and appended to a history file so the patterns compound over time. Real-book figures are from the Fund SuperMart statement; proxies approximate the driver, not the exact NAV. Not investment advice.
+        Real-book figures from the Fund SuperMart statement. Each fund&apos;s past-6-month line and 90-day forward cone come from its proxy index ({FWD.model}, {FWD.generatedAt}) via <code style={{ fontFamily: "var(--font-mono)" }}>ingestion/forward_view.py</code> — the proxy approximates the driver, not the exact NAV. Not investment advice.
       </div>
     </div>
   );
@@ -139,31 +215,11 @@ function Kpi({ label, value, col }: { label: string; value: string; col: string 
   );
 }
 
-function WhyCard({ title, tint, rows }: { title: string; tint: string; rows: FundHolding[] }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card" style={{ padding: 16, borderLeft: `3px solid ${tint}` }}>
-      <div className="t-micro" style={{ color: tint, marginBottom: 12 }}>{title}</div>
-      {rows.map(h => (
-        <div key={h.code} style={{ padding: "8px 0", borderTop: "1px solid var(--line)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>{h.code}</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: tint, fontWeight: 700, flexShrink: 0 }}>
-              {h.gainLossPct >= 0 ? "+" : ""}{h.gainLossPct.toFixed(1)}%
-            </span>
-          </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "baseline", marginTop: 2, flexWrap: "wrap" }}>
-            <span className="t-micro" style={{ color: "var(--dim)" }}>{h.theme}{h.proxy ? ` · ${h.proxy}` : ""}</span>
-            {h.proxy && PROXY_MTD.proxies[h.proxy] && (
-              <span className="t-micro" style={{ color: PROXY_MTD.proxies[h.proxy].mtdPct >= 0 ? "var(--bull)" : "var(--bear)" }}>
-                proxy 1mo {PROXY_MTD.proxies[h.proxy].mtdPct >= 0 ? "+" : ""}{PROXY_MTD.proxies[h.proxy].mtdPct.toFixed(1)}%
-              </span>
-            )}
-          </div>
-          {h.thesis && (
-            <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--muted)", lineHeight: 1.5, marginTop: 4 }}>{h.thesis}</div>
-          )}
-        </div>
-      ))}
+    <div>
+      <div className="t-micro" style={{ color: "var(--dim)" }}>{label}</div>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: "var(--ink)", marginTop: 2 }}>{value}</div>
     </div>
   );
 }

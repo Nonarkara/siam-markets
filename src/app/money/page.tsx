@@ -15,6 +15,7 @@ import { Tabs } from "@/components/Tabs/Tabs";
 import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
 import { PerfectPortfolio } from "@/components/Portfolio/PerfectPortfolio";
+import { DreamPortfolio } from "@/components/Portfolio/DreamPortfolio";
 import {
   PortfolioSummaryView,
   HoldingsTableView,
@@ -87,8 +88,12 @@ export default function MoneyPage() {
 
       <div className="dashboard-page__body">
         <Tabs
-          defaultId="summary"
+          defaultId="analysis"
           tabs={[
+            {
+              id: "analysis", label: "MINE vs DREAM", badge: "ANALYSIS",
+              content: <Scroller><DreamPortfolio /></Scroller>,
+            },
             {
               id: "summary", label: "SUMMARY", badge: `${HOLDINGS.length} funds`,
               content: <Scroller><PortfolioSummaryView /></Scroller>,

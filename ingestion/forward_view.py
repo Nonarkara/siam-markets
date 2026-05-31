@@ -75,10 +75,19 @@ def cone(close: pd.Series) -> dict | None:
         lo.append(round(spot * math.exp(mu * t - wob), 2))
         hi.append(round(spot * math.exp(mu * t + wob), 2))
     expRet = math.exp(mu * HORIZON) - 1
+
+    # Trailing history — "what happened over the past ~6 months", sampled to STEPS.
+    hist = px.tail(126)
+    hidx = np.linspace(0, len(hist) - 1, STEPS).astype(int)
+    hist_path = [round(float(hist.iloc[i]), 2) for i in hidx]
+    ret6m = float(px.iloc[-1] / px.iloc[max(0, len(px) - 126)] - 1)
+
     return {
         "spot": round(spot, 2),
         "expRet": round(expRet, 4),
+        "ret6m": round(ret6m, 4),
         "annVol": round(sd * math.sqrt(252), 4),
+        "histPath": hist_path,
         "path": path, "bandLo": lo, "bandHi": hi,
         "model": "vol-cone",
     }
