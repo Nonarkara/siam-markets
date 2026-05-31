@@ -17,3 +17,10 @@ ingestion/*.pkl
 # TypeScript incremental compile state
 *.tsbuildinfo
 
+
+# Scratch / audit artifacts (agent debugging tools — not product code)
+plan-audit*.js
+plan-v3-*.js
+axe_report.txt
+*.tsx.backup
+_orphans/

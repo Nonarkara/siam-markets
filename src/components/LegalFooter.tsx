@@ -26,6 +26,9 @@ export function LegalFooter() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <Link href="/integrity" style={{ color: "var(--dim)", textDecoration: "underline", textUnderlineOffset: "2px" }}>
+          Data Integrity
+        </Link>
         <Link href="/privacy" style={{ color: "var(--dim)", textDecoration: "underline", textUnderlineOffset: "2px" }}>
           Privacy
         </Link>
