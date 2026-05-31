@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-05-29",
+  "universe": "SET + GLOBAL + MACRO + CYCLE",
+  "nodes": [
+    { "id": "cycle.frag",     "label": "FRAG · now",  "type": "cycle",  "weight": 2.4, "note": "Dalio Stage 5 · 2026–28 · fragile, sideways" },
+    { "id": "cycle.reset",    "label": "RESET",       "type": "cycle",  "weight": 1.9, "note": "Stage 6 · 2029–30 · the crash window" },
+    { "id": "cycle.rise",     "label": "RISE",        "type": "cycle",  "weight": 1.7, "note": "Stage 1 · 2031–34 · recovery boom" },
+
+    { "id": "macro.fed",      "label": "Fed Rate",    "type": "macro",  "weight": 2.4, "note": "U.S. policy rate — global liquidity anchor" },
+    { "id": "macro.bot",      "label": "BoT Rate",    "type": "macro",  "weight": 1.7, "note": "Bank of Thailand policy rate" },
+    { "id": "macro.usdthb",   "label": "USD/THB",     "type": "macro",  "weight": 2.2, "note": "Baht weakness lifts exporters, dents inbound tourism nominal" },
+    { "id": "macro.oil",      "label": "Oil",         "type": "macro",  "weight": 2.1, "note": "Brent — energy sector revenue + Thai trade deficit" },
+    { "id": "macro.gold",     "label": "Gold",        "type": "macro",  "weight": 1.7, "note": "Safe-haven bid in late-cycle stress" },
+    { "id": "macro.spx",      "label": "S&P 500",     "type": "macro",  "weight": 2.0, "note": "Global risk barometer — SET beta ≈ 0.6" },
+    { "id": "macro.cn",       "label": "China",       "type": "macro",  "weight": 1.9, "note": "Thailand's #1 export destination + #1 tourist source" },
+    { "id": "macro.vix",      "label": "VIX",         "type": "macro",  "weight": 1.6, "note": "Volatility regime — inversely correlated to equity beta" },
+
+    { "id": "theme.tourism",  "label": "Tourism",     "type": "theme",  "weight": 1.8, "note": "~12% of Thai GDP · arrivals from CN/IN/KR drive it" },
+    { "id": "theme.exports",  "label": "Exports",     "type": "theme",  "weight": 1.7, "note": "Auto / electronics / rubber / agri — FX-sensitive" },
+    { "id": "theme.agri",     "label": "Agri",        "type": "theme",  "weight": 1.4, "note": "Rice / rubber / cassava / durian — weather + China demand" },
+    { "id": "theme.credit",   "label": "Credit Cycle","type": "theme",  "weight": 1.7, "note": "Household + corporate leverage — drives bank NIM and NPLs" },
+    { "id": "theme.geopol",   "label": "Geopolitics", "type": "theme",  "weight": 1.6, "note": "U.S.–China tension reshuffles supply chains toward ASEAN" },
+
+    { "id": "sec.energy",     "label": "Energy",      "type": "sector", "weight": 1.7 },
+    { "id": "sec.bank",       "label": "Banking",     "type": "sector", "weight": 1.8 },
+    { "id": "sec.tech",       "label": "Tech",        "type": "sector", "weight": 1.5 },
+    { "id": "sec.commi",      "label": "Comms",       "type": "sector", "weight": 1.4 },
+    { "id": "sec.tourism",    "label": "Tourism Co.", "type": "sector", "weight": 1.6 },
+    { "id": "sec.food",       "label": "Food/Agri",   "type": "sector", "weight": 1.4 },
+    { "id": "sec.retail",     "label": "Retail",      "type": "sector", "weight": 1.4 },
+
+    { "id": "tk.ptt",         "label": "PTT",         "type": "ticker", "weight": 1.7, "href": "/scan" },
+    { "id": "tk.pttep",       "label": "PTTEP",       "type": "ticker", "weight": 1.4, "href": "/scan" },
+    { "id": "tk.kbank",       "label": "KBANK",       "type": "ticker", "weight": 1.7, "href": "/scan" },
+    { "id": "tk.scb",         "label": "SCB",         "type": "ticker", "weight": 1.5, "href": "/scan" },
+    { "id": "tk.bbl",         "label": "BBL",         "type": "ticker", "weight": 1.4, "href": "/scan" },
+    { "id": "tk.advanc",      "label": "ADVANC",      "type": "ticker", "weight": 1.5, "href": "/scan" },
+    { "id": "tk.true",        "label": "TRUE",        "type": "ticker", "weight": 1.3, "href": "/scan" },
+    { "id": "tk.delta",       "label": "DELTA",       "type": "ticker", "weight": 1.7, "href": "/scan" },
+    { "id": "tk.aot",         "label": "AOT",         "type": "ticker", "weight": 1.6, "href": "/scan" },
+    { "id": "tk.mint",        "label": "MINT",        "type": "ticker", "weight": 1.3, "href": "/scan" },
+    { "id": "tk.cpall",       "label": "CPALL",       "type": "ticker", "weight": 1.5, "href": "/scan" },
+    { "id": "tk.cpf",         "label": "CPF",         "type": "ticker", "weight": 1.4, "href": "/scan" },
+    { "id": "tk.gulf",        "label": "GULF",        "type": "ticker", "weight": 1.3, "href": "/scan" }
+  ],
+  "edges": [
+    { "from": "cycle.frag",    "to": "sec.bank",      "kind": "drag",   "weight": 0.7, "why": "Late cycle stresses credit quality" },
+    { "from": "cycle.frag",    "to": "macro.gold",    "kind": "lift",   "weight": 0.8, "why": "Safe-haven bid in fragility" },
+    { "from": "cycle.frag",    "to": "macro.vix",     "kind": "lift",   "weight": 0.7, "why": "Volatility regime rising" },
+    { "from": "cycle.frag",    "to": "cycle.reset",   "kind": "leads",  "weight": 0.6, "why": "Fragility precedes the reset by 2–4 years (historical)" },
+    { "from": "cycle.reset",   "to": "cycle.rise",    "kind": "leads",  "weight": 0.8, "why": "Crash bottoms then recovery boom" },
+
+    { "from": "macro.fed",     "to": "macro.usdthb",  "kind": "drives", "weight": 0.8, "why": "Higher Fed → stronger USD → weaker baht" },
+    { "from": "macro.fed",     "to": "macro.bot",     "kind": "drives", "weight": 0.5, "why": "BoT follows, partially, to defend baht" },
+    { "from": "macro.fed",     "to": "macro.spx",     "kind": "drag",   "weight": 0.7, "why": "Tighter Fed pressures equity multiples" },
+    { "from": "macro.fed",     "to": "macro.gold",    "kind": "drag",   "weight": 0.6, "why": "Real yields rise, gold pressured" },
+
+    { "from": "macro.bot",     "to": "sec.bank",      "kind": "drives", "weight": 0.8, "why": "NIM expands when policy rate rises" },
+    { "from": "macro.bot",     "to": "macro.usdthb",  "kind": "drag",   "weight": 0.5, "why": "Higher BoT strengthens baht (partial)" },
+
+    { "from": "macro.usdthb",  "to": "theme.exports", "kind": "lift",   "weight": 0.8, "why": "Weak baht boosts export competitiveness" },
+    { "from": "macro.usdthb",  "to": "theme.tourism", "kind": "drag",   "weight": 0.4, "why": "Inbound tourist baht nominal smaller" },
+    { "from": "macro.usdthb",  "to": "sec.tech",      "kind": "lift",   "weight": 0.6, "why": "Electronics export pricing" },
+
+    { "from": "macro.oil",     "to": "sec.energy",    "kind": "drives", "weight": 0.9, "why": "Energy sector revenue ≈ Brent" },
+    { "from": "macro.oil",     "to": "theme.exports", "kind": "drag",   "weight": 0.5, "why": "Higher crude widens Thai trade deficit" },
+
+    { "from": "macro.spx",     "to": "sec.tech",      "kind": "drives", "weight": 0.7, "why": "Global tech beta — DELTA tracks Nasdaq" },
+    { "from": "macro.spx",     "to": "sec.bank",      "kind": "drives", "weight": 0.4, "why": "Risk-on beta" },
+
+    { "from": "macro.cn",      "to": "theme.tourism", "kind": "lift",   "weight": 0.9, "why": "Chinese arrivals = #1 inbound, ~30% of total" },
+    { "from": "macro.cn",      "to": "theme.exports", "kind": "drives", "weight": 0.7, "why": "Top export destination" },
+    { "from": "macro.cn",      "to": "theme.agri",    "kind": "lift",   "weight": 0.7, "why": "Cassava + durian demand" },
+    { "from": "macro.cn",      "to": "macro.oil",     "kind": "drives", "weight": 0.4, "why": "Demand swing factor" },
+
+    { "from": "theme.tourism", "to": "sec.tourism",   "kind": "drives", "weight": 0.9 },
+    { "from": "theme.exports", "to": "sec.tech",      "kind": "drives", "weight": 0.6 },
+    { "from": "theme.exports", "to": "sec.food",      "kind": "drives", "weight": 0.5 },
+    { "from": "theme.agri",    "to": "sec.food",      "kind": "drives", "weight": 0.8 },
+    { "from": "theme.credit",  "to": "sec.bank",      "kind": "drives", "weight": 0.9 },
+    { "from": "theme.credit",  "to": "sec.retail",    "kind": "drives", "weight": 0.6, "why": "Consumer leverage feeds retail" },
+    { "from": "theme.geopol",  "to": "theme.exports", "kind": "lift",   "weight": 0.5, "why": "Supply-chain reshuffle to ASEAN" },
+    { "from": "theme.geopol",  "to": "macro.gold",    "kind": "lift",   "weight": 0.4 },
+
+    { "from": "sec.energy",    "to": "tk.ptt",        "kind": "member", "weight": 0.9 },
+    { "from": "sec.energy",    "to": "tk.pttep",      "kind": "member", "weight": 0.9 },
+    { "from": "sec.energy",    "to": "tk.gulf",       "kind": "member", "weight": 0.6 },
+    { "from": "sec.bank",      "to": "tk.kbank",      "kind": "member", "weight": 0.9 },
+    { "from": "sec.bank",      "to": "tk.scb",        "kind": "member", "weight": 0.9 },
+    { "from": "sec.bank",      "to": "tk.bbl",        "kind": "member", "weight": 0.9 },
+    { "from": "sec.tech",      "to": "tk.delta",      "kind": "member", "weight": 0.9 },
+    { "from": "sec.commi",     "to": "tk.advanc",     "kind": "member", "weight": 0.9 },
+    { "from": "sec.commi",     "to": "tk.true",       "kind": "member", "weight": 0.8 },
+    { "from": "sec.tourism",   "to": "tk.aot",        "kind": "member", "weight": 0.9 },
+    { "from": "sec.tourism",   "to": "tk.mint",       "kind": "member", "weight": 0.8 },
+    { "from": "sec.retail",    "to": "tk.cpall",      "kind": "member", "weight": 0.9 },
+    { "from": "sec.food",      "to": "tk.cpf",        "kind": "member", "weight": 0.9 }
+  ]
+}

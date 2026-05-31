@@ -1109,3 +1109,28 @@ textarea:focus-visible {
   .plan-v3-teach { display: block; }
 }
 
+/* ─── DESK · Market Graph (Obsidian-style relationship web) ─────────────────── */
+.market-graph { background: var(--bg-raised); border: 1px solid var(--line); margin-bottom: 16px; }
+.market-graph-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px; border-bottom: 1px solid var(--line);
+  flex-wrap: wrap; gap: 8px;
+}
+.market-graph-body { display: flex; flex-direction: column; min-height: 0; }
+.market-graph-canvas { flex: 1; min-width: 0; }
+.market-graph-panel {
+  padding: 14px 16px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  min-height: 0;
+}
+.market-graph-panel--empty { color: var(--muted); }
+@media (min-width: 900px) {
+  .market-graph-body { flex-direction: row; }
+  .market-graph-panel {
+    width: 340px; flex-shrink: 0;
+    border-top: none; border-left: 1px solid var(--line);
+    max-height: 580px; overflow-y: auto;
+  }
+}
+
