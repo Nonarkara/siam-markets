@@ -4,12 +4,13 @@ import { useState } from "react";
 import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
 import { EfficientFrontier } from "@/components/Portfolio/EfficientFrontier";
+import { DreamPortfolio } from "@/components/Portfolio/DreamPortfolio";
 
-const TABS = ["Tax Calculator", "10-Year Projection", "Optimizer"] as const;
+const TABS = ["Dream Portfolio", "Tax Calculator", "10-Year Projection", "Optimizer"] as const;
 type Tab = typeof TABS[number];
 
 export default function PortfolioPage() {
-  const [tab, setTab] = useState<Tab>("Tax Calculator");
+  const [tab, setTab] = useState<Tab>("Dream Portfolio");
 
   return (
     <div className="page page-enter">
@@ -53,6 +54,8 @@ export default function PortfolioPage() {
           </button>
         ))}
       </div>
+
+      {tab === "Dream Portfolio" && <DreamPortfolio />}
 
       {tab === "Tax Calculator" && <TaxCalc />}
 

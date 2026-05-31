@@ -32,7 +32,6 @@ import {
   REGIMES, dnaSimilarity,
 } from "./api/intelligence/logic";
 import { QuadrantLayout } from "@/components/Quadrant/QuadrantLayout";
-import { MarketGraph } from "@/components/Desk/MarketGraph";
 import { fmtNum, fmtPct, pctClass } from "@/lib/format";
 import Link from "next/link";
 
@@ -145,8 +144,6 @@ export default async function DeskPage() {
           {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })}
         </span>
       </div>
-
-      <MarketGraph />
 
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <QuadrantLayout>

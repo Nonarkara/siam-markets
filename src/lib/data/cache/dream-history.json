@@ -1,0 +1,128 @@
+{
+  "lastRun": "2026-05-31",
+  "proxies": {
+    "SOXX": {
+      "close": 569.08,
+      "mtdPct": 23.33,
+      "label": "Semiconductors"
+    },
+    "BITQ": {
+      "close": 28.61,
+      "mtdPct": 20.31,
+      "label": "Blockchain equities"
+    },
+    "QQQ": {
+      "close": 738.31,
+      "mtdPct": 10.57,
+      "label": "Nasdaq-100 / US tech"
+    },
+    "MCHI": {
+      "close": 55.1,
+      "mtdPct": -4.29,
+      "label": "China equity"
+    },
+    "VNM": {
+      "close": 18.7,
+      "mtdPct": -0.74,
+      "label": "Vietnam equity"
+    },
+    "^SET.BK": {
+      "close": 1568.37,
+      "mtdPct": 5.14,
+      "label": "Thai SET"
+    },
+    "EWJ": {
+      "close": 92.96,
+      "mtdPct": 4.33,
+      "label": "Japan equity"
+    },
+    "ACWI": {
+      "close": 158.54,
+      "mtdPct": 4.62,
+      "label": "Global all-world"
+    },
+    "GLD": {
+      "close": 417.12,
+      "mtdPct": -1.54,
+      "label": "Gold"
+    },
+    "URTH": {
+      "close": 204.93,
+      "mtdPct": 4.26,
+      "label": "Global brands / world"
+    },
+    "INDA": {
+      "close": 48.56,
+      "mtdPct": -1.74,
+      "label": "India equity"
+    }
+  },
+  "series": {
+    "SOXX": [
+      {
+        "date": "2026-05-31",
+        "close": 569.08
+      }
+    ],
+    "BITQ": [
+      {
+        "date": "2026-05-31",
+        "close": 28.61
+      }
+    ],
+    "QQQ": [
+      {
+        "date": "2026-05-31",
+        "close": 738.31
+      }
+    ],
+    "MCHI": [
+      {
+        "date": "2026-05-31",
+        "close": 55.1
+      }
+    ],
+    "VNM": [
+      {
+        "date": "2026-05-31",
+        "close": 18.7
+      }
+    ],
+    "^SET.BK": [
+      {
+        "date": "2026-05-31",
+        "close": 1568.37
+      }
+    ],
+    "EWJ": [
+      {
+        "date": "2026-05-31",
+        "close": 92.96
+      }
+    ],
+    "ACWI": [
+      {
+        "date": "2026-05-31",
+        "close": 158.54
+      }
+    ],
+    "GLD": [
+      {
+        "date": "2026-05-31",
+        "close": 417.12
+      }
+    ],
+    "URTH": [
+      {
+        "date": "2026-05-31",
+        "close": 204.93
+      }
+    ],
+    "INDA": [
+      {
+        "date": "2026-05-31",
+        "close": 48.56
+      }
+    ]
+  }
+}
