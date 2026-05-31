@@ -17,6 +17,7 @@ import { PortfolioQuadrantSummary } from "@/components/Portfolio/PortfolioQuadra
 import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
 import { MorningSignal } from "@/components/Dashboard/MorningSignal";
+import { MrMarketMood } from "@/components/MrMarketMood";
 
 import { StockScannerTable } from "@/components/StockDetail/StockScannerTable";
 import {
@@ -127,6 +128,13 @@ export default async function DeskPage() {
         narrativeVerdict={narrativeReality?.verdict}
         macroEventsToday={3}
       />
+
+      {/* ═══════════════════════════════════════════════════════════════
+          MR. MARKET MOOD — daily market weather from Graham's lens
+          ═══════════════════════════════════════════════════════════════ */}
+      <div style={{ padding: "0 12px", marginTop: 8, marginBottom: 4 }}>
+        <MrMarketMood compact />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════
           WORLD CLOCK · Braun GMT strip

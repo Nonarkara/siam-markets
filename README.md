@@ -71,6 +71,10 @@ This is not a dashboard. It's a **correlation engine with a visual front end**.
 <td>Live SET · ASEAN · China · US indices on one screen. Fear & Greed dial. Real Fed rate from FRED. Real THB/USD. Mr Market's mood — stated plainly.</td>
 </tr>
 <tr>
+<td align="center"><strong>REGIME</strong></td>
+<td>Bull · range · bear classifier with evidence board, 60-day tape, and Graham/Dalio allocation stance. This is the context gate before Trade Desk, Portfolio, and Plan.</td>
+</tr>
+<tr>
 <td align="center"><strong>TRADE DESK</strong></td>
 <td>Technical readout: EMA 9/21, RSI, MACD, VWAP, Bollinger. Market regime detection. Support &amp; resistance zones with touch counts. Signal confidence score 0–100. Position sizer: account size + risk % → exact shares, notional, R:R.</td>
 </tr>

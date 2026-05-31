@@ -16,6 +16,7 @@ import { TaxCalc } from "@/components/Portfolio/TaxCalc";
 import { ProjectionChart } from "@/components/Portfolio/ProjectionChart";
 import { PerfectPortfolio } from "@/components/Portfolio/PerfectPortfolio";
 import { DreamPortfolio } from "@/components/Portfolio/DreamPortfolio";
+import { MrMarketMood } from "@/components/MrMarketMood";
 import {
   PortfolioSummaryView,
   HoldingsTableView,
@@ -87,6 +88,9 @@ export default function MoneyPage() {
       </div>
 
       <div className="dashboard-page__body">
+        <div style={{ padding: "12px 16px 0" }}>
+          <MrMarketMood />
+        </div>
         <Tabs
           defaultId="analysis"
           tabs={[

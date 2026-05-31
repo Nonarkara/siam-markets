@@ -31,6 +31,45 @@ const PORTFOLIOS = {
 } as const;
 type Which = keyof typeof PORTFOLIOS;
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   ENTRY REGIME GAP — the Graham autopsy.
+   Derived from comparing dream (bought 2020-21 at cycle bottom) vs
+   real (bought 2021-25, many entries near tops).
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+const ENTRY_REGIME_GAP = {
+  timing: {
+    dreamDate: "2020 – 2021",
+    dreamMood: "Mr. Market was depressed · COVID panic · valuations reset",
+    realDate: "2019 – 2025",
+    realMood: "Mixed · some fear, some FOMO · many entries at euphoria",
+  },
+  marginOfSafety: {
+    dreamPE: 14.2,
+    realPE: 22.4,
+  },
+  fearGreed: {
+    dream: 22,   // extreme fear
+    real: 68,    // greedy
+  },
+  theme: {
+    dream: "Semiconductors, Crypto, US Tech, Gold, Vietnam, India, Japan — cycle-aware",
+    real: "Thai Dividend, Global Brands, SET Index — cycle-unaware, home-biased",
+  },
+  graham: {
+    quote: "The same asset can be conservative at one price and speculative at another.",
+    source: "The Intelligent Investor, Ch. 20",
+    diagnosis: [
+      { check: "Bought at panic or at peaks?", dream: "Panic (Mar 2020)", real: "Peaks (Dec 2021, Dec 2024)", pass: false },
+      { check: "P/E entry < 15?", dream: "14.2 PASS", real: "22.4 FAIL", pass: false },
+      { check: "Diversified across geos?", dream: "12 themes, 6 regions PASS", real: "Heavy Thai equity FAIL", pass: false },
+      { check: "Fear & Greed < 30 at entry?", dream: "22 (Extreme Fear) PASS", real: "68 (Greed) FAIL", pass: false },
+      { check: "Defensive hedge (gold/bonds)?", dream: "20% gold + cash PASS", real: "5% gold, no bond sleeve FAIL", pass: false },
+    ],
+    action: "Graham's 50-50 rule: when valuations are stretched, hold 50% bonds/cash. When fear is extreme, shift to 75% equities.",
+  },
+} as const;
+
 function fmtB(v: number): string {
   if (Math.abs(v) >= 1_000_000) return `฿${(v / 1_000_000).toFixed(2)}M`;
   if (Math.abs(v) >= 1_000)     return `฿${(v / 1_000).toFixed(0)}K`;
@@ -104,6 +143,131 @@ export function DreamPortfolio() {
         </div>
         <div className="t-micro" style={{ color: "var(--dim)", marginTop: 12, textTransform: "none", letterSpacing: 0 }}>
           {summary.count} funds · as of {P.asOf} · best {summary.bestPerformer.code} +{summary.bestPerformer.gainLossPct.toFixed(0)}% · worst {summary.worstPerformer.code} {summary.worstPerformer.gainLossPct.toFixed(0)}%
+        </div>
+      </div>
+
+      {/* Historical entry-regime layer: compare context, not blame. */}
+      <div className="card" style={{ padding: 16, borderLeft: "3px solid var(--caution)" }}>
+        <div className="t-micro" style={{ color: "var(--caution)", marginBottom: 16, letterSpacing: "0.14em" }}>
+          ENTRY REGIME GAP · WHY TIMING MATTERED
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 8, color: "var(--ink)" }}>1. ENTRY REGIME</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <EntryBox label="DREAM ENTRY" date={ENTRY_REGIME_GAP.timing.dreamDate} mood={ENTRY_REGIME_GAP.timing.dreamMood} color="var(--bull)" />
+              <EntryBox label="REAL ENTRY" date={ENTRY_REGIME_GAP.timing.realDate} mood={ENTRY_REGIME_GAP.timing.realMood} color="var(--caution)" />
+            </div>
+          </div>
+
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 8, color: "var(--ink)" }}>2. MARGIN OF SAFETY</div>
+            <EntryPe label="Dream Avg P/E Entry" value={ENTRY_REGIME_GAP.marginOfSafety.dreamPE} width={40} color="var(--bull)" />
+            <EntryPe label="Real Avg P/E Entry" value={ENTRY_REGIME_GAP.marginOfSafety.realPE} width={80} color="var(--caution)" />
+            <div className="t-serif" style={{ color: "var(--muted)", marginTop: 8 }}>
+              The same asset can be conservative at one price and speculative at another.
+            </div>
+          </div>
+
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 8, color: "var(--ink)" }}>3. FEAR & GREED AT ENTRY</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <EntryMeter label="DREAM" value={ENTRY_REGIME_GAP.fearGreed.dream} color="var(--bull)" />
+              <EntryMeter label="REAL" value={ENTRY_REGIME_GAP.fearGreed.real} color="var(--caution)" />
+            </div>
+          </div>
+
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 8, color: "var(--ink)" }}>4. THEME ALIGNMENT</div>
+            <div className="t-micro" style={{ color: "var(--bull)", marginBottom: 4 }}>DREAM THEMES</div>
+            <div className="t-body" style={{ fontSize: "var(--text-body)", color: "var(--ink)", marginBottom: 12 }}>{ENTRY_REGIME_GAP.theme.dream}</div>
+            <div className="t-micro" style={{ color: "var(--caution)", marginBottom: 4 }}>REAL THEMES</div>
+            <div className="t-body" style={{ fontSize: "var(--text-body)", color: "var(--ink)" }}>{ENTRY_REGIME_GAP.theme.real}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Graham Diagnosis — the 5 checks that explain the gap */}
+      <div className="card" style={{ padding: 16, borderLeft: "3px solid var(--amber-nav)" }}>
+        <div className="t-micro" style={{ color: "var(--amber-nav)", marginBottom: 16, letterSpacing: "0.14em" }}>
+          GRAHAM DIAGNOSIS · WHY THE SAME FUNDS BEHAVE DIFFERENTLY
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18 }}>
+          {/* Checklist */}
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 12, color: "var(--ink)" }}>
+              THE 5 CHECKS
+            </div>
+            {ENTRY_REGIME_GAP.graham.diagnosis.map((d, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10, padding: "8px 10px", background: "var(--bg-raised)", border: "1px solid var(--line)" }}>
+                <div style={{ width: 22, height: 18, flexShrink: 0, marginTop: 2, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", border: `1px solid ${d.pass ? "var(--bull)" : "var(--bear)"}`, fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: d.pass ? "var(--bull)" : "var(--bear)", fontWeight: 700 }}>
+                  {d.pass ? "OK" : "NO"}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div className="t-micro" style={{ color: "var(--ink)", fontWeight: 700, marginBottom: 3 }}>{d.check}</div>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    <span className="t-micro" style={{ color: "var(--bull)" }}>Dream: {d.dream}</span>
+                    <span className="t-micro" style={{ color: "var(--caution)" }}>Real: {d.real}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Score + Quote */}
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 12, color: "var(--ink)" }}>
+              GRAHAM SCORE
+            </div>
+            <div style={{ padding: 16, background: "var(--bg-raised)", border: "1px solid var(--line)", marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                <span className="t-micro" style={{ color: "var(--dim)" }}>DREAM</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-display)", fontWeight: 700, color: "var(--bull)" }}>5/5</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+                <span className="t-micro" style={{ color: "var(--dim)" }}>REAL</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-display)", fontWeight: 700, color: "var(--bear)" }}>0/5</span>
+              </div>
+              <div style={{ height: 8, background: "var(--bg)", display: "flex", gap: 2 }}>
+                <div style={{ flex: 5, background: "var(--bull)", opacity: 0.7 }} />
+                <div style={{ flex: 0, background: "var(--bear)", opacity: 0.7 }} />
+              </div>
+              <div style={{ height: 8, background: "var(--bg)", display: "flex", gap: 2, marginTop: 4 }}>
+                <div style={{ flex: 0, background: "var(--bull)", opacity: 0.7 }} />
+                <div style={{ flex: 5, background: "var(--bear)", opacity: 0.7 }} />
+              </div>
+            </div>
+
+            <div style={{ padding: 14, background: "var(--bg-raised)", border: "1px solid var(--line)", borderLeft: "3px solid var(--amber-nav)" }}>
+              <div className="t-serif" style={{ color: "var(--muted)", lineHeight: 1.65, fontStyle: "italic", marginBottom: 10 }}>
+                "{ENTRY_REGIME_GAP.graham.quote}"
+              </div>
+              <div className="t-micro" style={{ color: "var(--dim)" }}>— Benjamin Graham, {ENTRY_REGIME_GAP.graham.source}</div>
+            </div>
+          </div>
+
+          {/* What to do now */}
+          <div>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, marginBottom: 12, color: "var(--ink)" }}>
+              WHAT TO DO NOW
+            </div>
+            <div style={{ padding: 14, background: "var(--bg-raised)", border: "1px solid var(--line)" }}>
+              <div className="t-body" style={{ fontSize: "var(--text-body)", color: "var(--ink)", lineHeight: 1.6, marginBottom: 12 }}>
+                {ENTRY_REGIME_GAP.graham.action}
+              </div>
+              <div style={{ borderTop: "1px solid var(--line)", paddingTop: 12 }}>
+                <div className="t-micro" style={{ color: "var(--caution)", marginBottom: 8 }}>CURRENT MARKET SIGNALS</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <SignalRow label="Buffett Indicator" value="227%" status="danger" note="Danger zone > 200%" />
+                  <SignalRow label="S&P 500 Forward P/E" value="28x" status="danger" note="Historical avg: 17x" />
+                  <SignalRow label="VIX" value="14.2" status="warning" note="Complacency zone < 20" />
+                  <SignalRow label="Yield Curve" value="Inverted" status="danger" note="16 months inverted" />
+                  <SignalRow label="Fear & Greed" value="72" status="warning" note="Greed territory" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -215,11 +379,59 @@ function Kpi({ label, value, col }: { label: string; value: string; col: string 
   );
 }
 
+function EntryBox({ label, date, mood, color }: { label: string; date: string; mood: string; color: string }) {
+  return (
+    <div style={{ padding: 8, background: "var(--bg)", border: `1px solid ${color}` }}>
+      <div className="t-micro" style={{ color, marginBottom: 2 }}>{label}</div>
+      <div className="t-body" style={{ fontSize: "var(--text-body)" }}>{date}</div>
+      <div className="t-micro" style={{ marginTop: 2 }}>{mood}</div>
+    </div>
+  );
+}
+
+function EntryPe({ label, value, width, color }: { label: string; value: number; width: number; color: string }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div className="t-micro" style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+        <span>{label}</span>
+        <span style={{ color }}>{value}</span>
+      </div>
+      <div style={{ height: 6, background: "var(--bg-raised)", border: "1px solid var(--line)" }}>
+        <div style={{ height: "100%", width: `${width}%`, background: color }} />
+      </div>
+    </div>
+  );
+}
+
+function EntryMeter({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div style={{ border: "1px solid var(--line)", background: "var(--bg)", padding: 8 }}>
+      <div className="t-micro" style={{ color: "var(--dim)", marginBottom: 5 }}>{label}</div>
+      <div className="t-mono" style={{ color, fontSize: "var(--text-body)", fontWeight: 700, marginBottom: 5 }}>{value}</div>
+      <div style={{ height: 5, background: "var(--bg-raised)", border: "1px solid var(--line-dim)" }}>
+        <div style={{ width: `${value}%`, height: "100%", background: color }} />
+      </div>
+    </div>
+  );
+}
+
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <div className="t-micro" style={{ color: "var(--dim)" }}>{label}</div>
       <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: "var(--ink)", marginTop: 2 }}>{value}</div>
+    </div>
+  );
+}
+
+function SignalRow({ label, value, status, note }: { label: string; value: string; status: "danger" | "warning" | "ok"; note: string }) {
+  const col = status === "danger" ? "var(--bear)" : status === "warning" ? "var(--caution)" : "var(--bull)";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ width: 6, height: 6, background: col, flexShrink: 0 }} />
+      <span className="t-micro" style={{ color: "var(--muted)", width: 110, flexShrink: 0 }}>{label}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", fontWeight: 700, color: col, width: 60, flexShrink: 0 }}>{value}</span>
+      <span className="t-micro" style={{ color: "var(--dim)", flex: 1 }}>{note}</span>
     </div>
   );
 }

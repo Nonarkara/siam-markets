@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/Theme/ThemeToggle";
 const NAV = [
   { href: "/",          label: "DESK"      },
   { href: "/markets",   label: "MARKETS"   },
+  { href: "/regime",    label: "REGIME"    },
   { href: "/signals",   label: "SIGNALS"   },
   { href: "/scan",      label: "BUYS"      },
   { href: "/funds",     label: "FUNDS"     },
@@ -50,7 +51,7 @@ export function TopNav() {
           href="/"
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "0.9375rem",
+            fontSize: "var(--text-body)",
             fontWeight: 700,
             letterSpacing: "0.1em",
             color: "var(--ink)",

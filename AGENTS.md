@@ -226,6 +226,7 @@ See `/Users/nonarkara/Projects/AGENTS.md` §11 for workspace-wide rules. Project
 | Route | Page | Data |
 |---|---|---|
 | `/` | Market Pulse | SET, global indices, Fear & Greed, macro |
+| `/regime` | Market Regime Intelligence | Bull/range/bear classifier, evidence board, 60-day tape, allocation stance |
 | `/trade` | Trade Desk | Technical indicators, AI signals, S/R, position sizer, news |
 | `/simulate` | Simulator | Paper trading with journal and performance metrics |
 | `/events` | World × Markets | GDELT events + SET/SPX price correlation |

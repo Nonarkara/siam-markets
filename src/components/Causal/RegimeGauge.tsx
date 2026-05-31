@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useState } from "react";
-import type { RegimeSummary, RegimeDay } from "@/app/api/regime/route";
+import type { RegimeSummary, RegimeDay } from "@/lib/regime";
 
 const REGIME_COLOR: Record<string, string> = {
   bull:    "var(--bull)",
@@ -37,7 +37,7 @@ function ProbBar({ label, prob, color }: { label: string; prob: number; color: s
       <div style={{ position: "relative", height: 8, background: "var(--bg-raised)", border: "1px solid var(--line)" }}>
         <div style={{ position: "absolute", inset: 0, width: `${prob * 100}%`, background: color }} />
       </div>
-      <span className="t-mono" style={{ fontSize: "0.6875rem", fontWeight: 700, color, textAlign: "right" }}>
+      <span className="t-mono" style={{ fontSize: "var(--text-micro)", fontWeight: 700, color, textAlign: "right" }}>
         {(prob * 100).toFixed(0)}%
       </span>
     </div>
@@ -61,7 +61,7 @@ export function RegimeGauge() {
 
   const today  = data?.today;
   const history = data?.history?.slice(-60) ?? [];
-  const counts  = data?.regime_counts_60d ?? {};
+  const counts: Record<string, number> = data?.regime_counts_60d ?? {};
 
   if (!today) {
     return <div className="t-micro" style={{ color: "var(--dim)" }}>No regime data</div>;
@@ -82,17 +82,17 @@ export function RegimeGauge() {
         }}
       >
         <div>
-          <div className="t-mono" style={{ fontSize: "1rem", fontWeight: 700, color: REGIME_COLOR[today.regime] }}>
+          <div className="t-mono" style={{ fontSize: "var(--text-body)", fontWeight: 700, color: REGIME_COLOR[today.regime] }}>
             {REGIME_LABEL[today.regime] ?? today.regime.toUpperCase()}
           </div>
-          <div className="t-body" style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: 4, lineHeight: 1.5 }}>
+          <div className="t-body" style={{ fontSize: "var(--text-micro)", color: "var(--muted)", marginTop: 4, lineHeight: 1.5 }}>
             {REGIME_DESC[today.regime]}
           </div>
         </div>
         <div className="t-micro" style={{ color: "var(--muted)", textAlign: "right" }}>
           {today.date}
           {today.vix !== null && today.vix !== undefined && (
-            <div className="t-mono" style={{ fontSize: "0.75rem", color: (today.vix ?? 0) > 25 ? "var(--bear)" : "var(--muted)", marginTop: 4 }}>
+            <div className="t-mono" style={{ fontSize: "var(--text-micro)", color: (today.vix ?? 0) > 25 ? "var(--bear)" : "var(--muted)", marginTop: 4 }}>
               VIX {today.vix?.toFixed(1)}
             </div>
           )}
@@ -136,7 +136,7 @@ export function RegimeGauge() {
           {(["bull", "ranging", "bear"] as const).map(r => (
             <span key={r} style={{ display: "flex", alignItems: "center", gap: 5 }}>
               <span style={{ width: 8, height: 8, background: REGIME_COLOR[r] }} />
-              <span className="t-mono" style={{ fontSize: "0.6875rem", color: REGIME_COLOR[r] }}>
+              <span className="t-mono" style={{ fontSize: "var(--text-micro)", color: REGIME_COLOR[r] }}>
                 {counts[r] ?? 0}d
               </span>
               <span className="t-micro" style={{ color: "var(--muted)" }}>{r}</span>

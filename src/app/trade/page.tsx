@@ -16,6 +16,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Tabs } from "@/components/Tabs/Tabs";
+import { CandleChart } from "@/components/Charts/CandleChart";
 import { RegimeGauge } from "@/components/Causal/RegimeGauge";
 import {
   ema, rsi, macd, bollingerBands, vwap, detectRegime,
@@ -208,7 +209,10 @@ export default function TradePage() {
       </div>
 
       {/* ── Tabs body ──────────────────────────────────────────── */}
-      <div className="dashboard-page__body">
+      <div className="dashboard-page__body" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+        {/* ── Terminal Chart — the Ikigai of the Trade Desk ─────── */}
+        <CandleChart data={data} height={340} />
+
         <Tabs
           defaultId="signal"
           tabs={[

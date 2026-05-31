@@ -70,6 +70,9 @@ export const DATA_SOURCES: DataSource[] = [
   { id: "econcal", label: "Economic calendar", surface: "DESK · Intel", kind: "live",
     source: "Public calendar feed", method: "Upcoming releases", engine: "/api/econ-calendar", asOf: "Hourly",
     limitation: "Consensus estimates shift; times are exchange-local." },
+  { id: "regime", label: "Market regime classification", surface: "/regime, DESK", kind: "live",
+    source: "Supabase regime table (← causal pipeline)", method: "Classifier over macro features; deterministic fallback summary when DB is unavailable", engine: "ingestion/regime.py · /api/regime", asOf: "Daily run",
+    limitation: "A probabilistic label, not a verdict; falls back to a synthetic summary without the DB." },
 
   // ── CACHED (offline ingestion → committed JSON) ──────────────────────────
   { id: "ohlcv", label: "SET50 daily OHLCV", surface: "/trade, /scan, /api/technical", kind: "cached",
@@ -129,12 +132,12 @@ export const DATA_SOURCES: DataSource[] = [
   { id: "mock-pulse", label: "Pulse breadth / indices", surface: "DESK · Pulse fallback", kind: "mock",
     source: "MOCK_INDICES / MOCK_SET", method: "Synthetic breadth + index levels", engine: "/api/pulse", asOf: "—",
     limitation: "Fallback when the live feed is unavailable." },
-  { id: "mock-mood", label: "Mr. Market Mood", surface: "/trade header", kind: "mock",
-    source: "Hardcoded label", method: "Static 'MANIC (GREEDY)' tag", engine: "trade/page.tsx", asOf: "—",
-    limitation: "Decorative narrative device; not derived from live sentiment." },
-  { id: "mock-gap", label: "'Why the Dream won' gap stats", surface: "/money · Mine vs Dream", kind: "mock",
-    source: "Hardcoded comparison", method: "Illustrative timing/P-E/Fear-Greed contrast", engine: "DreamPortfolio.tsx GAP_ANALYSIS", asOf: "—",
-    limitation: "Hand-set figures to teach the timing lesson — not measured from the books." },
+  { id: "mock-mood", label: "Mr. Market Mood gauge", surface: "DESK + /money", kind: "mock",
+    source: "Hardcoded signal set", method: "Six fixed signals (VIX 14.2, Fear&Greed 72, Buffett Indicator 227%, fwd P/E 28x, inverted curve, credit 3.2%) scored to a composite mood", engine: "MrMarketMood.tsx", asOf: "—",
+    limitation: "Illustrative teaching values, not live readings — it carries Graham's lesson, not the latest tick. Wire to /api/macro + feargreed to make it live." },
+  { id: "mock-gap", label: "Graham Diagnosis — portfolio autopsy", surface: "/money · Mine vs Dream", kind: "mock",
+    source: "Hardcoded Dream-vs-Real comparison", method: "Five Graham checks (entry mood, P/E<15, diversification, Fear&Greed, defensive hedge) → 5/5 vs 0/5", engine: "DreamPortfolio.tsx GAP_ANALYSIS", asOf: "—",
+    limitation: "Hand-set figures to teach Graham's margin-of-safety lesson — not measured from the live books." },
 ];
 
 export function provenanceSummary() {

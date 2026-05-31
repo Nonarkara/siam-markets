@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV = [
   { href: "/",          label: "DESK",      icon: DeskIcon     },
   { href: "/markets",   label: "MARKETS",   icon: MarketsIcon  },
+  { href: "/regime",    label: "REGIME",    icon: RegimeIcon   },
   { href: "/signals",   label: "WEB",       icon: WebIcon      },
   { href: "/scan",      label: "BUYS",      icon: ScanIcon     },
   { href: "/funds",     label: "FUNDS",     icon: FundsIcon    },
@@ -35,6 +36,9 @@ export function BottomNav() {
         background: "var(--bg-raised)",
         borderTop: "1px solid var(--line)",
         display: "flex",
+        overflowX: "auto",
+        overflowY: "hidden",
+        WebkitOverflowScrolling: "touch",
         zIndex: 100,
       }}
     >
@@ -45,7 +49,7 @@ export function BottomNav() {
             key={href}
             href={href}
             style={{
-              flex: 1,
+              flex: "0 0 72px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -61,7 +65,7 @@ export function BottomNav() {
             <Icon active={active} />
             <span style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
+              fontSize: "var(--text-micro)",
               letterSpacing: "0.08em",
               fontWeight: active ? 700 : 400,
             }}>
@@ -91,6 +95,18 @@ function MarketsIcon({ active }: { active: boolean }) {
       <circle cx="12" cy="12" r="10" />
       <line x1="2" y1="12" x2="22" y2="12" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+function RegimeIcon({ active }: { active: boolean }) {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <line x1="4" y1="19" x2="20" y2="19" />
+      <rect x="5" y="11" width="3" height="8" />
+      <rect x="11" y="5" width="3" height="14" />
+      <rect x="17" y="8" width="3" height="11" />
+      <path d="M4 7h4l3 4 4-7 5 5" />
     </svg>
   );
 }
