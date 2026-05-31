@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { type Lang, type GeoKey, type SafetyMargin, COPY, fmtC, pureSavings } from "./plan-data";
+import { type Lang, type GeoKey, type SafetyMargin, COPY, fmtC } from "./plan-data";
 
 function useCountUp(target: number, duration = 1.2) {
   const [display, setDisplay] = React.useState(0);
@@ -26,31 +26,30 @@ import React from "react";
 export function SafetyMarginSection({
   lang,
   geo,
-  investable,
-  salaryGrowth,
-  yearsToRetire,
+  totalPile,
   retirementTarget,
   safety,
+  yearsToRetire,
+  monthlySaved,
 }: {
   lang: Lang;
   geo: GeoKey;
-  investable: number;
-  salaryGrowth: number;
-  yearsToRetire: number;
+  totalPile: number;
   retirementTarget: number;
   safety: SafetyMargin;
+  yearsToRetire: number;
+  monthlySaved: number;
 }) {
   const C = COPY.safetyMargin[lang];
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
-  const sav100 = pureSavings(investable * (100 / 30), salaryGrowth, yearsToRetire); // if they saved 100%
-  const sav30 = pureSavings(investable, salaryGrowth, yearsToRetire);
-
-  const s100Display = useCountUp(sav100, 1.0);
-  const s30Display = useCountUp(sav30, 1.0);
+  const pileDisplay = useCountUp(totalPile, 1.0);
   const needDisplay = useCountUp(retirementTarget, 1.0);
   const scoreDisplay = useCountUp(safety.score, 1.2);
+
+  const gap = retirementTarget - totalPile;
+  const gapDisplay = useCountUp(Math.abs(gap), 1.0);
 
   const levelColors: Record<string, string> = {
     critical: "var(--bear)",
@@ -61,46 +60,103 @@ export function SafetyMarginSection({
   };
   const col = levelColors[safety.level] || "var(--muted)";
 
+  const maxBar = Math.max(totalPile, retirementTarget, 1);
+  const pileW = (totalPile / maxBar) * 100;
+  const needW = (retirementTarget / maxBar) * 100;
+
   return (
-    <section ref={ref} className="plan-v3-section" id="plan-safety">
+    <section ref={ref} className="plan-v3-section" id="plan-safety" style={{ marginTop: 40 }}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        style={{ marginBottom: 40 }}
+        style={{ marginBottom: 32 }}
       >
         <div className="plan-v3-overline">{C.overline}</div>
         <h2 className="plan-v3-h2">{C.h2}</h2>
         <p className="plan-v3-body">{C.body}</p>
       </motion.div>
 
-      {/* Three comparison cards */}
+      {/* Two-bar comparison */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.7, delay: 0.1 }}
-        className="plan-v3-gap-grid"
         style={{ marginBottom: 28 }}
       >
-        {[
-          { label: C.save100L, val: s100Display, color: "var(--muted)" },
-          { label: C.save30L, val: s30Display, color: "var(--caution)" },
-          { label: C.needL, val: needDisplay, color: "var(--ink)" },
-        ].map((item) => (
-          <div key={item.label} className="plan-v3-gap-card" style={{ textAlign: "center" }}>
-            <div className="plan-v3-stat-label" style={{ fontSize: "var(--text-micro)" }}>{item.label}</div>
-            <div className="plan-v3-stat-num" style={{ color: item.color, fontSize: "var(--text-display)" }}>
-              {fmtC(item.val, geo)}
+        <div
+          style={{
+            background: "var(--bg-raised)",
+            border: "1px solid var(--line)",
+            padding: "20px 16px 16px",
+          }}
+        >
+          {/* Your Pile */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+              <span className="plan-v3-stat-label">{C.pileL}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--tech)" }}>
+                {fmtC(pileDisplay, geo)}
+              </span>
+            </div>
+            <div style={{ height: 12, background: "var(--bg)", width: "100%" }}>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={inView ? { width: `${pileW}%` } : {}}
+                transition={{ duration: 1.0, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                style={{ height: "100%", background: "var(--tech)", opacity: 0.8 }}
+              />
             </div>
           </div>
-        ))}
+
+          {/* What You Need */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+              <span className="plan-v3-stat-label">{C.needL}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink)" }}>
+                {fmtC(needDisplay, geo)}
+              </span>
+            </div>
+            <div style={{ height: 12, background: "var(--bg)", width: "100%" }}>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={inView ? { width: `${needW}%` } : {}}
+                transition={{ duration: 1.0, delay: 0.45, ease: [0.23, 1, 0.32, 1] }}
+                style={{ height: "100%", background: "var(--ink)", opacity: 0.3 }}
+              />
+            </div>
+          </div>
+
+          {/* Gap */}
+          <div
+            style={{
+              borderTop: "1px solid var(--line)",
+              paddingTop: 12,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+            }}
+          >
+            <span className="plan-v3-stat-label">{C.gapL}</span>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-display)",
+                fontWeight: 700,
+                color: gap > 0 ? "var(--bear)" : "var(--bull)",
+              }}
+            >
+              {gap > 0 ? C.shortBy(fmtC(gapDisplay, geo)) : C.surplus(fmtC(gapDisplay, geo))}
+            </span>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Safety margin score */}
+      {/* Safety score */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={inView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.7, delay: 0.25 }}
+        transition={{ duration: 0.7, delay: 0.35 }}
         className="plan-v3-readiness-card"
         style={{ borderColor: `color-mix(in srgb, ${col} 30%, var(--line))` }}
       >
@@ -116,7 +172,7 @@ export function SafetyMarginSection({
             style={{ background: col }}
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(100, Math.max(0, scoreDisplay))}%` }}
-            transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1], delay: 0.4 }}
+            transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1], delay: 0.5 }}
           />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
@@ -129,17 +185,29 @@ export function SafetyMarginSection({
         </p>
       </motion.div>
 
-      {/* Buffer note */}
+      {/* Context notes */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="plan-v3-callout"
-        style={{ marginTop: 16, textAlign: "left", maxWidth: "none" }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        style={{ marginTop: 20 }}
       >
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--dim)", lineHeight: 1.5, margin: 0 }}>
-          {C.bufferNote}
-        </p>
+        <div className="plan-v3-callout" style={{ textAlign: "left", maxWidth: "none", marginBottom: 12 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--dim)", lineHeight: 1.5, margin: 0 }}>
+            {C.bufferNote}
+          </p>
+        </div>
+
+        {gap > 0 && (
+          <div className="plan-v3-callout" style={{ textAlign: "left", maxWidth: "none", borderColor: "var(--caution)" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-micro)", color: "var(--caution)", lineHeight: 1.5, margin: 0 }}>
+              {C.onlySave}
+            </p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", color: "var(--dim)", lineHeight: 1.5, margin: "6px 0 0" }}>
+              {C.yearsLeft(yearsToRetire)}
+            </p>
+          </div>
+        )}
       </motion.div>
     </section>
   );

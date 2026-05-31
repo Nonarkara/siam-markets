@@ -238,3 +238,20 @@ export interface DataSource {
   url: string;
   freshness: DataFreshness;
 }
+
+// Completed simulator trade persisted to Firestore (analytics). Shape per
+// src/lib/firebase/tradeService.ts.
+export interface Trade {
+  id: string;
+  ticker: string;
+  entryPrice: number;
+  exitPrice: number;
+  shares: number;
+  type: string;
+  status: string;
+  entryTime: string;
+  exitTime: string;
+  pnl: number;
+  pnlPct: number;
+  reason: string;
+}

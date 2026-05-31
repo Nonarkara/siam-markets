@@ -2,8 +2,10 @@
 
 import { usePlanState } from "@/components/Plan/use-plan-state";
 import { PlanControls } from "@/components/Plan/PlanControls";
-import { PlanHero, TimeAnchorSection, MaslowPyramidSection, SalaryFlowSection } from "@/components/Plan/plan-sections";
+import { PlanHero, TimeAnchorSection } from "@/components/Plan/plan-sections";
 import { EarningsProjectionSection } from "@/components/Plan/EarningsProjectionSection";
+import { SavingsPileSection } from "@/components/Plan/SavingsPileSection";
+import { RetirementNeedsSection } from "@/components/Plan/RetirementNeedsSection";
 import { SafetyMarginSection } from "@/components/Plan/SafetyMarginSection";
 import { AssetAllocatorSection } from "@/components/Plan/AssetAllocatorSection";
 import { AgeLens } from "@/components/Plan/AgeLens";
@@ -12,11 +14,11 @@ export default function PlanPage() {
   const s = usePlanState();
 
   const STEPS = [
-    { id: 0, label: "THE CYCLE" },
-    { id: 1, label: "IDENTITY" },
-    { id: 2, label: "CASHFLOW" },
-    { id: 3, label: "TARGET" },
-    { id: 4, label: "ALLOCATE" }
+    { id: 0, label: "START" },
+    { id: 1, label: "YOU" },
+    { id: 2, label: "MONEY" },
+    { id: 3, label: "NEEDS" },
+    { id: 4, label: "INVEST" }
   ];
 
   return (
@@ -108,17 +110,6 @@ export default function PlanPage() {
          
          {s.step === 2 && (
            <div style={{ maxWidth: 860, margin: "0 auto", width: "100%", paddingBottom: 64 }}>
-              <SalaryFlowSection
-                lang={s.lang}
-                geo={s.geo}
-                salary={s.salary}
-                salaryGrowth={s.salaryGrowth}
-                living={s.living}
-                transport={s.transport}
-                other={s.other}
-                yearsToRetire={s.yearsToRetire}
-                retirementTarget={s.retirementTarget}
-              />
               <EarningsProjectionSection
                 lang={s.lang}
                 geo={s.geo}
@@ -131,26 +122,42 @@ export default function PlanPage() {
                 earningsStable={s.earningsStable}
                 investable={s.investable}
               />
+              <SavingsPileSection
+                lang={s.lang}
+                geo={s.geo}
+                salary={s.salary}
+                salaryGrowth={s.salaryGrowth}
+                yearsToRetire={s.yearsToRetire}
+                savingsRate={s.savingsRate}
+                monthlySaved={s.monthlySaved}
+                currentSavings={s.currentSavings}
+                totalPile={s.totalPile}
+                savingsSnaps={s.savingsSnaps}
+                earningsStable={s.earningsStable}
+              />
            </div>
          )}
          
          {s.step === 3 && (
            <div style={{ maxWidth: 860, margin: "0 auto", width: "100%", paddingBottom: 64 }}>
-              <MaslowPyramidSection
+              <RetirementNeedsSection
                 lang={s.lang}
                 geo={s.geo}
-                needs={s.needs}
-                retireAge={s.retireAge}
-                lifeExp={s.geoConfig.lifeExp}
+                activeNeedsMonthly={s.activeNeedsMonthly}
+                healthcareMonthly={s.healthcareMonthly}
+                mortgageMonthly={s.mortgageMonthly}
+                retirementMonthlyNeed={s.retirementMonthlyNeed}
+                retirementTarget={s.retirementTarget}
+                yearsPostRetire={s.yearsPostRetire}
               />
               <SafetyMarginSection
                 lang={s.lang}
                 geo={s.geo}
-                investable={s.investable}
-                salaryGrowth={s.salaryGrowth}
-                yearsToRetire={s.yearsToRetire}
+                totalPile={s.totalPile}
                 retirementTarget={s.retirementTarget}
                 safety={s.safety}
+                yearsToRetire={s.yearsToRetire}
+                monthlySaved={s.monthlySaved}
               />
            </div>
          )}

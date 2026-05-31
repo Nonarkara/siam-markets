@@ -15,6 +15,7 @@ import {
   pureSavings,
   investAccum,
   fmtC,
+  inflatedNeed,
   calculateScenarios,
   safetyMargin as calcSafetyMargin,
 } from "./plan-data";
@@ -39,12 +40,16 @@ export function usePlanState() {
   const [jobStability, setJobStability] = useState(3);
   const [alloc, setAlloc] = useState<Allocation6>(DEFAULT_ALLOC_6);
   const [needs, setNeeds] = useState<Record<number, NeedState>>({
-    1: { active: false, monthly: GEOS.th.defaultNeeds[0] },
-    2: { active: false, monthly: GEOS.th.defaultNeeds[1] },
+    1: { active: true, monthly: GEOS.th.defaultNeeds[0] },
+    2: { active: true, monthly: GEOS.th.defaultNeeds[1] },
     3: { active: false, monthly: GEOS.th.defaultNeeds[2] },
     4: { active: false, monthly: GEOS.th.defaultNeeds[3] },
     5: { active: false, monthly: GEOS.th.defaultNeeds[4] },
   });
+  const [savingsRate, setSavingsRate] = useState(0.30);
+  const [currentSavings, setCurrentSavings] = useState(0);
+  const [healthcareMonthly, setHealthcareMonthly] = useState(3000);
+  const [mortgageMonthly, setMortgageMonthly] = useState(0);
 
   // Reset defaults when geo changes
   const prevGeo = useRef<GeoKey>(geo);
@@ -61,9 +66,13 @@ export function usePlanState() {
     setInvestStyle(null);
     setJobStability(3);
     setAlloc(DEFAULT_ALLOC_6);
+    setSavingsRate(0.30);
+    setCurrentSavings(0);
+    setHealthcareMonthly(Math.round(g.defaultNeeds[1] * 0.6));
+    setMortgageMonthly(0);
     setNeeds({
-      1: { active: false, monthly: g.defaultNeeds[0] },
-      2: { active: false, monthly: g.defaultNeeds[1] },
+      1: { active: true, monthly: g.defaultNeeds[0] },
+      2: { active: true, monthly: g.defaultNeeds[1] },
       3: { active: false, monthly: g.defaultNeeds[2] },
       4: { active: false, monthly: g.defaultNeeds[3] },
       5: { active: false, monthly: g.defaultNeeds[4] },
@@ -76,6 +85,7 @@ export function usePlanState() {
   const yearsPostRetire = Math.max(5, g.lifeExp - retireAge);
   const totalExpenses = living + transport + other;
   const investable = Math.max(0, salary - totalExpenses);
+  const monthlySaved = Math.min(salary * savingsRate, investable > 0 ? investable : salary * savingsRate);
   const stabilityFactor = JOB_STABILITY[jobStability - 1]?.factor ?? 0.88;
 
   // Earnings projection over working life
@@ -107,16 +117,40 @@ export function usePlanState() {
     [needs]
   );
 
+  const retirementMonthlyNeed = useMemo(() => {
+    const baseNeeds = activeNeedsMonthly > 0 ? activeNeedsMonthly : g.defaultNeeds[0] + g.defaultNeeds[1];
+    return baseNeeds + healthcareMonthly + mortgageMonthly;
+  }, [activeNeedsMonthly, healthcareMonthly, mortgageMonthly, g.defaultNeeds]);
+
   const retirementTarget = useMemo(() => {
-    if (activeNeedsMonthly > 0) {
-      return activeNeedsMonthly * 12 * yearsPostRetire;
-    }
-    return g.retireRef;
-  }, [activeNeedsMonthly, yearsPostRetire, g.retireRef]);
+    // Inflation-adjusted retirement need: costs grow each year of retirement
+    const infl = MED_INFLATION[geo];
+    return inflatedNeed(retirementMonthlyNeed * 12, infl, yearsPostRetire);
+  }, [retirementMonthlyNeed, yearsPostRetire, geo]);
 
   const savingsTotal = useMemo(
-    () => pureSavings(investable, salaryGrowth, yearsToRetire),
-    [investable, salaryGrowth, yearsToRetire]
+    () => pureSavings(monthlySaved, salaryGrowth, yearsToRetire),
+    [monthlySaved, salaryGrowth, yearsToRetire]
+  );
+
+  const totalPile = useMemo(
+    () => currentSavings + savingsTotal,
+    [currentSavings, savingsTotal]
+  );
+
+  const savingsSnaps = useMemo(
+    () => {
+      const s = [currentSavings];
+      let total = currentSavings;
+      let m = monthlySaved;
+      for (let y = 0; y < yearsToRetire; y++) {
+        total += m * 12;
+        m *= 1 + salaryGrowth;
+        s.push(total);
+      }
+      return s;
+    },
+    [currentSavings, monthlySaved, salaryGrowth, yearsToRetire]
   );
 
   const projectedFinal = useMemo(() => {
@@ -170,9 +204,13 @@ export function usePlanState() {
     setInvestStyle(null);
     setJobStability(3);
     setAlloc(DEFAULT_ALLOC_6);
+    setSavingsRate(0.30);
+    setCurrentSavings(0);
+    setHealthcareMonthly(Math.round(gg.defaultNeeds[1] * 0.6));
+    setMortgageMonthly(0);
     setNeeds({
-      1: { active: false, monthly: gg.defaultNeeds[0] },
-      2: { active: false, monthly: gg.defaultNeeds[1] },
+      1: { active: true, monthly: gg.defaultNeeds[0] },
+      2: { active: true, monthly: gg.defaultNeeds[1] },
       3: { active: false, monthly: gg.defaultNeeds[2] },
       4: { active: false, monthly: gg.defaultNeeds[3] },
       5: { active: false, monthly: gg.defaultNeeds[4] },
@@ -207,18 +245,31 @@ export function usePlanState() {
     setJobStability,
     alloc,
     setAlloc,
+    // state
+    savingsRate,
+    setSavingsRate,
+    currentSavings,
+    setCurrentSavings,
+    healthcareMonthly,
+    setHealthcareMonthly,
+    mortgageMonthly,
+    setMortgageMonthly,
     // derived
     yearsToRetire,
     yearsPostRetire,
     totalExpenses,
     investable,
+    monthlySaved,
     stabilityFactor,
     earningsRaw,
     earningsReal,
     earningsStable,
     activeNeedsMonthly,
+    retirementMonthlyNeed,
     retirementTarget,
     savingsTotal,
+    totalPile,
+    savingsSnaps,
     projectedFinal,
     readiness,
     deficit,

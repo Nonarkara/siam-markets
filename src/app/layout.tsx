@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { BottomNav } from "@/components/Nav/BottomNav";
 import { TopNav } from "@/components/Nav/TopNav";
 import { LegalFooter } from "@/components/LegalFooter";
 import { LangProvider } from "@/lib/i18n/useLang";
 import { THEME_INIT_SCRIPT } from "@/components/Theme/ThemeToggle";
+import { AnalyticsObserver } from "@/components/AnalyticsObserver";
 
 export const metadata: Metadata = {
   title: "DayTraders — Your Money, Visualized",
@@ -31,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <LangProvider>
+          <Suspense fallback={null}><AnalyticsObserver /></Suspense>
           <div className="lg-only">
             <TopNav />
           </div>
